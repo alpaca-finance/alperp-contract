@@ -1,0 +1,77 @@
+{
+  "Tokens": {
+    "ALPACA": "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F",
+    "ALP": "0xE14B9f9C6aA1a941E74C1D56b0d399934eE35CA1",
+    "ETH": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+    "WBNB": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+    "BTCB": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
+    "DAI": "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
+    "USDC": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+    "USDT": "0x55d398326f99059fF775485246999027B3197955",
+    "BUSD": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
+  },
+  "ThirdParty": {
+    "Oracle": {
+      "Pyth": {
+        "address": "0x4D7E825f80bDf85e913E0DD2A2D54927e9dE1594",
+        "priceIDs": {
+          "BTCB": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43",
+          "WBNB": "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f",
+          "DAI": "0xb0948a5e5313200c632b51bb5ca32f6de0d36e9950a942d19751e833f70dabfd",
+          "BUSD": "0x5bc91f13e412c07599167bae86f07543f076a638962b8d6017ec19dab4a82814"
+        }
+      }
+    }
+  },
+  "PoolRouter": "0xc8e5f1F69DEa9c82d09E70FeCe05B7a72169b0fd",
+  "WNativeRelayer": "0xE1D2CA01bc88F325fF7266DD2165944f3CAf0D3D",
+  "Pools": {
+    "ALP": {
+      "poolDiamond": "0x0d389aa093AD69443cD2B342Ed3a4A8225efE857",
+      "pythPriceFeed": "0x67972120E4A3c377C40E524010a67D41Fc1ca1ab",
+      "oracle": "0x746a651bE7f3326625201E3703103B5786496F48",
+      "orderbook": "0x238B44242c6C2aEF83ed5BFAdF35802Ae3e07F6D",
+      "facets": {
+        "admin": "0x8c14A7ECEB9e0a4523B2cD10036d9d7a1BB0d601",
+        "accessControl": "0x5890F76dd9444b2fc06e2F660BD85af85D335012",
+        "farm": "0x966531295228B34B959736DFeC52eD558222F4Af",
+        "diamondCut": "0x0a2b42136DE6bac24eceeAA798eF1381a9Af4E3f",
+        "diamondLoupe": "0x5024F7F7b5b17f7bc2AEB53631B133Bc381b4b29",
+        "liquidity": "0x4f6A325F692Dd952798bAC9E5e00f66007db1503",
+        "fundingRate": "0xD160fb905252C8811110aBb0E4022c1aCe8Dcad2",
+        "getter": "0x2E00E7E624114Cf7250C7c5F6083F833410482Bc",
+        "ownership": "0x5e9C160fD0E47C34f9818297E390D836b69D5A1d",
+        "perpTrade": "0xB07F214b06Ae3e40836307d9a0b350c764A46018",
+        "diamondInitializer": "0xd280FbD35203E3825D696d13faC91851d1849045",
+        "poolConfigInitializer": "0x318dc61cc0A167bd3c1F8B821E1EafC3f93Eda6E",
+        "accessControlInitializer": "0x388F2b701F4dCdE99bA71a78417E66C26D633A5e"
+      }
+    }
+  },
+  "Staking": {
+    "ALPStaking": {
+      "address": "0x011dD4F821546524118771833aBc39F46875F008",
+      "rewarders": [
+        {
+          "name": "ALP Staking Protocol Revenue",
+          "address": "0x0e19d8Ec7b5bb1214802f6D1F600D81FBFB9224F",
+          "rewardToken": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
+        },
+        {
+          "name": "ALP Staking ALPACA Emission",
+          "address": "0x6C1Aa4C1D890F592A059A8FCFEc45F1cfc6C9dec",
+          "rewardToken": "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F"
+        }
+      ]
+    },
+    "RewardDistributor": {
+      "address": "",
+      "deployedAtBlock": ""
+    }
+  },
+  "MerkleAirdrop": {
+    "address": "",
+    "deployedAtBlock": ""
+  },
+  "TimelockController": ""
+}
