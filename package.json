@@ -147,6 +147,7 @@
     "deploy:mainnet:staking:set_reward_distributor_feeder": "npx hardhat --network mainnet deploy --no-compile --reset --tags SetRewardDistributorFeeder",
     "deploy:mainnet:oracle:enable_secondary_price_feed": "npx hardhat --network mainnet deploy --no-compile --reset --tags EnableSecondaryPriceFeed",
     "deploy:mainnet:misc:wnative_relayer_set_caller_ok": "npx hardhat --network mainnet deploy --no-compile --reset --tags WNativeRelayerSetCallerOK",
+    "deploy:mainnet:oracle:upgrade_pyth_price_feed": "npx hardhat --network tenderly deploy --no-compile --reset --tags UpgradePythPriceFeed",
     "----------Script Tenderly Fork & Non Configuration Update-------------": "----------Simulate Tenderly Fork-------------",
     "script:tenderly:simulate_add_liquidity": "hardhat --network tenderly invoke:simulate_add_liquidity",
     "script:tenderly:simulate_open_position": "hardhat --network tenderly invoke:simulate_open_position",

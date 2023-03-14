@@ -116,6 +116,8 @@ contract PythPriceFeed is
     emit SetUpdater(_account, _isActive);
   }
 
+
+
   /// @notice A function for updating prices based on price update data
   /// @param _priceUpdateData - price update data
   function updatePrices(bytes[] memory _priceUpdateData)
@@ -148,11 +150,10 @@ contract PythPriceFeed is
   /// @dev ref price is injected via priceOracle (primary price feeder)
   /// @param _token - a token address
   /// @param _referencePrice - a reference price
-  /// @param _maximise - a boolean indicating whether we should maximise the price or not
   function getPrice(
     address _token,
     uint256 _referencePrice,
-    bool _maximise
+    bool /*_maximise*/
   ) external view returns (uint256) {
     if (favorRefPrice) {
       return _referencePrice;
@@ -169,14 +170,7 @@ contract PythPriceFeed is
       uint256 tokenDecimals = _price.expo < 0
         ? (10**int256(-_price.expo).toUint256())
         : 10**int256(_price.expo).toUint256();
-      if (_maximise) {
-        return
-          ((int256(_price.price) + uint256(_price.conf).toInt256())
-            .toUint256() * PRICE_PRECISION) / tokenDecimals;
-      }
-      return
-        ((int256(_price.price) - uint256(_price.conf).toInt256()).toUint256() *
-          PRICE_PRECISION) / tokenDecimals;
+      return ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
     } catch {
       // if some problem occurred (e.g. price is older than maxPriceAge), return reference price from primary source
       return _referencePrice;
