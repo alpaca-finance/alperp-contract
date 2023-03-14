@@ -6,7 +6,7 @@ import { getImplementationAddress } from "@openzeppelin/upgrades-core";
 
 const config = getConfig();
 
-const TARGET_ADDRESS = config.Pools.ALP.oracle;
+const TARGET_ADDRESS = config.Pools.ALP.pythPriceFeed;
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];
