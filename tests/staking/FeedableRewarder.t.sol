@@ -12,7 +12,7 @@ Alpaca Fin Corporation
 */
 pragma solidity 0.8.17;
 
-import {FeedableRewarder} from "../../staking/FeedableRewarder.sol";
+import {FeedableRewarder} from "src/staking/FeedableRewarder.sol";
 import {BaseTest} from "../base/BaseTest.sol";
 import {MockErc20} from "../mocks/MockERC20.sol";
 import {MockSimpleStaking} from "../mocks/MockSimpleStaking.sol";

@@ -19,7 +19,7 @@ import { console } from "../utils/console.sol";
 import { stdError } from "../utils/stdError.sol";
 import { math } from "../utils/math.sol";
 
-import { MintableTokenInterface } from "../../interfaces/MintableTokenInterface.sol";
+import { MintableTokenInterface } from "src/interfaces/MintableTokenInterface.sol";
 
 import { MockErc20 } from "../mocks/MockERC20.sol";
 import { MockWNative } from "../mocks/MockWNative.sol";
@@ -28,47 +28,47 @@ import { MockDonateVault } from "../mocks/MockDonateVault.sol";
 import { MockFlashLoanBorrower } from "../mocks/MockFlashLoanBorrower.sol";
 import { MockStrategy } from "../mocks/MockStrategy.sol";
 
-import { PoolOracle } from "../../core/PoolOracle.sol";
-import { ALP } from "../../tokens/ALP.sol";
+import { PoolOracle } from "src/core/PoolOracle.sol";
+import { ALP } from "src/tokens/ALP.sol";
 import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import { IPool } from "../../interfaces/IPool.sol";
+import { IPool } from "src/interfaces/IPool.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // Diamond things
 // Libs
-import { LibPoolConfigV1 } from "../../core/pool-diamond/libraries/LibPoolConfigV1.sol";
+import { LibPoolConfigV1 } from "src/core/pool-diamond/libraries/LibPoolConfigV1.sol";
 // Facets
-import { DiamondCutFacet, DiamondCutInterface } from "../../core/pool-diamond/facets/DiamondCutFacet.sol";
-import { DiamondLoupeFacet } from "../../core/pool-diamond/facets/DiamondLoupeFacet.sol";
-import { OwnershipFacet, OwnershipFacetInterface } from "../../core/pool-diamond/facets/OwnershipFacet.sol";
-import { GetterFacet, GetterFacetInterface } from "../../core/pool-diamond/facets/GetterFacet.sol";
-import { FundingRateFacet, FundingRateFacetInterface } from "../../core/pool-diamond/facets/FundingRateFacet.sol";
-import { LiquidityFacet, LiquidityFacetInterface } from "../../core/pool-diamond/facets/LiquidityFacet.sol";
-import { PerpTradeFacet, PerpTradeFacetInterface } from "../../core/pool-diamond/facets/PerpTradeFacet.sol";
-import { AdminFacet, AdminFacetInterface } from "../../core/pool-diamond/facets/AdminFacet.sol";
-import { FarmFacet, FarmFacetInterface } from "../../core/pool-diamond/facets/FarmFacet.sol";
-import { AccessControlFacet, AccessControlFacetInterface } from "../../core/pool-diamond/facets/AccessControlFacet.sol";
+import { DiamondCutFacet, DiamondCutInterface } from "src/core/pool-diamond/facets/DiamondCutFacet.sol";
+import { DiamondLoupeFacet } from "src/core/pool-diamond/facets/DiamondLoupeFacet.sol";
+import { OwnershipFacet, OwnershipFacetInterface } from "src/core/pool-diamond/facets/OwnershipFacet.sol";
+import { GetterFacet, GetterFacetInterface } from "src/core/pool-diamond/facets/GetterFacet.sol";
+import { FundingRateFacet, FundingRateFacetInterface } from "src/core/pool-diamond/facets/FundingRateFacet.sol";
+import { LiquidityFacet, LiquidityFacetInterface } from "src/core/pool-diamond/facets/LiquidityFacet.sol";
+import { PerpTradeFacet, PerpTradeFacetInterface } from "src/core/pool-diamond/facets/PerpTradeFacet.sol";
+import { AdminFacet, AdminFacetInterface } from "src/core/pool-diamond/facets/AdminFacet.sol";
+import { FarmFacet, FarmFacetInterface } from "src/core/pool-diamond/facets/FarmFacet.sol";
+import { AccessControlFacet, AccessControlFacetInterface } from "src/core/pool-diamond/facets/AccessControlFacet.sol";
 
-import { LibAccessControl } from "../../core/pool-diamond/libraries/LibAccessControl.sol";
-import { DiamondInitializer } from "../../core/pool-diamond/initializers/DiamondInitializer.sol";
-import { PoolConfigInitializer } from "../../core/pool-diamond/initializers/PoolConfigInitializer.sol";
-import { AccessControlInitializer } from "../../core/pool-diamond/initializers/AccessControlInitializer.sol";
-import { PoolDiamond } from "../../core/pool-diamond/PoolDiamond.sol";
-import { AlpacaVaultFarmStrategy } from "../../core/AlpacaVaultFarmStrategy.sol";
+import { LibAccessControl } from "src/core/pool-diamond/libraries/LibAccessControl.sol";
+import { DiamondInitializer } from "src/core/pool-diamond/initializers/DiamondInitializer.sol";
+import { PoolConfigInitializer } from "src/core/pool-diamond/initializers/PoolConfigInitializer.sol";
+import { AccessControlInitializer } from "src/core/pool-diamond/initializers/AccessControlInitializer.sol";
+import { PoolDiamond } from "src/core/pool-diamond/PoolDiamond.sol";
+import { AlpacaVaultFarmStrategy } from "src/core/AlpacaVaultFarmStrategy.sol";
 
-import { PoolRouter03 } from "../../core/pool-diamond/PoolRouter03.sol";
-import { Orderbook02 } from "../../core/pool-diamond/limit-orders/Orderbook02.sol";
+import { PoolRouter03 } from "src/core/pool-diamond/PoolRouter03.sol";
+import { Orderbook02 } from "src/core/pool-diamond/limit-orders/Orderbook02.sol";
 
-import { MarketOrderRouter } from "../../core/pool-diamond/market-orders/MarketOrderRouter.sol";
+import { MarketOrderRouter } from "src/core/pool-diamond/market-orders/MarketOrderRouter.sol";
 
-import { MockWNative } from "src/tests/mocks/MockWNative.sol";
+import { MockWNative } from "../mocks/MockWNative.sol";
 
-import { MockWNativeRelayer } from "src/tests/mocks/MockWNativeRelayer.sol";
-import { FastPriceFeed } from "../../core/FastPriceFeed.sol";
-import { PythPriceFeed } from "../../core/PythPriceFeed.sol";
+import { MockWNativeRelayer } from "../mocks/MockWNativeRelayer.sol";
+import { FastPriceFeed } from "src/core/FastPriceFeed.sol";
+import { PythPriceFeed } from "src/core/PythPriceFeed.sol";
 
-import { MerkleAirdrop } from "../../airdrop/MerkleAirdrop.sol";
-import { RewardDistributor } from "../../staking/RewardDistributor.sol";
+import { MerkleAirdrop } from "src/airdrop/MerkleAirdrop.sol";
+import { RewardDistributor } from "src/staking/RewardDistributor.sol";
 
 import { MockPyth as FakePyth } from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
 

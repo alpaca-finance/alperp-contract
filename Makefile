@@ -6,7 +6,7 @@ export FOUNDRY_FORK_BLOCK_NUMBER=22558708
 
 
 test-integration: node_modules
-	@forge test -vvv --ffi -c src/tests/integrations
+	@forge test -vvv --ffi -c tests/integrations
 
 .PHONY: config
 config:

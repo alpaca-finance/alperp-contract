@@ -12,7 +12,7 @@ Alpaca Fin Corporation
 */
 pragma solidity 0.8.17;
 
-import "../../staking/interfaces/IRewarder.sol";
+import "src/staking/interfaces/IRewarder.sol";
 
 contract MockRewarder is IRewarder {
     function name() external view returns (string memory) {}
