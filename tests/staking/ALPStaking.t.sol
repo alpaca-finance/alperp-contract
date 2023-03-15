@@ -12,7 +12,7 @@ Alpaca Fin Corporation
 */
 pragma solidity 0.8.17;
 
-import { ALPStaking } from "../../staking/ALPStaking.sol";
+import { ALPStaking } from "src/staking/ALPStaking.sol";
 import { BaseTest } from "../base/BaseTest.sol";
 import { MockErc20 } from "../mocks/MockERC20.sol";
 import { MockRewarder } from "../mocks/MockRewarder.sol";

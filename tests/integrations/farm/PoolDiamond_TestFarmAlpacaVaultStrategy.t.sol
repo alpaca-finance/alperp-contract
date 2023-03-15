@@ -311,7 +311,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // 4. removing liquidity
     IERC20(address(alp)).approve(address(poolRouter), 100000 ether);
 
-    uint256 receivedAmount = poolRouter.removeLiquidity(
+    poolRouter.removeLiquidity(
       address(wbtc),
       100000 ether, // liquidity,
       address(this),
@@ -758,7 +758,9 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // AUMs = wbtc aum + busd aum
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      9970 ether + (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+        9970 ether +
+        0.004434570082362653 ether +
+        (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
 
@@ -1148,8 +1150,10 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // AUMs = wbtc aum + busd aum
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      9970 ether + (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
-      math.roundUpE30(prices.wbtcMinPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
+        9970 ether +
+        0.004434570082362653 ether +
+        (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+      math.roundUpE30(prices.wbtcMaxPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
 
     // wbtc's AUM = 100952.373064013598578951 + short position loss
@@ -1252,12 +1256,19 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
       assertEq(position.size, 10 * PRICE_PRECISION);
     }
 
-    // AUMs = wbtc aum + busd aum
-    // this min price is the same as average price, hence no position delta included
-    // 100929.994007421680874228 + 9970.00221726816777057
+    // wbtc's AUM = 100929.994007262622089557 + short position loss
+    // = 100929.994007262622089557 + ((priceDelta * shortSize) / shortAvgPrice)
+    // = 100929.994007262622089557 + ((4.488 * 10) / 20240.97)
+    // = 100929.994007262622089557 + 0.002217285041181326
+    // getAUM, regardless of true of false, when it comes to short delta, we will always use the max price
+    // busd's AUM = 9970.00221726816777057
+    // AUM = sum of each token AUM
+    // = (100929.994007262622089557 + 0.002217285041181326) + 9970.00221726816777057
+
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
       9970.00221726816777057 ether +
+        0.002217285041181326 ether +
         (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
