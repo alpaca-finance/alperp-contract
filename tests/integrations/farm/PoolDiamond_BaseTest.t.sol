@@ -14,39 +14,39 @@ pragma solidity 0.8.17;
 
 import { BaseTest } from "../base/BaseTest.sol";
 import { console } from "../../utils/console.sol";
-import { PoolDiamond } from "../../../core/pool-diamond/PoolDiamond.sol";
+import { PoolDiamond } from "src/core/pool-diamond/PoolDiamond.sol";
 import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import { PoolOracle } from "../../../core/PoolOracle.sol";
-import { PoolRouter03 } from "../../../core/pool-diamond/PoolRouter03.sol";
-import { DiamondLoupeFacet } from "../../../core/pool-diamond/facets/DiamondLoupeFacet.sol";
-import { OwnershipFacet, OwnershipFacetInterface } from "../../../core/pool-diamond/facets/OwnershipFacet.sol";
-import { GetterFacet, GetterFacetInterface } from "../../../core/pool-diamond/facets/GetterFacet.sol";
-import { FundingRateFacet, FundingRateFacetInterface } from "../../../core/pool-diamond/facets/FundingRateFacet.sol";
-import { LiquidityFacet, LiquidityFacetInterface } from "../../../core/pool-diamond/facets/LiquidityFacet.sol";
-import { PerpTradeFacet, PerpTradeFacetInterface } from "../../../core/pool-diamond/facets/PerpTradeFacet.sol";
-import { AdminFacet, AdminFacetInterface } from "../../../core/pool-diamond/facets/AdminFacet.sol";
-import { FarmFacet, FarmFacetInterface } from "../../../core/pool-diamond/facets/FarmFacet.sol";
-import { AccessControlFacet, AccessControlFacetInterface } from "../../../core/pool-diamond/facets/AccessControlFacet.sol";
-import { DiamondInitializer } from "../../../core/pool-diamond/initializers/DiamondInitializer.sol";
-import { AccessControlInitializer } from "../../../core/pool-diamond/initializers/AccessControlInitializer.sol";
-import { PoolConfigInitializer } from "../../../core/pool-diamond/initializers/PoolConfigInitializer.sol";
-import { PythPriceFeed } from "../../../core/PythPriceFeed.sol";
+import { PoolOracle } from "src/core/PoolOracle.sol";
+import { PoolRouter03 } from "src/core/pool-diamond/PoolRouter03.sol";
+import { DiamondLoupeFacet } from "src/core/pool-diamond/facets/DiamondLoupeFacet.sol";
+import { OwnershipFacet, OwnershipFacetInterface } from "src/core/pool-diamond/facets/OwnershipFacet.sol";
+import { GetterFacet, GetterFacetInterface } from "src/core/pool-diamond/facets/GetterFacet.sol";
+import { FundingRateFacet, FundingRateFacetInterface } from "src/core/pool-diamond/facets/FundingRateFacet.sol";
+import { LiquidityFacet, LiquidityFacetInterface } from "src/core/pool-diamond/facets/LiquidityFacet.sol";
+import { PerpTradeFacet, PerpTradeFacetInterface } from "src/core/pool-diamond/facets/PerpTradeFacet.sol";
+import { AdminFacet, AdminFacetInterface } from "src/core/pool-diamond/facets/AdminFacet.sol";
+import { FarmFacet, FarmFacetInterface } from "src/core/pool-diamond/facets/FarmFacet.sol";
+import { AccessControlFacet, AccessControlFacetInterface } from "src/core/pool-diamond/facets/AccessControlFacet.sol";
+import { DiamondInitializer } from "src/core/pool-diamond/initializers/DiamondInitializer.sol";
+import { AccessControlInitializer } from "src/core/pool-diamond/initializers/AccessControlInitializer.sol";
+import { PoolConfigInitializer } from "src/core/pool-diamond/initializers/PoolConfigInitializer.sol";
+import { PythPriceFeed } from "src/core/PythPriceFeed.sol";
 
 import { MockPyth as FakePyth } from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
 
 import { IPyth } from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
-import { LibAccessControl } from "../../../core/pool-diamond/libraries/LibAccessControl.sol";
-import { LibPoolConfigV1 } from "../../../core/pool-diamond/libraries/LibPoolConfigV1.sol";
-import { ALP } from "../../../tokens/ALP.sol";
-import { IVault } from "../../../apis/alpaca/IVault.sol";
-import { AlpacaVaultFarmStrategy } from "../../../core/AlpacaVaultFarmStrategy.sol";
+import { LibAccessControl } from "src/core/pool-diamond/libraries/LibAccessControl.sol";
+import { LibPoolConfigV1 } from "src/core/pool-diamond/libraries/LibPoolConfigV1.sol";
+import { ALP } from "src/tokens/ALP.sol";
+import { IVault } from "src/apis/alpaca/IVault.sol";
+import { AlpacaVaultFarmStrategy } from "src/core/AlpacaVaultFarmStrategy.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import { ChainlinkPriceFeedInterface } from "../../../interfaces/ChainLinkPriceFeedInterface.sol";
+import { ChainlinkPriceFeedInterface } from "src/interfaces/ChainLinkPriceFeedInterface.sol";
 
 import { math } from "../../utils/math.sol";
 
-import { DiamondCutFacet, DiamondCutInterface } from "../../../core/pool-diamond/facets/DiamondCutFacet.sol";
+import { DiamondCutFacet, DiamondCutInterface } from "src/core/pool-diamond/facets/DiamondCutFacet.sol";
 
 contract PoolDiamond_BaseTest is BaseTest {
   struct PoolConfigConstructorParams {

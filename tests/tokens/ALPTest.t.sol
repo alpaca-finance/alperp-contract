@@ -14,7 +14,7 @@ Alpaca Fin Corporation
 pragma solidity >=0.8.4 <0.9.0;
 
 import { BaseTest } from "../base/BaseTest.sol";
-import { ALP } from "../../tokens/ALP.sol";
+import { ALP } from "src/tokens/ALP.sol";
 
 contract ALPTest is BaseTest {
   ALP internal alp;

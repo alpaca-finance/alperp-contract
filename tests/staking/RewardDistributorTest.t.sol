@@ -17,7 +17,7 @@ import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.s
 
 import { BaseTest, MerkleAirdrop } from "../base/BaseTest.sol";
 import { MockErc20 } from "../mocks/MockERC20.sol";
-import { RewardDistributor } from "../../staking/RewardDistributor.sol";
+import { RewardDistributor } from "src/staking/RewardDistributor.sol";
 import { MockFeedableRewarder } from "../mocks/MockFeedableRewarder.sol";
 import { MockPoolForRewardDistributor } from "../mocks/MockPoolForRewardDistributor.sol";
 import { MockPoolRouterForRewardDistributor } from "../mocks/MockPoolRouterForRewardDistributor.sol";

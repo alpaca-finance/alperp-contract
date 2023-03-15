@@ -10,7 +10,7 @@
     "build": "yarn run build:cjs",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "hardhat": "hardhat",
-    "test:unit": "forge test -vvv --ffi --no-match-path src/tests/**/integrations/*.t.sol --optimizer-runs 1 --optimize",
+    "test:unit": "forge test -vvv --ffi --no-match-path tests/**/integrations/*.t.sol --optimizer-runs 1 --optimize",
     "test:integration": "make test-integration",
     "----------Deploy Tenderly Fork-------------": "----------Deploy Tenderly Fork-------------",
     "deploy:tenderly:oracle:mock_chainlink_pricefeed": "hardhat --network tenderly deploy --no-compile --reset --tags MockChainlinkPriceFeed",
