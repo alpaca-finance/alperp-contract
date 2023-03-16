@@ -6,7 +6,7 @@ import { getConfig } from "../utils/config";
 
 const config = getConfig();
 
-const LIQUIDATORS = [""];
+const LIQUIDATORS = ["0xFef9d28767de30F4239B9b40Bc915919b0bcACe8"];
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];

@@ -10,8 +10,8 @@ const config = getConfig();
 const REWARDER = config.Staking.ALPStaking.rewarders.find(
   (each: any) => each.name === "ALP Staking ALPACA Emission"
 );
-const AMOUNT = "69000";
-const DURATION = "1209600"; // 2 weeks in seconds
+const AMOUNT = "10000";
+const DURATION = "604800";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   if (!REWARDER) {
@@ -24,19 +24,36 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deployer
   );
   const token = ERC20__factory.connect(REWARDER.rewardToken, deployer);
+  const symbol = await token.symbol();
   const decimals = await token.decimals();
-  await (
-    await token.approve(REWARDER.address, ethers.constants.MaxUint256)
-  ).wait();
+  const allowance = await token.allowance(deployer.address, REWARDER.address);
+
+  console.log(
+    `> Feeding ${AMOUNT} to ${
+      REWARDER.address
+    } ${await token.symbol()} for ${DURATION} seconds`
+  );
+
+  console.log(`> Checking allowance...`);
+  if (allowance.eq(0)) {
+    console.log(`> Allowance not set`);
+    console.log(`> Approving ${REWARDER.address} to spend ${symbol}`);
+    await (
+      await token.approve(REWARDER.address, ethers.constants.MaxUint256)
+    ).wait();
+  }
+  console.log(`> ✅ Done`);
+
   const tx = await rewarder.feed(
     ethers.utils.parseUnits(AMOUNT, decimals),
     BigNumber.from(DURATION),
     { gasLimit: 10000000 }
   );
-  const txReceipt = await tx.wait();
-  console.log(`Fed Rewarder: ${REWARDER.address}`);
-  console.log(`> Executed at: ${txReceipt.transactionHash}`);
-  console.log(`> ✅ Executed FeedALPACAEmissionRewarder`);
+  console.log(`> Tx is submitted: ${tx.hash}`);
+
+  console.log(`> Waiting for tx to be mined...`);
+  await tx.wait();
+  console.log(`> ✅ Done`);
 };
 
 export default func;
