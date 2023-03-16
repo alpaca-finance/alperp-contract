@@ -14,7 +14,7 @@ Alpaca Fin Corporation
 pragma solidity 0.8.17;
 
 import { BaseTest, console, PoolOracle } from "../../base/BaseTest.sol";
-import { ChainlinkPriceFeedInterface } from "../../../interfaces/ChainLinkPriceFeedInterface.sol";
+import { ChainlinkPriceFeedInterface } from "src/interfaces/ChainLinkPriceFeedInterface.sol";
 
 abstract contract PoolOracle_BaseTest is BaseTest {
   PoolOracle internal poolOracle;

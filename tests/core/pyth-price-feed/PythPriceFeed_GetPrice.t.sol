@@ -46,14 +46,8 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     uint256 tokenDecimals = _price.expo < 0
       ? (10**int256(-_price.expo).toUint256())
       : 10**int256(_price.expo).toUint256();
-    if (_maximise) {
-      return
-        ((int256(_price.price) + uint256(_price.conf).toInt256()).toUint256() *
+    return ((int256(_price.price)).toUint256() *
           PRICE_PRECISION) / tokenDecimals;
-    }
-    return
-      ((int256(_price.price) - uint256(_price.conf).toInt256()).toUint256() *
-        PRICE_PRECISION) / tokenDecimals;
   }
 
   function testCorrectness_WhenPriceIsOlderThanMaxPrice() external {
@@ -150,9 +144,8 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     assertEq(price, _convertPythPriceDataToTetherFormat(priceStruct, true));
     // Calculation correctness check
     // Price should be 28895911666 * 10**30 / 10**8 = 288959116660000000000000000000000
-    // With maximise = true, it should add confidence to the price
-    // 288959116660000000000000000000000 + (16436851 * 10**30 / 10**8) = 289123485170000000000000000000000
-    assertEq(price, 289123485170000000000000000000000);
+    // Omit maximize since conf can be very large, hence use only the price from pyth
+    assertEq(price, 288959116660000000000000000000000);
 
     // Incase of maximise = false, it should subtract confidence from the price
     price = pythPriceFeed.getPrice(address(bnb), refPrice, false);
@@ -161,9 +154,8 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     assertEq(price, _convertPythPriceDataToTetherFormat(priceStruct, false));
     // Calculation correctness check
     // Price should be 28895911666 * 10**30 / 10**8 = 288959116660000000000000000000000
-    // With maximise = true, it should add confidence to the price
-    // 288959116660000000000000000000000 - (16436851 * 10**30 / 10**8) = 288794748150000000000000000000000
-    assertEq(price, 288794748150000000000000000000000);
+    // Omit maximize since conf can be very large, hence use only the price from pyth
+    assertEq(price, 288959116660000000000000000000000);
   }
 
   function testCorrectness_WhenFavorRefPrice() external {

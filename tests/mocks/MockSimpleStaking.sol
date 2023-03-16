@@ -12,7 +12,7 @@ Alpaca Fin Corporation
 */
 pragma solidity 0.8.17;
 
-import {IRewarder} from "../../staking/interfaces/IRewarder.sol";
+import {IRewarder} from "src/staking/interfaces/IRewarder.sol";
 
 contract MockSimpleStaking {
     // does not related to ALPStaking

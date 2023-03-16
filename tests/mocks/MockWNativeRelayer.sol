@@ -16,7 +16,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-import "../../interfaces/IWNative.sol";
+import "src/interfaces/IWNative.sol";
 
 contract MockWNativeRelayer is Ownable, ReentrancyGuard {
   address private wnative;

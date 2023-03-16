@@ -209,7 +209,7 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     // 7. Redeemable WBTC in USD should be 93.7168 USD
     assertEq(
       poolGetterFacet.alp().balanceOf(address(ALICE)),
-      92573912195121951219
+      92573912195121951219 
     );
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 706);
     assertEq(poolGetterFacet.getAumE18(false), 93.7168 * 10**18);
@@ -407,11 +407,11 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
       // min price = 40k, max price = 41k, same as what primary oracle's latest answers
       PriceFeedData memory priceFeedDataStruct = PriceFeedData({
         id: WBTC_PRICE_ID,
-        price: int64(4050000000000),
-        conf: uint64(50000000000),
+        price: int64(4100000000000),
+        conf: uint64(0),
         expo: int32(-8),
-        emaPrice: int64(4050000000000),
-        emaConf: uint64(50000000000),
+        emaPrice: int64(4100000000000),
+        emaConf: uint64(0),
         publishTime: uint64(block.timestamp)
       });
       bytes memory priceFeedData = FakePyth(address(pyth))
@@ -461,11 +461,11 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
       // Add block scope to Avoid stack-too-deep
       PriceFeedData memory priceFeedDataStruct = PriceFeedData({
         id: WBTC_PRICE_ID,
-        price: int64(4050000000000),
-        conf: uint64(50000000000),
+        price: int64(4100000000000),
+        conf: uint64(0),
         expo: int32(-8),
-        emaPrice: int64(4050000000000),
-        emaConf: uint64(50000000000),
+        emaPrice: int64(4100000000000),
+        emaConf: uint64(0),
         publishTime: uint64(block.timestamp)
       });
       bytes memory priceFeedData = FakePyth(address(pyth))
@@ -497,24 +497,24 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     vm.startPrank(ALICE);
     // After Alice added 117499 satoshi as a liquidity,
     // the following conditions should be met:
-    // 1. Alice should get 46.8584 ALP
+    // 1. Alice should get 48.02986 ALP
     // 2. Pool should make 353 sathoshi
     // 3. Pool's AUM by min price should be:
-    // 0.00117499 * (1-0.003) * 40000 = 46.8584 USD
+    // 0.00117499 * (1-0.003) * 41000 = 48.02986 USD
     // 4. Pool's AUM by max price should be:
     // 0.00117499 * (1-0.003) * 41000 = 48.02986 USD
     // 5. WBTC's USD debt should be 48.8584 USD
     // 6. WBTC's liquidity should be 117499 - 353 = 117146 satoshi
     // 7. Redeemable WBTC in USD should be 48.8584 USD
-    assertEq(poolGetterFacet.alp().balanceOf(address(ALICE)), 46.8584 * 10**18);
+    assertEq(poolGetterFacet.alp().balanceOf(address(ALICE)), 48.02986 * 10**18);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 353);
-    assertEq(poolGetterFacet.getAumE18(false), 46.8584 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 48.02986 * 10**18);
     assertEq(poolGetterFacet.getAumE18(true), 48.02986 * 10**18);
-    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 46.8584 * 10**18);
+    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 48.02986 * 10**18);
     assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 117146);
     assertEq(
       poolGetterFacet.getRedemptionCollateralUsd(address(wbtc)),
-      46.8584 * 10**30
+      48.02986 * 10**30
     );
 
     // Alice add liquidity again with 117499 satoshi
@@ -527,11 +527,11 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
       // Add block scope to Avoid stack-too-deep
       PriceFeedData memory priceFeedDataStruct = PriceFeedData({
         id: WBTC_PRICE_ID,
-        price: int64(4050000000000),
-        conf: uint64(50000000000),
+        price: int64(4100000000000),
+        conf: uint64(0),
         expo: int32(-8),
-        emaPrice: int64(4050000000000),
-        emaConf: uint64(50000000000),
+        emaPrice: int64(4100000000000),
+        emaConf: uint64(0),
         publishTime: uint64(block.timestamp)
       });
       bytes memory priceFeedData = FakePyth(address(pyth))
@@ -562,27 +562,27 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
 
     // After Alice added 117499 satoshi as a liquidity,
     // the following conditions should be met:
-    // 1. Alice Contract should get 46.8584 + (46.8584 * 46.8584 / 48.02986) = 92573912195121951219 ALP
+    // 1. Alice Contract should get  48.02986 + ( 48.02986 *  48.02986 / 48.02986) = 96059720000000000000 ALP
     // 2. Pool should make 706 sathoshi
     // 3. Pool's AUM by min price should be:
-    // 46.8584 + (0.00117499 * (1-0.003) * 40000) = 93.7168 USD
+    //  48.02986 + (0.00117499 * (1-0.003) * 41000) = 96.05972 USD
     // 4. Pool's AUM by max price should be:
     // 48.02986 + (0.00117499 * (1-0.003) * 41000) = 96.05972 USD
-    // 5. WBTC's USD debt should be 93.7168 USD
+    // 5. WBTC's USD debt should be 96.05972 USD
     // 6. WBTC's liquidity should be 117146 + 117499 - 353 = 234292 satoshi
-    // 7. Redeemable WBTC in USD should be 93.7168 USD
+    // 7. Redeemable WBTC in USD should be 96.05972 USD
     assertEq(
       poolGetterFacet.alp().balanceOf(address(ALICE)),
-      92573912195121951219
+      96059720000000000000
     );
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 706);
-    assertEq(poolGetterFacet.getAumE18(false), 93.7168 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 96.05972 * 10**18);
     assertEq(poolGetterFacet.getAumE18(true), 96.05972 * 10**18);
-    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 93.7168 * 10**18);
+    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 96.05972 * 10**18);
     assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 234292);
     assertEq(
       poolGetterFacet.getRedemptionCollateralUsd(address(wbtc)),
-      93.7168 * 10**30
+      96.05972 * 10**30
     );
 
     vm.stopPrank();
@@ -717,7 +717,7 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.getAumE18(false), 96.06004 * 10**18);
     assertEq(poolGetterFacet.getAumE18(true), 96.06004 * 10**18);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 820);
-    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 93.7168 * 10**18);
+    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 96.05972 * 10**18);
     assertEq(wbtc.balanceOf(address(poolDiamond)), 257498);
 
     // Assert a postion
