@@ -12,7 +12,7 @@ Alpaca Fin Corporation
 */
 pragma solidity 0.8.17;
 
-import { BaseTest, MockWNative, console, stdError, MockStrategy, MockDonateVault, ALP, MockFlashLoanBorrower, LibPoolConfigV1, PoolOracle, PoolRouter03, OwnershipFacetInterface, GetterFacetInterface, LiquidityFacetInterface, PerpTradeFacetInterface, AdminFacetInterface, FarmFacetInterface, AccessControlFacetInterface, LibAccessControl, FundingRateFacetInterface, Orderbook02, MarketOrderRouter, FastPriceFeed, PythPriceFeed, FakePyth } from "../../base/BaseTest.sol";
+import { BaseTest, MockWNative, console, stdError, MockStrategy, MockDonateVault, ALP, MockFlashLoanBorrower, LibPoolConfigV1, PoolOracle, PoolRouter03, OwnershipFacetInterface, GetterFacetInterface, LiquidityFacetInterface, PerpTradeFacetInterface, AdminFacetInterface, FarmFacetInterface, AccessControlFacetInterface, LibAccessControl, FundingRateFacetInterface, Orderbook02, MarketOrderRouter, FastPriceFeed, PythPriceFeed02, FakePyth } from "../../base/BaseTest.sol";
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -37,7 +37,7 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
   Orderbook02 internal orderbook;
   MarketOrderRouter internal marketOrderRouter;
 
-  PythPriceFeed internal pythPriceFeed;
+  PythPriceFeed02 internal pythPriceFeed;
   IPyth internal pyth;
 
   function setUp() public virtual {

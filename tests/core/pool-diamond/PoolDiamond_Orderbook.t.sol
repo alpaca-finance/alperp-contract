@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, console, LibPoolConfigV1, LiquidityFacetInterface, GetterFacetInterface, PerpTradeFacetInterface, PythPriceFeed, FakePyth } from "./PoolDiamond_BaseTest.t.sol";
+import { PoolDiamond_BaseTest, console, LibPoolConfigV1, LiquidityFacetInterface, GetterFacetInterface, PerpTradeFacetInterface, FakePyth } from "./PoolDiamond_BaseTest.t.sol";
 
 contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
   bytes32 internal constant WBTC_PRICE_ID =
@@ -209,7 +209,7 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     // 7. Redeemable WBTC in USD should be 93.7168 USD
     assertEq(
       poolGetterFacet.alp().balanceOf(address(ALICE)),
-      92573912195121951219 
+      92573912195121951219
     );
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 706);
     assertEq(poolGetterFacet.getAumE18(false), 93.7168 * 10**18);
@@ -506,7 +506,10 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     // 5. WBTC's USD debt should be 48.8584 USD
     // 6. WBTC's liquidity should be 117499 - 353 = 117146 satoshi
     // 7. Redeemable WBTC in USD should be 48.8584 USD
-    assertEq(poolGetterFacet.alp().balanceOf(address(ALICE)), 48.02986 * 10**18);
+    assertEq(
+      poolGetterFacet.alp().balanceOf(address(ALICE)),
+      48.02986 * 10**18
+    );
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 353);
     assertEq(poolGetterFacet.getAumE18(false), 48.02986 * 10**18);
     assertEq(poolGetterFacet.getAumE18(true), 48.02986 * 10**18);

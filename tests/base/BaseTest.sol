@@ -65,7 +65,7 @@ import { MockWNative } from "../mocks/MockWNative.sol";
 
 import { MockWNativeRelayer } from "../mocks/MockWNativeRelayer.sol";
 import { FastPriceFeed } from "src/core/FastPriceFeed.sol";
-import { PythPriceFeed } from "src/core/PythPriceFeed.sol";
+import { PythPriceFeed02 } from "src/core/PythPriceFeed02.sol";
 
 import { MerkleAirdrop } from "src/airdrop/MerkleAirdrop.sol";
 import { RewardDistributor } from "src/staking/RewardDistributor.sol";
@@ -917,16 +917,19 @@ contract BaseTest is DSTest {
       IPyth(address(new FakePyth(_validTimePeriod, _singleUpdateFeeInWei)));
   }
 
-  function deployPythPriceFeed(address _pyth) internal returns (PythPriceFeed) {
+  function deployPythPriceFeed(address _pyth)
+    internal
+    returns (PythPriceFeed02)
+  {
     bytes memory _logicBytecode = abi.encodePacked(
-      vm.getCode("./out/PythPriceFeed.sol/PythPriceFeed.json")
+      vm.getCode("./out/PythPriceFeed02.sol/PythPriceFeed02.json")
     );
     bytes memory _initializer = abi.encodeWithSelector(
       bytes4(keccak256("initialize(address)")),
       _pyth
     );
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
-    return PythPriceFeed(payable(_proxy));
+    return PythPriceFeed02(payable(_proxy));
   }
 
   function deployMerkleAirdrop(address token, address feeder)
