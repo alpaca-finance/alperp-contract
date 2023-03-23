@@ -13,7 +13,7 @@ Alpaca Fin Corporation
 
 pragma solidity 0.8.17;
 
-import { PythPriceFeed_BaseTest, PythPriceFeed02, IPyth, FakePyth } from "./PythPriceFeed_BaseTest.t.sol";
+import { PythPriceFeed_BaseTest, PythPriceFeed, IPyth, FakePyth } from "./PythPriceFeed_BaseTest.t.sol";
 import { PythStructs } from "@pythnetwork/pyth-sdk-solidity/PythStructs.sol";
 import { SafeCast } from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 

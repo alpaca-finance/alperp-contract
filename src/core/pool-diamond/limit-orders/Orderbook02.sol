@@ -282,20 +282,13 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     if (msg.sender != wnativeRelayer) revert InvalidSender();
   }
 
-  function _updatePrices(bytes[] memory _priceUpdateData)
-    internal
-    returns (uint256)
-  {
-    uint256 fee = oraclePriceUpdater.getUpdateFee(_priceUpdateData);
-    if (fee == 0) return fee;
-    uint256 wNativeBalance = IWNative(weth).balanceOf(address(this));
-    if (fee > wNativeBalance)
-      revert InsufficientUpdatedFee(fee, wNativeBalance);
-
-    IERC20Upgradeable(weth).safeTransfer(wnativeRelayer, fee);
-    IWNativeRelayer(wnativeRelayer).withdraw(fee);
-    oraclePriceUpdater.updatePrices{ value: fee }(_priceUpdateData);
-    return fee;
+  function _updatePrices(
+    bytes[] memory _priceUpdateData,
+    address[] memory _tokens,
+    uint256[] memory _prices
+  ) internal returns (uint256) {
+    oraclePriceUpdater.setFastPrices(_priceUpdateData, _tokens, _prices);
+    return 0;
   }
 
   function setWhitelist(address whitelistAddress, bool isAllow)
@@ -531,9 +524,11 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address _account,
     uint256 _orderIndex,
     address payable _feeReceiver,
-    bytes[] memory _priceUpdateData
+    bytes[] memory _priceUpdateData,
+    address[] memory _tokens,
+    uint256[] memory _prices
   ) external nonReentrant whitelisted {
-    uint256 updatePriceFee = _updatePrices(_priceUpdateData);
+    uint256 updatePriceFee = _updatePrices(_priceUpdateData, _tokens, _prices);
     SwapOrder memory order = swapOrders[_account][_orderIndex];
     if (order.account == address(0)) revert NonExistentOrder();
 
@@ -871,9 +866,11 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _subAccountId,
     uint256 _orderIndex,
     address payable _feeReceiver,
-    bytes[] memory _priceUpdateData
+    bytes[] memory _priceUpdateData,
+    address[] memory _tokens,
+    uint256[] memory _prices
   ) external nonReentrant whitelisted {
-    uint256 updatePriceFee = _updatePrices(_priceUpdateData);
+    uint256 updatePriceFee = _updatePrices(_priceUpdateData, _tokens, _prices);
     address subAccount = getSubAccount(_address, _subAccountId);
     IncreaseOrder memory order = increaseOrders[subAccount][_orderIndex];
     if (order.account == address(0)) revert NonExistentOrder();
@@ -1017,9 +1014,11 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _subAccountId,
     uint256 _orderIndex,
     address payable _feeReceiver,
-    bytes[] memory _priceUpdateData
+    bytes[] memory _priceUpdateData,
+    address[] memory _tokens,
+    uint256[] memory _prices
   ) external nonReentrant whitelisted {
-    uint256 updatePriceFee = _updatePrices(_priceUpdateData);
+    uint256 updatePriceFee = _updatePrices(_priceUpdateData, _tokens, _prices);
     address subAccount = getSubAccount(_address, _subAccountId);
     DecreaseOrder memory order = decreaseOrders[subAccount][_orderIndex];
     if (order.account == address(0)) revert NonExistentOrder();

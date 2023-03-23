@@ -14,6 +14,12 @@ Alpaca Fin Corporation
 pragma solidity 0.8.17;
 
 interface IOnchainPriceUpdater {
+  function setFastPrices(
+    bytes[] memory _priceUpdateData,
+    address[] memory _tokens,
+    uint256[] memory _prices
+  ) external;
+
   function updatePrices(bytes[] memory _priceUpdateData) external payable;
 
   function getUpdateFee(bytes[] memory _priceUpdateData)

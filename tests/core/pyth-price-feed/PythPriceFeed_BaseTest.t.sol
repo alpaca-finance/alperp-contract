@@ -13,12 +13,12 @@ Alpaca Fin Corporation
 
 pragma solidity 0.8.17;
 
-import { BaseTest, console, PoolOracle, FakePyth, PythPriceFeed02 } from "../../base/BaseTest.sol";
+import { BaseTest, console, PoolOracle, FakePyth, PythPriceFeed } from "../../base/BaseTest.sol";
 
 import { IPyth } from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
 abstract contract PythPriceFeed_BaseTest is BaseTest {
-  PythPriceFeed02 internal pythPriceFeed;
+  PythPriceFeed internal pythPriceFeed;
   IPyth internal pyth;
 
   uint256 internal constant FEE = 0.01 ether;
