@@ -57,7 +57,7 @@ import { PoolDiamond } from "src/core/pool-diamond/PoolDiamond.sol";
 import { AlpacaVaultFarmStrategy } from "src/core/AlpacaVaultFarmStrategy.sol";
 
 import { PoolRouter03 } from "src/core/pool-diamond/PoolRouter03.sol";
-import { Orderbook02 } from "src/core/pool-diamond/limit-orders/Orderbook02.sol";
+import { Orderbook03 } from "src/core/pool-diamond/limit-orders/Orderbook03.sol";
 
 import { MarketOrderRouter } from "src/core/pool-diamond/market-orders/MarketOrderRouter.sol";
 
@@ -820,9 +820,9 @@ contract BaseTest is DSTest {
     uint256 _minExecutionFee,
     uint256 _minPurchaseTokenAmountUsd,
     address _oraclePriceUpdater
-  ) internal returns (Orderbook02) {
+  ) internal returns (Orderbook03) {
     bytes memory _logicBytecode = abi.encodePacked(
-      vm.getCode("./out/Orderbook02.sol/Orderbook02.json")
+      vm.getCode("./out/Orderbook03.sol/Orderbook03.json")
     );
     MockWNativeRelayer _mockWNativeRelayer = deployWNativeRelayer(_weth);
     bytes memory _initializer = abi.encodeWithSelector(
@@ -845,7 +845,7 @@ contract BaseTest is DSTest {
     callers[0] = _proxy;
     _mockWNativeRelayer.setCallerOk(callers, true);
 
-    return Orderbook02(payable(_proxy));
+    return Orderbook03(payable(_proxy));
   }
 
   function deployMarketOrderRouter(
