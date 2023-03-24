@@ -247,7 +247,7 @@ contract PythPriceFeed is
     }
   }
 
-  /// @custom:oz-upgrades-eco-allow constructor
+  /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() {
     _disableInitializers();
   }
