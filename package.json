@@ -98,6 +98,8 @@
     "deploy:tenderly:staking:set_feedable_reward_feeder": "npx hardhat --network tenderly deploy --no-compile --reset --tags SetFeedableRewarderFeeder",
     "deploy:tenderly:staking:upgrade_feedable_rewarder": "npx hardhat --network tenderly deploy --no-compile --reset --tags UpgradeFeedableRewarder",
     "deploy:tenderly:staking:upgrade_reward_distributor": "npx hardhat --network tenderly deploy --no-compile --reset --tags UpgradeRewardDistributor",
+    "deploy:tenderly:oracle:upgrade_pyth_price_feed": "npx hardhat --network tenderly deploy --no-compile --reset --tags UpgradePythPriceFeed",
+    "deploy:tenderly:oracle:upgrade_orderbook": "npx hardhat --network tenderly deploy --no-compile --reset --tags UpgradeOrderBook",
     "----------Deploy BSC Mainnet-------------": "----------Deploy Tenderly Fork-------------",
     "deploy:mainnet:oracle:pool_oracle": "hardhat --network mainnet deploy --no-compile --reset --tags PoolOracle",
     "deploy:mainnet:facet:access_control": "hardhat --network mainnet deploy --no-compile --reset --tags AccessControlFacet",
