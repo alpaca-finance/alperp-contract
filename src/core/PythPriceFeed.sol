@@ -218,15 +218,15 @@ contract PythPriceFeed is
     // Every chain has a default recency threshold which can be retrieved by calling the getValidTimePeriod() function on the contract.
     // Please see IPyth.sol for variants of this function that support configurable recency thresholds and other useful features.
 
+    // use FatPrice[priceID] if FastPrice[priceID] has been updated at the same block
     FastPrice memory fastPrice = fastPrices[priceID];
+    if (fastPrice.price != 0 && fastPrice.updatedTime == block.timestamp) {
+      return fastPrice.price;
+    }
 
     try pyth.getPriceNoOlderThan(priceID, maxPriceAge) returns (
       PythStructs.Price memory _price
     ) {
-      if (fastPrice.price != 0 && fastPrice.updatedTime > _price.publishTime) {
-        return fastPrice.price;
-      }
-
       uint256 tokenDecimals = _price.expo < 0
         ? (10**int256(-_price.expo).toUint256())
         : 10**int256(_price.expo).toUint256();
@@ -234,14 +234,6 @@ contract PythPriceFeed is
         ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
     } catch {
       // if some problem occurred (e.g. price is older than maxPriceAge)
-      // also check fast if it's still available
-      if (
-        fastPrice.price != 0 &&
-        (block.timestamp - fastPrice.updatedTime) < maxPriceAge
-      ) {
-        return fastPrice.price;
-      }
-
       // return reference price from primary source
       return _referencePrice;
     }

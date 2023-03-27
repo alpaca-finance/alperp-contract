@@ -249,7 +249,9 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     assertEq(price, refPrice);
   }
 
-  function testCorrectness_WhenFastPriceIsNewerThanPythPrice() external {
+  function testCorrectness_WhenGetFastPriceAtSameBlockWithSetFastPrice()
+    external
+  {
     // set max price agge to 15
     pythPriceFeed.setMaxPriceAge(15);
 
@@ -296,9 +298,29 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     assertEq(price, fastWBNBPrice);
   }
 
-  function testCorrectness_WhenFastPriceIsOlderThanPythPrice() external {
+  function testCorrectness_WhenGetFastPriceAfterSetFastPriceBlock() external {
     // set max price agge to 15
     pythPriceFeed.setMaxPriceAge(15);
+
+    // set price
+    bytes memory priceFeedData = FakePyth(address(pyth))
+      .createPriceFeedUpdateData({
+        id: WBNB_PRICE_ID,
+        price: int64(28895911666),
+        conf: uint64(16436851),
+        expo: int32(-8),
+        emaPrice: int64(28895911666),
+        emaConf: uint64(16436851),
+        publishTime: uint64(block.timestamp)
+      });
+
+    // update price in a Pyth contract
+    bytes[] memory priceFeedDatas = new bytes[](1);
+    priceFeedDatas[0] = priceFeedData;
+    pyth.updatePriceFeeds{ value: FEE }(priceFeedDatas);
+
+    // warp to 5 seconds later
+    vm.warp(block.timestamp + 5);
 
     // set token to the correct price id
     pythPriceFeed.setTokenPriceId(address(bnb), WBNB_PRICE_ID);
@@ -306,7 +328,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     // set ALICE as a updater
     pythPriceFeed.setUpdater(ALICE, true);
 
-    // ALICE call setFastPrice
+    // alice set eco price
     uint256 fastWBNBPrice = 280 * 10**30;
     vm.prank(ALICE);
     bytes[] memory fastPriceUpdateDatas = new bytes[](1);
@@ -318,32 +340,17 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     vm.stopPrank();
 
     // warp to 5 seconds later
-    vm.warp(block.timestamp + 5);
+    vm.warp(block.timestamp + 3);
 
-    // set price
-    bytes memory priceFeedData = FakePyth(address(pyth))
-      .createPriceFeedUpdateData({
-        id: WBNB_PRICE_ID,
-        price: int64(28895911666),
-        conf: uint64(16436851),
-        expo: int32(-8),
-        emaPrice: int64(28895911666),
-        emaConf: uint64(16436851),
-        publishTime: uint64(block.timestamp)
-      });
-
-    // update price in a Pyth contract
-    bytes[] memory priceFeedDatas = new bytes[](1);
-    priceFeedDatas[0] = priceFeedData;
-    pyth.updatePriceFeeds{ value: FEE }(priceFeedDatas);
-
-    // get price, should return price
+    // get price, should return eco price instead
     uint256 price = pythPriceFeed.getPrice(address(bnb), 290 * 10**30, true);
 
     assertEq(price, 288959116660000000000000000000000);
   }
 
-  function testCorrectness_WhenBothFastPriceAndPythPriceAreStale() external {
+  function testCorrectness_WhenSomeoneUpdatePythPriceButStillSameBlock()
+    external
+  {
     // set max price agge to 15
     pythPriceFeed.setMaxPriceAge(15);
 
@@ -353,7 +360,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     // set ALICE as a updater
     pythPriceFeed.setUpdater(ALICE, true);
 
-    // ALICE call setFastPrice
+    // alice set eco price
     uint256 fastWBNBPrice = 280 * 10**30;
     vm.prank(ALICE);
     bytes[] memory fastPriceUpdateDatas = new bytes[](1);
@@ -381,12 +388,9 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     priceFeedDatas[0] = priceFeedData;
     pyth.updatePriceFeeds{ value: FEE }(priceFeedDatas);
 
-    // warp to 60 seconds later for let prices are stale
-    vm.warp(block.timestamp + 60);
-
-    // get price, should return price
+    // get price, should return eco price instead
     uint256 price = pythPriceFeed.getPrice(address(bnb), 290 * 10**30, true);
 
-    assertEq(price, 290 * 10**30);
+    assertEq(price, fastWBNBPrice);
   }
 }
