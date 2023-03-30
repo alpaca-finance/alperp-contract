@@ -81,14 +81,14 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
       WBNB_PRICE_ID
     );
     assertEq(bnbPrice, 280 * 10**30);
-    assertEq(bnbUpdated, block.timestamp);
+    assertEq(bnbUpdated, 1);
 
     // assert BTC price state
     (uint256 btcPrice, uint256 btcUpdated) = pythPriceFeed.fastPrices(
       BTC_PRICE_ID
     );
     assertEq(btcPrice, 28_000 * 10**30);
-    assertEq(btcUpdated, block.timestamp);
+    assertEq(btcUpdated, 1);
   }
 
   function testRevert_WhenBeCalledBySomeone() external {

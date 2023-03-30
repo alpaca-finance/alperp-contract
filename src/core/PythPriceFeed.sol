@@ -34,7 +34,7 @@ contract PythPriceFeed is
 
   struct CachedPrice {
     uint192 price;
-    uint64 updatedTime;
+    uint64 updatedBlock;
   }
 
   // pyth related fields
@@ -162,7 +162,7 @@ contract PythPriceFeed is
       CachedPrice memory ecoData = fastPrices[priceId];
 
       ecoData.price = _prices[i].toUint192();
-      ecoData.updatedTime = block.timestamp.toUint64();
+      ecoData.updatedBlock = block.number.toUint64();
 
       fastPrices[priceId] = ecoData;
     }
@@ -218,7 +218,9 @@ contract PythPriceFeed is
 
     // use FatPrice[priceID] if CachedPrice[priceID] has been updated at the same block
     CachedPrice memory fastPrice = fastPrices[priceID];
-    if (fastPrice.price != 0 && fastPrice.updatedTime == block.timestamp) {
+    if (
+      fastPrice.price != 0 && fastPrice.updatedBlock == block.number.toUint64()
+    ) {
       return fastPrice.price;
     }
 

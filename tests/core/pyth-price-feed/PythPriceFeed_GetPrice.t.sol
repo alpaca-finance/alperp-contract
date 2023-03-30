@@ -321,8 +321,8 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     priceFeedDatas[0] = priceFeedData;
     pyth.updatePriceFeeds{ value: FEE }(priceFeedDatas);
 
-    // warp to 5 seconds later
-    vm.warp(block.timestamp + 5);
+    // wrap to another block
+    vm.roll(block.number + 1);
 
     // set token to the correct price id
     pythPriceFeed.setTokenPriceId(address(bnb), WBNB_PRICE_ID);
@@ -341,8 +341,8 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
     vm.stopPrank();
 
-    // warp to 5 seconds later
-    vm.warp(block.timestamp + 3);
+    // wrap to another block
+    vm.roll(block.number + 1);
 
     // get price, should return eco price instead
     uint256 price = pythPriceFeed.getPrice(address(bnb), 290 * 10**30, true);
