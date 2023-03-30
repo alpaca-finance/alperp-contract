@@ -64,27 +64,31 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
 
     // ALICE call setCachedPrice
     vm.prank(ALICE);
-    bytes[] memory fastPriceUpdateDatas = new bytes[](2);
+    bytes[] memory cachedPriceUpdateDatas = new bytes[](2);
     address[] memory tokenAddrs = new address[](2);
-    uint256[] memory fastPrices = new uint256[](2);
+    uint256[] memory cachedPrices = new uint256[](2);
 
     tokenAddrs[0] = address(bnb);
     tokenAddrs[1] = address(wbtc);
-    fastPrices[0] = 280 * 10**30;
-    fastPrices[1] = 28_000 * 10**30;
+    cachedPrices[0] = 280 * 10**30;
+    cachedPrices[1] = 28_000 * 10**30;
 
-    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(
+      cachedPriceUpdateDatas,
+      tokenAddrs,
+      cachedPrices
+    );
     vm.stopPrank();
 
     // assert BNB price state
-    (uint256 bnbPrice, uint256 bnbUpdated) = pythPriceFeed.fastPrices(
+    (uint256 bnbPrice, uint256 bnbUpdated) = pythPriceFeed.cahcedPriceOf(
       WBNB_PRICE_ID
     );
     assertEq(bnbPrice, 280 * 10**30);
     assertEq(bnbUpdated, 1);
 
     // assert BTC price state
-    (uint256 btcPrice, uint256 btcUpdated) = pythPriceFeed.fastPrices(
+    (uint256 btcPrice, uint256 btcUpdated) = pythPriceFeed.cahcedPriceOf(
       BTC_PRICE_ID
     );
     assertEq(btcPrice, 28_000 * 10**30);
@@ -94,13 +98,17 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
   function testRevert_WhenBeCalledBySomeone() external {
     // ALICE call setCachedPrice
     vm.prank(ALICE);
-    bytes[] memory fastPriceUpdateDatas = new bytes[](1);
+    bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
-    uint256[] memory fastPrices = new uint256[](1);
+    uint256[] memory cachedPrices = new uint256[](1);
 
     vm.expectRevert(abi.encodeWithSignature("PythPriceFeed_OnlyUpdater()"));
 
-    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(
+      cachedPriceUpdateDatas,
+      tokenAddrs,
+      cachedPrices
+    );
     vm.stopPrank();
   }
 
@@ -110,20 +118,24 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
 
     // ALICE call setCachedPrice
     vm.prank(ALICE);
-    bytes[] memory fastPriceUpdateDatas = new bytes[](1);
+    bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](2);
-    uint256[] memory fastPrices = new uint256[](2);
+    uint256[] memory cachedPrices = new uint256[](2);
 
     tokenAddrs[0] = address(bnb);
     tokenAddrs[1] = address(wbtc);
-    fastPrices[0] = 280 * 10**30;
-    fastPrices[1] = 28_000 * 10**30;
+    cachedPrices[0] = 280 * 10**30;
+    cachedPrices[1] = 28_000 * 10**30;
 
     vm.expectRevert(
       abi.encodeWithSignature("PythPriceFeed_InvalidCachedPriceDataLength()")
     );
 
-    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(
+      cachedPriceUpdateDatas,
+      tokenAddrs,
+      cachedPrices
+    );
     vm.stopPrank();
   }
 
@@ -137,16 +149,20 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
 
     // ALICE call setCachedPrice
     vm.prank(ALICE);
-    bytes[] memory fastPriceUpdateDatas = new bytes[](1);
+    bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
-    uint256[] memory fastPrices = new uint256[](1);
+    uint256[] memory cachedPrices = new uint256[](1);
 
     tokenAddrs[0] = address(weth);
-    fastPrices[0] = 1800 * 10**30;
+    cachedPrices[0] = 1800 * 10**30;
 
     vm.expectRevert(abi.encodeWithSignature("PythPriceFeed_InvalidPriceId()"));
 
-    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(
+      cachedPriceUpdateDatas,
+      tokenAddrs,
+      cachedPrices
+    );
     vm.stopPrank();
   }
 }

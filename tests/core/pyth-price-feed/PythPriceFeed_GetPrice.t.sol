@@ -284,15 +284,19 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     // alice set cached price
     uint256 fastWBNBPrice = 280 * 10**30;
     vm.prank(ALICE);
-    bytes[] memory fastPriceUpdateDatas = new bytes[](1);
+    bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
-    uint256[] memory fastPrices = new uint256[](1);
+    uint256[] memory cachedPrices = new uint256[](1);
     tokenAddrs[0] = address(bnb);
-    fastPrices[0] = fastWBNBPrice;
-    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    cachedPrices[0] = fastWBNBPrice;
+    pythPriceFeed.setCachedPrices(
+      cachedPriceUpdateDatas,
+      tokenAddrs,
+      cachedPrices
+    );
     vm.stopPrank();
 
-    // get price, should return eco price instead
+    // get price, should return cached price instead
     uint256 price = pythPriceFeed.getPrice(address(bnb), 290 * 10**30, true);
 
     assertEq(price, fastWBNBPrice);
@@ -333,18 +337,22 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     // alice set cached price
     uint256 fastWBNBPrice = 280 * 10**30;
     vm.prank(ALICE);
-    bytes[] memory fastPriceUpdateDatas = new bytes[](1);
+    bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
-    uint256[] memory fastPrices = new uint256[](1);
+    uint256[] memory cachedPrices = new uint256[](1);
     tokenAddrs[0] = address(bnb);
-    fastPrices[0] = fastWBNBPrice;
-    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    cachedPrices[0] = fastWBNBPrice;
+    pythPriceFeed.setCachedPrices(
+      cachedPriceUpdateDatas,
+      tokenAddrs,
+      cachedPrices
+    );
     vm.stopPrank();
 
     // wrap to another block
     vm.roll(block.number + 1);
 
-    // get price, should return eco price instead
+    // get price, should return cached price instead
     uint256 price = pythPriceFeed.getPrice(address(bnb), 290 * 10**30, true);
 
     assertEq(price, 288959116660000000000000000000000);
@@ -362,15 +370,19 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     // set ALICE as a updater
     pythPriceFeed.setUpdater(ALICE, true);
 
-    // alice set eco price
+    // alice set cached price
     uint256 fastWBNBPrice = 280 * 10**30;
     vm.prank(ALICE);
-    bytes[] memory fastPriceUpdateDatas = new bytes[](1);
+    bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
-    uint256[] memory fastPrices = new uint256[](1);
+    uint256[] memory cachedPrices = new uint256[](1);
     tokenAddrs[0] = address(bnb);
-    fastPrices[0] = fastWBNBPrice;
-    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    cachedPrices[0] = fastWBNBPrice;
+    pythPriceFeed.setCachedPrices(
+      cachedPriceUpdateDatas,
+      tokenAddrs,
+      cachedPrices
+    );
     vm.stopPrank();
 
     // set price
@@ -390,7 +402,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     priceFeedDatas[0] = priceFeedData;
     pyth.updatePriceFeeds{ value: FEE }(priceFeedDatas);
 
-    // get price, should return eco price instead
+    // get price, should return cached price instead
     uint256 price = pythPriceFeed.getPrice(address(bnb), 290 * 10**30, true);
 
     assertEq(price, fastWBNBPrice);

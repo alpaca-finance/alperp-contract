@@ -45,8 +45,8 @@ contract PythPriceFeed is
   bool public favorRefPrice;
   mapping(address => bool) public isUpdater;
 
-  // fast price that represent save gas price
-  mapping(bytes32 => CachedPrice) public fastPrices;
+  // Cached price that represent save gas price
+  mapping(bytes32 => CachedPrice) public cahcedPriceOf;
 
   event SetTokenPriceId(address indexed token, bytes32 priceId);
   event SetMaxPriceAge(uint256 maxPriceAge);
@@ -159,12 +159,12 @@ contract PythPriceFeed is
         revert PythPriceFeed_InvalidPriceId();
       }
 
-      CachedPrice memory ecoData = fastPrices[priceId];
+      CachedPrice memory cachedPrice = cahcedPriceOf[priceId];
 
-      ecoData.price = _prices[i].toUint192();
-      ecoData.updatedBlock = block.number.toUint64();
+      cachedPrice.price = _prices[i].toUint192();
+      cachedPrice.updatedBlock = block.number.toUint64();
 
-      fastPrices[priceId] = ecoData;
+      cahcedPriceOf[priceId] = cachedPrice;
     }
 
     emit SetCachedPrices(_priceUpdateData, _tokens, _prices);
@@ -217,11 +217,12 @@ contract PythPriceFeed is
     // Please see IPyth.sol for variants of this function that support configurable recency thresholds and other useful features.
 
     // use FatPrice[priceID] if CachedPrice[priceID] has been updated at the same block
-    CachedPrice memory fastPrice = fastPrices[priceID];
+    CachedPrice memory cachedPrice = cahcedPriceOf[priceID];
     if (
-      fastPrice.price != 0 && fastPrice.updatedBlock == block.number.toUint64()
+      cachedPrice.price != 0 &&
+      cachedPrice.updatedBlock == block.number.toUint64()
     ) {
-      return fastPrice.price;
+      return cachedPrice.price;
     }
 
     try pyth.getPriceNoOlderThan(priceID, maxPriceAge) returns (
