@@ -287,7 +287,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address[] memory _tokens,
     uint256[] memory _prices
   ) internal returns (uint256) {
-    oraclePriceUpdater.setFastPrices(_priceUpdateData, _tokens, _prices);
+    oraclePriceUpdater.setCachedPrices(_priceUpdateData, _tokens, _prices);
     return 0;
   }
 

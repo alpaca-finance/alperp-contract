@@ -249,7 +249,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     assertEq(price, refPrice);
   }
 
-  function testCorrectness_WhenGetFastPriceAtSameBlockWithSetFastPrice()
+  function testCorrectness_WhenGetCachedPriceAtSameBlockWithSetCachedPrice()
     external
   {
     // set max price agge to 15
@@ -281,7 +281,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     // set ALICE as a updater
     pythPriceFeed.setUpdater(ALICE, true);
 
-    // alice set eco price
+    // alice set cached price
     uint256 fastWBNBPrice = 280 * 10**30;
     vm.prank(ALICE);
     bytes[] memory fastPriceUpdateDatas = new bytes[](1);
@@ -289,7 +289,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     uint256[] memory fastPrices = new uint256[](1);
     tokenAddrs[0] = address(bnb);
     fastPrices[0] = fastWBNBPrice;
-    pythPriceFeed.setFastPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
     vm.stopPrank();
 
     // get price, should return eco price instead
@@ -298,7 +298,9 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     assertEq(price, fastWBNBPrice);
   }
 
-  function testCorrectness_WhenGetFastPriceAfterSetFastPriceBlock() external {
+  function testCorrectness_WhenGetCachedPriceAfterSetCachedPriceBlock()
+    external
+  {
     // set max price agge to 15
     pythPriceFeed.setMaxPriceAge(15);
 
@@ -328,7 +330,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     // set ALICE as a updater
     pythPriceFeed.setUpdater(ALICE, true);
 
-    // alice set eco price
+    // alice set cached price
     uint256 fastWBNBPrice = 280 * 10**30;
     vm.prank(ALICE);
     bytes[] memory fastPriceUpdateDatas = new bytes[](1);
@@ -336,7 +338,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     uint256[] memory fastPrices = new uint256[](1);
     tokenAddrs[0] = address(bnb);
     fastPrices[0] = fastWBNBPrice;
-    pythPriceFeed.setFastPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
     vm.stopPrank();
 
     // warp to 5 seconds later
@@ -368,7 +370,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     uint256[] memory fastPrices = new uint256[](1);
     tokenAddrs[0] = address(bnb);
     fastPrices[0] = fastWBNBPrice;
-    pythPriceFeed.setFastPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
     vm.stopPrank();
 
     // set price

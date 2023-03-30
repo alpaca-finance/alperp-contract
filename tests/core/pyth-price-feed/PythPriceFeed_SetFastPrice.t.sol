@@ -15,7 +15,7 @@ pragma solidity 0.8.17;
 
 import { PythPriceFeed_BaseTest, FakePyth } from "./PythPriceFeed_BaseTest.t.sol";
 
-contract PythPriceFeed_SetFastPrice is PythPriceFeed_BaseTest {
+contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
   bytes32 internal constant WBNB_PRICE_ID =
     0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f;
   bytes32 internal constant BTC_PRICE_ID =
@@ -62,7 +62,7 @@ contract PythPriceFeed_SetFastPrice is PythPriceFeed_BaseTest {
     // set ALICE as a updater
     pythPriceFeed.setUpdater(ALICE, true);
 
-    // ALICE call setFastPrice
+    // ALICE call setCachedPrice
     vm.prank(ALICE);
     bytes[] memory fastPriceUpdateDatas = new bytes[](2);
     address[] memory tokenAddrs = new address[](2);
@@ -73,7 +73,7 @@ contract PythPriceFeed_SetFastPrice is PythPriceFeed_BaseTest {
     fastPrices[0] = 280 * 10**30;
     fastPrices[1] = 28_000 * 10**30;
 
-    pythPriceFeed.setFastPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
     vm.stopPrank();
 
     // assert BNB price state
@@ -92,7 +92,7 @@ contract PythPriceFeed_SetFastPrice is PythPriceFeed_BaseTest {
   }
 
   function testRevert_WhenBeCalledBySomeone() external {
-    // ALICE call setFastPrice
+    // ALICE call setCachedPrice
     vm.prank(ALICE);
     bytes[] memory fastPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
@@ -100,15 +100,15 @@ contract PythPriceFeed_SetFastPrice is PythPriceFeed_BaseTest {
 
     vm.expectRevert(abi.encodeWithSignature("PythPriceFeed_OnlyUpdater()"));
 
-    pythPriceFeed.setFastPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
     vm.stopPrank();
   }
 
-  function testRevert_WhenFastPriceDataIsNotConsistency() external {
+  function testRevert_WhenCachedPriceDataIsNotConsistency() external {
     // set ALICE as a updater
     pythPriceFeed.setUpdater(ALICE, true);
 
-    // ALICE call setFastPrice
+    // ALICE call setCachedPrice
     vm.prank(ALICE);
     bytes[] memory fastPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](2);
@@ -120,10 +120,10 @@ contract PythPriceFeed_SetFastPrice is PythPriceFeed_BaseTest {
     fastPrices[1] = 28_000 * 10**30;
 
     vm.expectRevert(
-      abi.encodeWithSignature("PythPriceFeed_InvalidFastPriceDataLength()")
+      abi.encodeWithSignature("PythPriceFeed_InvalidCachedPriceDataLength()")
     );
 
-    pythPriceFeed.setFastPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
     vm.stopPrank();
   }
 
@@ -135,7 +135,7 @@ contract PythPriceFeed_SetFastPrice is PythPriceFeed_BaseTest {
     // set ALICE as a updater
     pythPriceFeed.setUpdater(ALICE, true);
 
-    // ALICE call setFastPrice
+    // ALICE call setCachedPrice
     vm.prank(ALICE);
     bytes[] memory fastPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
@@ -146,7 +146,7 @@ contract PythPriceFeed_SetFastPrice is PythPriceFeed_BaseTest {
 
     vm.expectRevert(abi.encodeWithSignature("PythPriceFeed_InvalidPriceId()"));
 
-    pythPriceFeed.setFastPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
+    pythPriceFeed.setCachedPrices(fastPriceUpdateDatas, tokenAddrs, fastPrices);
     vm.stopPrank();
   }
 }

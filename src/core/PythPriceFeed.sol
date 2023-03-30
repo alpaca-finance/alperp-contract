@@ -32,7 +32,7 @@ contract PythPriceFeed is
   uint256 public constant PRICE_PRECISION = 10**30;
   uint256 public constant MAXIMUM_PRICE_AGE = 120; // 2 mins
 
-  struct FastPrice {
+  struct CachedPrice {
     // Price
     uint256 price;
     // Unix timestamp describing when the price was updated
@@ -48,13 +48,13 @@ contract PythPriceFeed is
   mapping(address => bool) public isUpdater;
 
   // fast price that represent save gas price
-  mapping(bytes32 => FastPrice) public fastPrices;
+  mapping(bytes32 => CachedPrice) public fastPrices;
 
   event SetTokenPriceId(address indexed token, bytes32 priceId);
   event SetMaxPriceAge(uint256 maxPriceAge);
   event SetFavorRefPrice(bool favorRefPrice);
   event SetUpdater(address indexed account, bool isActive);
-  event SetFastPrices(
+  event SetCachedPrices(
     bytes[] _priceUpdateData,
     address[] _tokens,
     uint256[] _prices
@@ -63,7 +63,7 @@ contract PythPriceFeed is
   error PythPriceFeed_OnlyUpdater();
   error PythPriceFeed_InvalidMaxPriceAge();
   error PythPriceFeed_InvalidPriceId();
-  error PythPriceFeed_InvalidFastPriceDataLength();
+  error PythPriceFeed_InvalidCachedPriceDataLength();
 
   function initialize(address _pyth) external initializer {
     OwnableUpgradeable.__Ownable_init();
@@ -132,11 +132,11 @@ contract PythPriceFeed is
     emit SetUpdater(_account, _isActive);
   }
 
-  /// @notice A function for updating eco prices based on price update data, price id address and price
+  /// @notice A function for updating cached prices based on price update data, price id address and price
   /// @param _priceUpdateData - Array of price update data
   /// @param _tokens - Array of token address
   /// @param _prices - Array of price
-  function setFastPrices(
+  function setCachedPrices(
     bytes[] memory _priceUpdateData,
     address[] memory _tokens,
     uint256[] memory _prices
@@ -150,7 +150,7 @@ contract PythPriceFeed is
       _priceUpdateData.length != _tokens.length ||
       _priceUpdateData.length != _prices.length
     ) {
-      revert PythPriceFeed_InvalidFastPriceDataLength();
+      revert PythPriceFeed_InvalidCachedPriceDataLength();
     }
 
     // loop for setting price
@@ -161,7 +161,7 @@ contract PythPriceFeed is
         revert PythPriceFeed_InvalidPriceId();
       }
 
-      FastPrice memory ecoData = fastPrices[priceId];
+      CachedPrice memory ecoData = fastPrices[priceId];
 
       ecoData.price = _prices[i];
       ecoData.updatedTime = block.timestamp;
@@ -169,7 +169,7 @@ contract PythPriceFeed is
       fastPrices[priceId] = ecoData;
     }
 
-    emit SetFastPrices(_priceUpdateData, _tokens, _prices);
+    emit SetCachedPrices(_priceUpdateData, _tokens, _prices);
   }
 
   /// @notice A function for updating prices based on price update data
@@ -218,8 +218,8 @@ contract PythPriceFeed is
     // Every chain has a default recency threshold which can be retrieved by calling the getValidTimePeriod() function on the contract.
     // Please see IPyth.sol for variants of this function that support configurable recency thresholds and other useful features.
 
-    // use FatPrice[priceID] if FastPrice[priceID] has been updated at the same block
-    FastPrice memory fastPrice = fastPrices[priceID];
+    // use FatPrice[priceID] if CachedPrice[priceID] has been updated at the same block
+    CachedPrice memory fastPrice = fastPrices[priceID];
     if (fastPrice.price != 0 && fastPrice.updatedTime == block.timestamp) {
       return fastPrice.price;
     }
