@@ -33,10 +33,8 @@ contract PythPriceFeed is
   uint256 public constant MAXIMUM_PRICE_AGE = 120; // 2 mins
 
   struct CachedPrice {
-    // Price
-    uint256 price;
-    // Unix timestamp describing when the price was updated
-    uint256 updatedTime;
+    uint192 price;
+    uint64 updatedTime;
   }
 
   // pyth related fields
@@ -163,8 +161,8 @@ contract PythPriceFeed is
 
       CachedPrice memory ecoData = fastPrices[priceId];
 
-      ecoData.price = _prices[i];
-      ecoData.updatedTime = block.timestamp;
+      ecoData.price = _prices[i].toUint192();
+      ecoData.updatedTime = block.timestamp.toUint64();
 
       fastPrices[priceId] = ecoData;
     }
