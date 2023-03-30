@@ -164,12 +164,16 @@
     "script:tenderly:stake_alp_token": "npx hardhat --network tenderly deploy --no-compile --reset --tags DepositToken"
   },
   "devDependencies": {
+    "@safe-global/safe-core-sdk": "^3.3.2",
+    "@safe-global/safe-ethers-lib": "^1.9.2",
+    "@safe-global/safe-service-client": "^2.0.0",
     "@tenderly/hardhat-tenderly": "^1.1.6",
     "@typechain/ethers-v5": "^10.0.0",
     "@typechain/hardhat": "^5.0.0",
     "@types/lodash": "^4.14.191",
     "@types/mocha": "^9.1.0",
     "@types/readline-sync": "^1.4.4",
+    "ethers": "^5.0.31",
     "lodash": "^4.17.21",
     "prettier": "^2.6.2",
     "prettier-plugin-solidity": "^1.0.0-beta.19",
