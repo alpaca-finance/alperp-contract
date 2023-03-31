@@ -12,7 +12,7 @@ Alpaca Fin Corporation
 */
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, LibPoolConfigV1, console, GetterFacetInterface, LiquidityFacetInterface, PoolRouter03 } from "./PoolDiamond_BaseTest.t.sol";
+import { PoolDiamond_BaseTest, LibPoolConfigV1, console, GetterFacetInterface, LiquidityFacetInterface, PoolRouter04 } from "./PoolDiamond_BaseTest.t.sol";
 import { ALP } from "src/tokens/ALP.sol";
 
 contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
@@ -296,7 +296,7 @@ contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
     dai.approve(address(poolRouter), 100 ether);
     vm.expectRevert(
       abi.encodeWithSelector(
-        PoolRouter03.PoolRouter_InsufficientOutputAmount.selector,
+        PoolRouter04.PoolRouter_InsufficientOutputAmount.selector,
         100 ether,
         99.7 ether
       )

@@ -57,7 +57,7 @@ import { AccessControlInitializer } from "src/core/pool-diamond/initializers/Acc
 import { PoolDiamond } from "src/core/pool-diamond/PoolDiamond.sol";
 import { AlpacaVaultFarmStrategy } from "src/core/AlpacaVaultFarmStrategy.sol";
 
-import { PoolRouter03 } from "src/core/pool-diamond/PoolRouter03.sol";
+import { PoolRouter04 } from "src/core/pool-diamond/PoolRouter04.sol";
 import { Orderbook02 } from "src/core/pool-diamond/limit-orders/Orderbook02.sol";
 
 import { MarketOrderRouter } from "src/core/pool-diamond/market-orders/MarketOrderRouter.sol";
@@ -74,6 +74,8 @@ import { RewardDistributor } from "src/staking/RewardDistributor.sol";
 import { MockPyth as FakePyth } from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
 
 import { IPyth } from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
+
+import { Miner } from "src/core/Miner.sol";
 
 // solhint-disable const-name-snakecase
 // solhint-disable no-inline-assembly
@@ -708,17 +710,6 @@ contract BaseTest is DSTest {
     return ALP(payable(_proxy));
   }
 
-  function deployAP() internal returns (AP) {
-    bytes memory _logicBytecode = abi.encodePacked(
-      vm.getCode("./out/AP.sol/AP.json")
-    );
-    bytes memory _initializer = abi.encodeWithSelector(
-      bytes4(keccak256("initialize()"))
-    );
-    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
-    return AP(payable(_proxy));
-  }
-
   function deployPoolOracle(uint80 roundDepth) internal returns (PoolOracle) {
     bytes memory _logicBytecode = abi.encodePacked(
       vm.getCode("./out/PoolOracle.sol/PoolOracle.json")
@@ -814,8 +805,20 @@ contract BaseTest is DSTest {
     address _wNative,
     address _pool,
     address _oraclePriceUpdater
-  ) internal returns (PoolRouter03) {
-    return new PoolRouter03(_wNative, _pool, _oraclePriceUpdater);
+  ) internal returns (PoolRouter04) {
+    bytes memory _logicBytecode = abi.encodePacked(
+      vm.getCode("./out/PoolRouter04.sol/PoolRouter04.json")
+    );
+
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize(address,address,address)")),
+      _wNative,
+      _pool,
+      _oraclePriceUpdater
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+
+    return PoolRouter04(payable(_proxy));
   }
 
   function deployWNativeRelayer(address _weth)
@@ -987,5 +990,27 @@ contract BaseTest is DSTest {
 
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
     return RewardDistributor(payable(_proxy));
+  }
+
+  function deployAP() internal returns (AP) {
+    bytes memory _logicBytecode = abi.encodePacked(
+      vm.getCode("./out/AP.sol/AP.json")
+    );
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize()"))
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+    return AP(payable(_proxy));
+  }
+
+  function deployMiner() internal returns (Miner) {
+    bytes memory _logicBytecode = abi.encodePacked(
+      vm.getCode("./out/Miner.sol/Miner.json")
+    );
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize()"))
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+    return Miner(payable(_proxy));
   }
 }

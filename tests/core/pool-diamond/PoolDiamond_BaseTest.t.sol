@@ -12,7 +12,7 @@ Alpaca Fin Corporation
 */
 pragma solidity 0.8.17;
 
-import { BaseTest, MockWNative, console, stdError, MockStrategy, MockDonateVault, ALP, MockFlashLoanBorrower, LibPoolConfigV1, PoolOracle, PoolRouter03, OwnershipFacetInterface, GetterFacetInterface, LiquidityFacetInterface, PerpTradeFacetInterface, AdminFacetInterface, FarmFacetInterface, AccessControlFacetInterface, LibAccessControl, FundingRateFacetInterface, Orderbook02, MarketOrderRouter, FastPriceFeed, PythPriceFeed, FakePyth } from "../../base/BaseTest.sol";
+import { BaseTest, MockWNative, console, stdError, MockStrategy, MockDonateVault, ALP, AP, MockFlashLoanBorrower, LibPoolConfigV1, PoolOracle, PoolRouter04, OwnershipFacetInterface, GetterFacetInterface, LiquidityFacetInterface, PerpTradeFacetInterface, AdminFacetInterface, FarmFacetInterface, AccessControlFacetInterface, LibAccessControl, FundingRateFacetInterface, Orderbook02, MarketOrderRouter, FastPriceFeed, PythPriceFeed, FakePyth, Miner } from "../../base/BaseTest.sol";
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -21,8 +21,10 @@ import { IPyth } from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 abstract contract PoolDiamond_BaseTest is BaseTest {
   PoolOracle internal poolOracle;
   address internal poolDiamond;
-  PoolRouter03 internal poolRouter;
+  PoolRouter04 internal poolRouter;
   ALP internal alp;
+  Miner internal miner;
+  AP internal ap;
 
   MockWNative internal revenueToken;
 
@@ -115,6 +117,18 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
     pythPriceFeed.setUpdater(address(orderbook), true);
     pythPriceFeed.setUpdater(address(poolRouter), true);
     pythPriceFeed.setMaxPriceAge(15);
+
+    // trading miner
+    miner = deployMiner();
+    ap = deployAP();
+    ap.setMinter(address(miner), true);
+    ap.setRewardToken(address(usdc), true);
+    miner.setWhitelist(address(poolRouter), true);
+    miner.setWhitelist(address(orderbook), true);
+    miner.setPeriod(1, 1735689600);
+    miner.setMiningPoint(address(ap));
+    poolRouter.setMiner(address(miner));
+    orderbook.setMiner(address(miner));
   }
 
   function checkPoolBalanceWithState(address token, int256 offset) internal {

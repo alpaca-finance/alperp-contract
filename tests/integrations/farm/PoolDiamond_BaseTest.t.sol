@@ -17,7 +17,7 @@ import { console } from "../../utils/console.sol";
 import { PoolDiamond } from "src/core/pool-diamond/PoolDiamond.sol";
 import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import { PoolOracle } from "src/core/PoolOracle.sol";
-import { PoolRouter03 } from "src/core/pool-diamond/PoolRouter03.sol";
+import { PoolRouter04 } from "src/core/pool-diamond/PoolRouter04.sol";
 import { DiamondLoupeFacet } from "src/core/pool-diamond/facets/DiamondLoupeFacet.sol";
 import { OwnershipFacet, OwnershipFacetInterface } from "src/core/pool-diamond/facets/OwnershipFacet.sol";
 import { GetterFacet, GetterFacetInterface } from "src/core/pool-diamond/facets/GetterFacet.sol";
@@ -61,7 +61,7 @@ contract PoolDiamond_BaseTest is BaseTest {
   }
   address internal constant TREASURY = address(168168168168);
 
-  PoolRouter03 internal poolRouter;
+  PoolRouter04 internal poolRouter;
   PoolOracle internal poolOracle;
   address internal poolDiamond;
 
@@ -740,8 +740,20 @@ contract PoolDiamond_BaseTest is BaseTest {
     address _wNative,
     address _pool,
     address _oraclePriceUpdater
-  ) internal returns (PoolRouter03) {
-    return new PoolRouter03(_wNative, _pool, _oraclePriceUpdater);
+  ) internal returns (PoolRouter04) {
+    bytes memory _logicBytecode = abi.encodePacked(
+      vm.getCode("./out/PoolRouter04.sol/PoolRouter04.json")
+    );
+
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize(address,address,address)")),
+      _wNative,
+      _pool,
+      _oraclePriceUpdater
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+
+    return PoolRouter04(payable(_proxy));
   }
 
   function deployAlpacaVaultFarmStrategy(address token_, address vault_)
