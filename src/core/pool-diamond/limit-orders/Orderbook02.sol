@@ -286,9 +286,8 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     bytes[] memory _priceUpdateData,
     address[] memory _tokens,
     uint256[] memory _prices
-  ) internal returns (uint256) {
+  ) internal {
     oraclePriceUpdater.setCachedPrices(_priceUpdateData, _tokens, _prices);
-    return 0;
   }
 
   function setWhitelist(address whitelistAddress, bool isAllow)
@@ -528,7 +527,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address[] memory _tokens,
     uint256[] memory _prices
   ) external nonReentrant whitelisted {
-    uint256 updatePriceFee = _updatePrices(_priceUpdateData, _tokens, _prices);
+    _updatePrices(_priceUpdateData, _tokens, _prices);
     SwapOrder memory order = swapOrders[_account][_orderIndex];
     if (order.account == address(0)) revert NonExistentOrder();
 
@@ -565,10 +564,8 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
         order.account
       );
     }
-    if (updatePriceFee < order.executionFee) {
-      // pay executor
-      _transferOutETH(order.executionFee - updatePriceFee, _feeReceiver);
-    }
+
+    _transferOutETH(order.executionFee, _feeReceiver);
 
     emit ExecuteSwapOrder(
       _account,
@@ -870,7 +867,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address[] memory _tokens,
     uint256[] memory _prices
   ) external nonReentrant whitelisted {
-    uint256 updatePriceFee = _updatePrices(_priceUpdateData, _tokens, _prices);
+    _updatePrices(_priceUpdateData, _tokens, _prices);
     address subAccount = getSubAccount(_address, _subAccountId);
     IncreaseOrder memory order = increaseOrders[subAccount][_orderIndex];
     if (order.account == address(0)) revert NonExistentOrder();
@@ -916,10 +913,8 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       order.isLong
     );
 
-    if (updatePriceFee < order.executionFee) {
-      // pay executor
-      _transferOutETH(order.executionFee - updatePriceFee, _feeReceiver);
-    }
+    // pay executor
+    _transferOutETH(order.executionFee, _feeReceiver);
 
     emit ExecuteIncreaseOrder(
       order.account,
@@ -1018,7 +1013,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address[] memory _tokens,
     uint256[] memory _prices
   ) external nonReentrant whitelisted {
-    uint256 updatePriceFee = _updatePrices(_priceUpdateData, _tokens, _prices);
+    _updatePrices(_priceUpdateData, _tokens, _prices);
     address subAccount = getSubAccount(_address, _subAccountId);
     DecreaseOrder memory order = decreaseOrders[subAccount][_orderIndex];
     if (order.account == address(0)) revert NonExistentOrder();
@@ -1062,10 +1057,8 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       );
     }
 
-    if (updatePriceFee < order.executionFee) {
-      // pay executor
-      _transferOutETH(order.executionFee - updatePriceFee, _feeReceiver);
-    }
+    // pay executor
+    _transferOutETH(order.executionFee, _feeReceiver);
 
     emit ExecuteDecreaseOrder(
       order.account,
