@@ -30,6 +30,7 @@ import { MockStrategy } from "../mocks/MockStrategy.sol";
 
 import { PoolOracle } from "src/core/PoolOracle.sol";
 import { ALP } from "src/tokens/ALP.sol";
+import { AP } from "src/tokens/AP.sol";
 import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import { IPool } from "src/interfaces/IPool.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -705,6 +706,17 @@ contract BaseTest is DSTest {
     );
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
     return ALP(payable(_proxy));
+  }
+
+  function deployAP() internal returns (AP) {
+    bytes memory _logicBytecode = abi.encodePacked(
+      vm.getCode("./out/AP.sol/AP.json")
+    );
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize()"))
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+    return AP(payable(_proxy));
   }
 
   function deployPoolOracle(uint80 roundDepth) internal returns (PoolOracle) {
