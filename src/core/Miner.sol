@@ -18,11 +18,11 @@ import { IMiner } from "../interfaces/IMiner.sol";
 import { IMiningPoint } from "../interfaces/IMiningPoint.sol";
 
 contract Miner is IMiner, OwnableUpgradeable {
-  uint256 startTimestamp;
-  uint256 endTimestamp;
+  uint256 public startTimestamp;
+  uint256 public endTimestamp;
   mapping(address => bool) public isWhitelist;
 
-  IMiningPoint miningPoint;
+  address public miningPoint;
 
   event Miner_SetWhitelist(address whitelisted, bool _newAllow);
   event Miner_SetPoint(address _newApAddr);
@@ -62,7 +62,7 @@ contract Miner is IMiner, OwnableUpgradeable {
   }
 
   function setMiningPoint(address _miningPoint) external onlyOwner {
-    miningPoint = IMiningPoint(_miningPoint);
+    miningPoint = _miningPoint;
 
     emit Miner_SetPoint(_miningPoint);
   }
@@ -76,7 +76,7 @@ contract Miner is IMiner, OwnableUpgradeable {
     uint256,
     bool
   ) external onlyWhitelisted {
-    if (address(miningPoint) == address(0)) {
+    if (miningPoint == address(0)) {
       revert Miner_InvlidMiningPoint();
     }
 
@@ -84,7 +84,7 @@ contract Miner is IMiner, OwnableUpgradeable {
       return;
     }
 
-    miningPoint.mint(_primaryAccount, _sizeDelta);
+    IMiningPoint(miningPoint).mint(_primaryAccount, _sizeDelta);
 
     return;
   }
