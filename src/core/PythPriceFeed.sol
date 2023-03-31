@@ -46,7 +46,7 @@ contract PythPriceFeed is
   mapping(address => bool) public isUpdater;
 
   // Cached price that represent save gas price
-  mapping(address => CachedPrice) public cahcedPriceOf;
+  mapping(address => CachedPrice) public cachedPriceOf;
 
   event SetTokenPriceId(address indexed token, bytes32 priceId);
   event SetMaxPriceAge(uint256 maxPriceAge);
@@ -154,12 +154,12 @@ contract PythPriceFeed is
     // loop for setting price
     for (uint256 i = 0; i < _priceUpdateData.length; ) {
       address token = _tokens[i];
-      CachedPrice memory cachedPrice = cahcedPriceOf[token];
+      CachedPrice memory cachedPrice = cachedPriceOf[token];
 
       cachedPrice.price = _prices[i].toUint192();
       cachedPrice.updatedBlock = block.number.toUint64();
 
-      cahcedPriceOf[token] = cachedPrice;
+      cachedPriceOf[token] = cachedPrice;
 
       unchecked {
         ++i;
@@ -211,7 +211,7 @@ contract PythPriceFeed is
     }
 
     // use FatPrice[priceID] if CachedPrice[priceID] has been updated at the same block
-    CachedPrice memory cachedPrice = cahcedPriceOf[_token];
+    CachedPrice memory cachedPrice = cachedPriceOf[_token];
     if (
       cachedPrice.price != 0 &&
       cachedPrice.updatedBlock == block.number.toUint64()

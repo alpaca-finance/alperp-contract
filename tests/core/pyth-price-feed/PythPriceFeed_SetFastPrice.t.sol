@@ -81,14 +81,14 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
     vm.stopPrank();
 
     // assert BNB price state
-    (uint256 bnbPrice, uint256 bnbUpdated) = pythPriceFeed.cahcedPriceOf(
+    (uint256 bnbPrice, uint256 bnbUpdated) = pythPriceFeed.cachedPriceOf(
       address(bnb)
     );
     assertEq(bnbPrice, 280 * 10**30);
     assertEq(bnbUpdated, 1);
 
     // assert BTC price state
-    (uint256 btcPrice, uint256 btcUpdated) = pythPriceFeed.cahcedPriceOf(
+    (uint256 btcPrice, uint256 btcUpdated) = pythPriceFeed.cachedPriceOf(
       address(wbtc)
     );
     assertEq(btcPrice, 28_000 * 10**30);
