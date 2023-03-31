@@ -28,8 +28,9 @@ contract Miner is IMiner, OwnableUpgradeable {
   event Miner_SetPoint(address _newApAddr);
   event Miner_SetPeriod(uint256 _startTimestamp, uint256 _endTimestamp);
 
-  error Miner_InvlidAlperpPoint();
+  error Miner_InvlidMiningPoint();
   error Miner_NotWhitelisted();
+  error Miner_InvlidPeriod();
 
   function initialize() external initializer {
     OwnableUpgradeable.__Ownable_init();
@@ -50,6 +51,10 @@ contract Miner is IMiner, OwnableUpgradeable {
     external
     onlyOwner
   {
+    if (_endTimestamp < _startTimestamp) {
+      revert Miner_InvlidPeriod();
+    }
+
     startTimestamp = _startTimestamp;
     endTimestamp = _endTimestamp;
 
@@ -72,7 +77,7 @@ contract Miner is IMiner, OwnableUpgradeable {
     bool
   ) external onlyWhitelisted {
     if (address(miningPoint) == address(0)) {
-      revert Miner_InvlidAlperpPoint();
+      revert Miner_InvlidMiningPoint();
     }
 
     if (block.timestamp < startTimestamp || block.timestamp > endTimestamp) {
@@ -139,5 +144,10 @@ contract Miner is IMiner, OwnableUpgradeable {
     address
   ) external view onlyWhitelisted {
     return;
+  }
+
+  /// @custom:oz-upgrades-unsafe-allow constructor
+  constructor() {
+    _disableInitializers();
   }
 }
