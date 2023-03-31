@@ -2,6 +2,7 @@
   "Tokens": {
     "ALPACA": "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F",
     "ALP": "0x8c14A7ECEB9e0a4523B2cD10036d9d7a1BB0d601",
+    "AP": "",
     "WBNB": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
     "ETH": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
     "BTCB": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
@@ -26,6 +27,7 @@
       "pythPriceFeed": "",
       "oracle": "0xD4A043B42c60674f288a25CBCeFc21CCcD087880",
       "orderbook": "0x3680181828B179caFFC4F36E53d33a1AEA3024b2",
+      "miner": "",
       "facets": {
         "admin": "0x3C9aF60A79EB4DF4516b0f432cAA420532300059",
         "accessControl": "0xc980c91b1D010EA46eAb99431eb370B26790182E",
