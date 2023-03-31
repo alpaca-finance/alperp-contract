@@ -46,7 +46,7 @@ contract PythPriceFeed is
   mapping(address => bool) public isUpdater;
 
   // Cached price that represent save gas price
-  mapping(bytes32 => CachedPrice) public cahcedPriceOf;
+  mapping(address => CachedPrice) public cahcedPriceOf;
 
   event SetTokenPriceId(address indexed token, bytes32 priceId);
   event SetMaxPriceAge(uint256 maxPriceAge);
@@ -153,18 +153,13 @@ contract PythPriceFeed is
 
     // loop for setting price
     for (uint256 i = 0; i < _priceUpdateData.length; ) {
-      bytes32 priceId = tokenPriceId[_tokens[i]];
-      // check token has been set
-      if (priceId == 0) {
-        revert PythPriceFeed_InvalidPriceId();
-      }
-
-      CachedPrice memory cachedPrice = cahcedPriceOf[priceId];
+      address token = _tokens[i];
+      CachedPrice memory cachedPrice = cahcedPriceOf[token];
 
       cachedPrice.price = _prices[i].toUint192();
       cachedPrice.updatedBlock = block.number.toUint64();
 
-      cahcedPriceOf[priceId] = cachedPrice;
+      cahcedPriceOf[token] = cachedPrice;
 
       unchecked {
         ++i;
@@ -215,19 +210,19 @@ contract PythPriceFeed is
       return _referencePrice;
     }
 
-    bytes32 priceID = tokenPriceId[_token];
-    // Read the current value of priceID, aborting the transaction if the price has not been updated recently.
-    // Every chain has a default recency threshold which can be retrieved by calling the getValidTimePeriod() function on the contract.
-    // Please see IPyth.sol for variants of this function that support configurable recency thresholds and other useful features.
-
     // use FatPrice[priceID] if CachedPrice[priceID] has been updated at the same block
-    CachedPrice memory cachedPrice = cahcedPriceOf[priceID];
+    CachedPrice memory cachedPrice = cahcedPriceOf[_token];
     if (
       cachedPrice.price != 0 &&
       cachedPrice.updatedBlock == block.number.toUint64()
     ) {
       return cachedPrice.price;
     }
+
+    bytes32 priceID = tokenPriceId[_token];
+    // Read the current value of priceID, aborting the transaction if the price has not been updated recently.
+    // Every chain has a default recency threshold which can be retrieved by calling the getValidTimePeriod() function on the contract.
+    // Please see IPyth.sol for variants of this function that support configurable recency thresholds and other useful features.
 
     try pyth.getPriceNoOlderThan(priceID, maxPriceAge) returns (
       PythStructs.Price memory _price

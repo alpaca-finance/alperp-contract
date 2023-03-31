@@ -82,14 +82,14 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
 
     // assert BNB price state
     (uint256 bnbPrice, uint256 bnbUpdated) = pythPriceFeed.cahcedPriceOf(
-      WBNB_PRICE_ID
+      address(bnb)
     );
     assertEq(bnbPrice, 280 * 10**30);
     assertEq(bnbUpdated, 1);
 
     // assert BTC price state
     (uint256 btcPrice, uint256 btcUpdated) = pythPriceFeed.cahcedPriceOf(
-      BTC_PRICE_ID
+      address(wbtc)
     );
     assertEq(btcPrice, 28_000 * 10**30);
     assertEq(btcUpdated, 1);
@@ -130,33 +130,6 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
     vm.expectRevert(
       abi.encodeWithSignature("PythPriceFeed_InvalidCachedPriceDataLength()")
     );
-
-    pythPriceFeed.setCachedPrices(
-      cachedPriceUpdateDatas,
-      tokenAddrs,
-      cachedPrices
-    );
-    vm.stopPrank();
-  }
-
-  function testRevert_WhenTryToSetNonWhitelistToken() external {
-    // set token to the correct price id
-    pythPriceFeed.setTokenPriceId(address(bnb), WBNB_PRICE_ID);
-    pythPriceFeed.setTokenPriceId(address(wbtc), BTC_PRICE_ID);
-
-    // set ALICE as a updater
-    pythPriceFeed.setUpdater(ALICE, true);
-
-    // ALICE call setCachedPrice
-    vm.prank(ALICE);
-    bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
-    address[] memory tokenAddrs = new address[](1);
-    uint256[] memory cachedPrices = new uint256[](1);
-
-    tokenAddrs[0] = address(weth);
-    cachedPrices[0] = 1800 * 10**30;
-
-    vm.expectRevert(abi.encodeWithSignature("PythPriceFeed_InvalidPriceId()"));
 
     pythPriceFeed.setCachedPrices(
       cachedPriceUpdateDatas,
