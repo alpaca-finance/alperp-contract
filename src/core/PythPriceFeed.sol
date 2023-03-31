@@ -152,7 +152,7 @@ contract PythPriceFeed is
     }
 
     // loop for setting price
-    for (uint256 i = 0; i < _priceUpdateData.length; i++) {
+    for (uint256 i = 0; i < _priceUpdateData.length; ) {
       bytes32 priceId = tokenPriceId[_tokens[i]];
       // check token has been set
       if (priceId == 0) {
@@ -165,6 +165,10 @@ contract PythPriceFeed is
       cachedPrice.updatedBlock = block.number.toUint64();
 
       cahcedPriceOf[priceId] = cachedPrice;
+
+      unchecked {
+        ++i;
+      }
     }
 
     emit SetCachedPrices(_priceUpdateData, _tokens, _prices);
