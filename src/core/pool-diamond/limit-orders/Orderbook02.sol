@@ -24,6 +24,7 @@ import { IOnchainPriceUpdater } from "../../../interfaces/IOnChainPriceUpdater.s
 import { IWNativeRelayer } from "../../../interfaces/IWNativeRelayer.sol";
 import { GetterFacetInterface } from "../interfaces/GetterFacetInterface.sol";
 import { LiquidityFacetInterface } from "../interfaces/LiquidityFacetInterface.sol";
+import { IMiner } from "../../../interfaces/IMiner.sol";
 import { PerpTradeFacetInterface } from "../interfaces/PerpTradeFacetInterface.sol";
 import { PoolOracle } from "../../PoolOracle.sol";
 import { IterableMapping, Orders, OrderType, itmap } from "../libraries/IterableMapping.sol";
@@ -88,6 +89,8 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   IOnchainPriceUpdater public oraclePriceUpdater;
 
   address public wnativeRelayer;
+
+  IMiner miner;
 
   event CreateIncreaseOrder(
     address indexed account,
@@ -237,6 +240,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   event UpdateMinPurchaseTokenAmountUsd(uint256 minPurchaseTokenAmountUsd);
   event SetWhitelist(address whitelistAddress, bool oldAllow, bool newAllow);
   event SetIsAllowAllExecutor(bool isAllow);
+  event SetMiner(address _miner);
 
   error InvalidSender();
   error InvalidPathLength();
@@ -316,6 +320,12 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     minPurchaseTokenAmountUsd = _minPurchaseTokenAmountUsd;
 
     emit UpdateMinPurchaseTokenAmountUsd(_minPurchaseTokenAmountUsd);
+  }
+
+  function setMiner(address _miner) external onlyOwner {
+    miner = IMiner(_miner);
+
+    emit SetMiner(_miner);
   }
 
   function getSwapOrder(address _account, uint256 _orderIndex)
@@ -915,6 +925,17 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     // pay executor
     _transferOutETH(order.executionFee, _feeReceiver);
+
+    // miner
+    miner.increasePosition(
+      order.account,
+      order.subAccountId,
+      order.purchaseToken,
+      order.indexToken,
+      order.sizeDelta,
+      order.purchaseTokenAmount,
+      order.isLong
+    );
 
     emit ExecuteIncreaseOrder(
       order.account,
