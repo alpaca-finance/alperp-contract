@@ -56,7 +56,7 @@ contract AP_Claim is AP_BaseTest {
     assertEq(weth.balanceOf(address(ap)), 1.95 ether);
     assertEq(weth.balanceOf(address(BOB)), 1.05 ether);
     // also check isClaimed
-    (, bool bobClaimed) = ap.weeklyAccountAmount(2770, address(BOB));
+    (, bool bobClaimed) = ap.weeklyAccountBalanceOf(2770, address(BOB));
     assertTrue(bobClaimed);
 
     // then CAT claim
@@ -71,7 +71,7 @@ contract AP_Claim is AP_BaseTest {
     assertEq(weth.balanceOf(address(BOB)), 1.05 ether);
     assertEq(weth.balanceOf(address(CAT)), 0.75 ether);
     // also check isClaimed
-    (, bool catClaimed) = ap.weeklyAccountAmount(2770, address(CAT));
+    (, bool catClaimed) = ap.weeklyAccountBalanceOf(2770, address(CAT));
     assertTrue(catClaimed);
 
     // then the leftover will be DAVE
@@ -86,7 +86,7 @@ contract AP_Claim is AP_BaseTest {
     assertEq(weth.balanceOf(address(DAVE)), 1.2 ether);
 
     // also check isClaimed
-    (, bool daveClaimed) = ap.weeklyAccountAmount(2770, address(DAVE));
+    (, bool daveClaimed) = ap.weeklyAccountBalanceOf(2770, address(DAVE));
     assertTrue(daveClaimed);
   }
 

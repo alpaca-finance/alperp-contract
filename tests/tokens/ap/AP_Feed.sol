@@ -46,7 +46,7 @@ contract AP_Feed is AP_BaseTest {
     // expect reward should be transfer
     // and weekly reward amount should be update
     assertEq(weth.balanceOf(address(ap)), 12 ether);
-    assertEq(ap.weeklyRewardTokenAmount(2770, address(weth)), 12 ether);
+    assertEq(ap.weeklyRewardTokenBalanceOf(2770, address(weth)), 12 ether);
 
     // check indexing
     assertEq(ap.indexWeekTimestamp(0), 2770);
@@ -58,11 +58,11 @@ contract AP_Feed is AP_BaseTest {
     vm.stopPrank();
 
     // old fed shouldn't change
-    assertEq(ap.weeklyRewardTokenAmount(2770, address(weth)), 12 ether);
+    assertEq(ap.weeklyRewardTokenBalanceOf(2770, address(weth)), 12 ether);
 
     // at week 2777, reward amount should be update
     assertEq(weth.balanceOf(address(ap)), 27 ether);
-    assertEq(ap.weeklyRewardTokenAmount(2777, address(weth)), 15 ether);
+    assertEq(ap.weeklyRewardTokenBalanceOf(2777, address(weth)), 15 ether);
 
     // check indexing
     assertEq(ap.indexWeekTimestamp(0), 2770);

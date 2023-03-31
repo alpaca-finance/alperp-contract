@@ -22,7 +22,7 @@ import { IMiningPoint } from "../interfaces/IMiningPoint.sol";
 contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
   using SafeERC20Upgradeable for IERC20Upgradeable;
 
-  struct AccountAmount {
+  struct AccountInfo {
     uint256 amount;
     bool isClaimed;
   }
@@ -38,10 +38,10 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
   mapping(uint256 => uint256) public weeklyTotalSupply;
   /// @dev mapping(weekTimestamp => mapping(rewardToken => amount))
   mapping(uint256 => mapping(address => uint256))
-    public weeklyRewardTokenAmount;
-  /// @dev mapping(weekTimestamp => mapping(account => AccountAmount))
-  mapping(uint256 => mapping(address => AccountAmount))
-    public weeklyAccountAmount;
+    public weeklyRewardTokenBalanceOf;
+  /// @dev mapping(weekTimestamp => mapping(account => AccountInfo))
+  mapping(uint256 => mapping(address => AccountInfo))
+    public weeklyAccountBalanceOf;
 
   event AP_SetMinter(address _minter, bool _newAllow);
   event AP_SetRewardToken(address _rewardToken, bool _newAllow);
@@ -110,7 +110,7 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     weeklyTotalSupply[weekTimestamp] =
       weeklyTotalSupply[weekTimestamp] +
       _amount;
-    weeklyAccountAmount[weekTimestamp][_to].amount = _amount;
+    weeklyAccountBalanceOf[weekTimestamp][_to].amount = _amount;
 
     _mint(_to, _amount);
 
@@ -130,12 +130,12 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
       revert AP_NotRewardToken();
     }
 
-    if (weeklyRewardTokenAmount[_weekTimestamp][_rewardToken] != 0) {
+    if (weeklyRewardTokenBalanceOf[_weekTimestamp][_rewardToken] != 0) {
       revert AP_AlreadyFed();
     }
 
     // accounting
-    weeklyRewardTokenAmount[_weekTimestamp][_rewardToken] = _amount;
+    weeklyRewardTokenBalanceOf[_weekTimestamp][_rewardToken] = _amount;
 
     // transfer
     IERC20Upgradeable(_rewardToken).safeTransferFrom(
@@ -181,7 +181,7 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     address _rewardToken,
     address _to
   ) public {
-    AccountAmount memory accountAmount = weeklyAccountAmount[_weekTimestamp][
+    AccountInfo memory accountAmount = weeklyAccountBalanceOf[_weekTimestamp][
       _to
     ];
     if (accountAmount.amount == 0 || accountAmount.isClaimed) {
@@ -190,7 +190,7 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
 
     // calculate reward sharing
     uint256 reward = (accountAmount.amount *
-      weeklyRewardTokenAmount[_weekTimestamp][_rewardToken]) /
+      weeklyRewardTokenBalanceOf[_weekTimestamp][_rewardToken]) /
       weeklyTotalSupply[_weekTimestamp];
 
     // transfer
@@ -200,7 +200,7 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     _burn(_to, accountAmount.amount);
 
     // update claim
-    weeklyAccountAmount[_weekTimestamp][_to].isClaimed = true;
+    weeklyAccountBalanceOf[_weekTimestamp][_to].isClaimed = true;
 
     emit AP_Claim(_weekTimestamp, _to, accountAmount.amount, reward);
   }
