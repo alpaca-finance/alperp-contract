@@ -28,11 +28,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   );
 
   const args: RewardDistributorSetParamsArgs = {
-    alpStakingProtocolRevenue: (
-      config.Staking.ALPStaking.rewarders.find(
-        (o) => o.name === "ALP Staking Protocol Revenue"
-      ) as any
-    ).address,
+    devFundAddress: "0x855d2A7865b2dBe7a876E95cc87cc5aB71014d8A",
   };
 
   const [
