@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, console, LibPoolConfigV1, LiquidityFacetInterface, GetterFacetInterface, PerpTradeFacetInterface, PythPriceFeed, FakePyth } from "./PoolDiamond_BaseTest.t.sol";
+import { PoolDiamond_BaseTest, console, LibPoolConfigV1, LiquidityFacetInterface, GetterFacetInterface, PerpTradeFacetInterface, FakePyth } from "./PoolDiamond_BaseTest.t.sol";
 
 contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
+  uint256 internal constant FEE = 0.01 ether;
   bytes32 internal constant WBTC_PRICE_ID =
     0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43;
 
@@ -50,6 +51,21 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     poolOracle.setIsSecondaryPriceEnabled(true);
 
     orderbook.setWhitelist(address(this), true);
+
+    // init price price
+    bytes memory bnbPriceFeedData = FakePyth(address(pyth))
+      .createPriceFeedUpdateData({
+        id: WBTC_PRICE_ID,
+        price: int64(4100000000000),
+        conf: uint64(0),
+        expo: int32(-8),
+        emaPrice: int64(4100000000000),
+        emaConf: uint64(0),
+        publishTime: uint64(block.timestamp + 1)
+      });
+    bytes[] memory poolPriceFeedDatas = new bytes[](1);
+    poolPriceFeedDatas[0] = bnbPriceFeedData;
+    pyth.updatePriceFeeds{ value: FEE }(poolPriceFeedDatas);
   }
 
   function testRevert_IncreaseOrder_InsufficientExecutionFee() external {
@@ -209,7 +225,7 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     // 7. Redeemable WBTC in USD should be 93.7168 USD
     assertEq(
       poolGetterFacet.alp().balanceOf(address(ALICE)),
-      92573912195121951219 
+      92573912195121951219
     );
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 706);
     assertEq(poolGetterFacet.getAumE18(false), 93.7168 * 10**18);
@@ -299,8 +315,18 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     vm.warp(1669832202); // warp ahead
 
     // executeOrders(orderList, payable(BOB));
-    bytes[] memory data = new bytes[](1);
-    orderbook.executeIncreaseOrder(ALICE, 0, 1, payable(BOB), data);
+    bytes[] memory priceDatas = new bytes[](1);
+    address[] memory tokenAddr = new address[](1);
+    uint256[] memory prices = new uint256[](1);
+    orderbook.executeIncreaseOrder(
+      ALICE,
+      0,
+      1,
+      payable(BOB),
+      priceDatas,
+      tokenAddr,
+      prices
+    );
     // Bob should receive 0.01 ether as execution fee
     assertEq(BOB.balance, 0.01 ether);
 
@@ -380,7 +406,15 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     vm.warp(block.timestamp + 1000);
 
     // executeOrders(orderList, payable(BOB));
-    orderbook.executeDecreaseOrder(ALICE, 0, 0, payable(BOB), data);
+    orderbook.executeDecreaseOrder(
+      ALICE,
+      0,
+      0,
+      payable(BOB),
+      priceDatas,
+      tokenAddr,
+      prices
+    );
     // Bob should receive another 0.01 ether as execution fee
     assertEq(BOB.balance, 0.02 ether);
 
@@ -506,7 +540,10 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     // 5. WBTC's USD debt should be 48.8584 USD
     // 6. WBTC's liquidity should be 117499 - 353 = 117146 satoshi
     // 7. Redeemable WBTC in USD should be 48.8584 USD
-    assertEq(poolGetterFacet.alp().balanceOf(address(ALICE)), 48.02986 * 10**18);
+    assertEq(
+      poolGetterFacet.alp().balanceOf(address(ALICE)),
+      48.02986 * 10**18
+    );
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 353);
     assertEq(poolGetterFacet.getAumE18(false), 48.02986 * 10**18);
     assertEq(poolGetterFacet.getAumE18(true), 48.02986 * 10**18);
@@ -664,30 +701,22 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     vm.warp(1669832202); // warp ahead
 
     // executeOrders(orderList, payable(BOB));
-    PriceFeedData memory priceFeedDataStruct = PriceFeedData({
-      id: WBTC_PRICE_ID,
-      price: int64(4100000000000),
-      conf: uint64(0),
-      expo: int32(-8),
-      emaPrice: int64(4100000000000),
-      emaConf: uint64(0),
-      publishTime: uint64(block.timestamp)
-    });
-    bytes memory priceFeedData = FakePyth(address(pyth))
-      .createPriceFeedUpdateData({
-        id: priceFeedDataStruct.id,
-        price: priceFeedDataStruct.price,
-        conf: priceFeedDataStruct.conf,
-        expo: priceFeedDataStruct.expo,
-        emaPrice: priceFeedDataStruct.emaPrice,
-        emaConf: priceFeedDataStruct.emaConf,
-        publishTime: priceFeedDataStruct.publishTime
-      });
-    bytes[] memory data = new bytes[](1);
-    data[0] = priceFeedData;
-    orderbook.executeIncreaseOrder(ALICE, 0, 1, payable(BOB), data);
-    // Bob should receive 0.01 ether as execution fee
-    assertEq(BOB.balance, 0.01 ether);
+    bytes[] memory priceDatas = new bytes[](1);
+    address[] memory tokenAddr = new address[](1);
+    tokenAddr[0] = address(wbtc);
+    uint256[] memory prices = new uint256[](1);
+    prices[0] = 41_000 * 10**30;
+    orderbook.executeIncreaseOrder(
+      ALICE,
+      0,
+      1,
+      payable(BOB),
+      priceDatas,
+      tokenAddr,
+      prices
+    );
+    // Bob should receive 0.02 ether as execution fee
+    assertEq(BOB.balance, 0.02 ether);
 
     // The following condition expected to be happened:
     // 1. Pool's WBTC liquidity should be:
@@ -765,28 +794,18 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     vm.warp(block.timestamp + 1000);
 
     // executeOrders(orderList, payable(BOB));
-    priceFeedDataStruct = PriceFeedData({
-      id: WBTC_PRICE_ID,
-      price: int64(4500000000000),
-      conf: uint64(0),
-      expo: int32(-8),
-      emaPrice: int64(4500000000000),
-      emaConf: uint64(0),
-      publishTime: uint64(block.timestamp)
-    });
-    priceFeedData = FakePyth(address(pyth)).createPriceFeedUpdateData({
-      id: priceFeedDataStruct.id,
-      price: priceFeedDataStruct.price,
-      conf: priceFeedDataStruct.conf,
-      expo: priceFeedDataStruct.expo,
-      emaPrice: priceFeedDataStruct.emaPrice,
-      emaConf: priceFeedDataStruct.emaConf,
-      publishTime: priceFeedDataStruct.publishTime
-    });
-    data[0] = priceFeedData;
-    orderbook.executeDecreaseOrder(ALICE, 0, 0, payable(BOB), data);
-    // Bob should receive another 0.01 ether as execution fee
-    assertEq(BOB.balance, 0.02 ether);
+    prices[0] = 45_000 * 10**30;
+    orderbook.executeDecreaseOrder(
+      ALICE,
+      0,
+      0,
+      payable(BOB),
+      priceDatas,
+      tokenAddr,
+      prices
+    );
+    // Bob should receive another 0.02 ether as execution fee
+    assertEq(BOB.balance, 0.04 ether);
 
     position = poolGetterFacet.getPositionWithSubAccountId(
       ALICE,
@@ -1195,9 +1214,18 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     wbtcPriceFeed.setLatestAnswer(100000 * 10**8);
     wbtcPriceFeed.setLatestAnswer(80000 * 10**8);
 
-    bytes[] memory data = new bytes[](1);
+    bytes[] memory priceDatas = new bytes[](1);
+    address[] memory tokenAddr = new address[](1);
+    uint256[] memory prices = new uint256[](1);
     vm.expectRevert(abi.encodeWithSignature("InvalidPriceForExecution()"));
-    orderbook.executeSwapOrder(ALICE, 0, payable(BOB), data);
+    orderbook.executeSwapOrder(
+      ALICE,
+      0,
+      payable(BOB),
+      priceDatas,
+      tokenAddr,
+      prices
+    );
   }
 
   function testCorrectness_WhenSwap() external {
@@ -1361,7 +1389,9 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
 
     uint256 curIndex = 0;
 
-    bytes[] memory data = new bytes[](1);
+    bytes[] memory priceDatas = new bytes[](1);
+    address[] memory tokenAddr = new address[](1);
+    uint256[] memory prices = new uint256[](1);
 
     while (curIndex < orderLength) {
       address account = address(orderList[curIndex * 4]);
@@ -1375,7 +1405,9 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
           account,
           orderIndex,
           _executionFeeReceiver,
-          data
+          priceDatas,
+          tokenAddr,
+          prices
         );
       } else if (orderType == 1) {
         //INCREASE
@@ -1384,7 +1416,9 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
           subAccountId,
           orderIndex,
           _executionFeeReceiver,
-          data
+          priceDatas,
+          tokenAddr,
+          prices
         );
       } else if (orderType == 2) {
         //DECREASE
@@ -1393,7 +1427,9 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
           subAccountId,
           orderIndex,
           _executionFeeReceiver,
-          data
+          priceDatas,
+          tokenAddr,
+          prices
         );
       }
       curIndex++;

@@ -73,5 +73,8 @@
     "address": "",
     "deployedAtBlock": ""
   },
-  "TimelockController": ""
+  "TimelockController": "",
+  "ProxyAdmin": "",
+  "Timelock": "",
+  "OpMultiSig": ""
 }

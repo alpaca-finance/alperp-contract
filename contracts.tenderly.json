@@ -75,5 +75,8 @@
     "address": "0x49f47948063B240C471709d58493fC7d9a510ceb",
     "deployedAtBlock": "25770898"
   },
-  "TimelockController": ""
+  "TimelockController": "",
+  "ProxyAdmin": "0x4c7674E008991c257209Cd48Bc6233dCB4812419",
+  "Timelock": "",
+  "OpMultiSig": ""
 }

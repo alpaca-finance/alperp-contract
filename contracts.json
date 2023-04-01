@@ -73,5 +73,9 @@
   "MerkleAirdrop": {
     "address": "0xC018C6130F47EE34E50045016E8A92357E1cAD43",
     "deployedAtBlock": "26142438"
-  }
+  },
+  "TimelockController": "",
+  "ProxyAdmin": "",
+  "Timelock": "",
+  "OpMultiSig": ""
 }

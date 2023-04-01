@@ -32,6 +32,11 @@ contract PythPriceFeed is
   uint256 public constant PRICE_PRECISION = 10**30;
   uint256 public constant MAXIMUM_PRICE_AGE = 120; // 2 mins
 
+  struct CachedPrice {
+    uint192 price;
+    uint64 updatedBlock;
+  }
+
   // pyth related fields
   IPyth public pyth;
   mapping(address => bytes32) public tokenPriceId;
@@ -40,14 +45,23 @@ contract PythPriceFeed is
   bool public favorRefPrice;
   mapping(address => bool) public isUpdater;
 
+  // Cached price for gas saving
+  mapping(address => CachedPrice) public cachedPriceOf;
+
   event SetTokenPriceId(address indexed token, bytes32 priceId);
   event SetMaxPriceAge(uint256 maxPriceAge);
   event SetFavorRefPrice(bool favorRefPrice);
   event SetUpdater(address indexed account, bool isActive);
+  event SetCachedPrices(
+    bytes[] _priceUpdateData,
+    address[] _tokens,
+    uint256[] _prices
+  );
 
   error PythPriceFeed_OnlyUpdater();
   error PythPriceFeed_InvalidMaxPriceAge();
   error PythPriceFeed_InvalidPriceId();
+  error PythPriceFeed_InvalidCachedPriceDataLength();
 
   function initialize(address _pyth) external initializer {
     OwnableUpgradeable.__Ownable_init();
@@ -116,7 +130,41 @@ contract PythPriceFeed is
     emit SetUpdater(_account, _isActive);
   }
 
+  /// @notice A function for updating cached prices based on price update data, tokens and prices
+  /// @param _priceUpdateData - Array of price update data
+  /// @param _tokens - Array of token address
+  /// @param _prices - Array of price
+  function setCachedPrices(
+    bytes[] memory _priceUpdateData,
+    address[] memory _tokens,
+    uint256[] memory _prices
+  ) external onlyUpdater {
+    if (favorRefPrice) {
+      return;
+    }
 
+    // Validate parameter length
+    if (
+      _priceUpdateData.length != _tokens.length ||
+      _priceUpdateData.length != _prices.length
+    ) {
+      revert PythPriceFeed_InvalidCachedPriceDataLength();
+    }
+
+    // Loop for setting price
+    for (uint256 i = 0; i < _priceUpdateData.length; ) {
+      CachedPrice storage cachedPrice = cachedPriceOf[_tokens[i]];
+
+      cachedPrice.price = _prices[i].toUint192();
+      cachedPrice.updatedBlock = block.number.toUint64();
+
+      unchecked {
+        ++i;
+      }
+    }
+
+    emit SetCachedPrices(_priceUpdateData, _tokens, _prices);
+  }
 
   /// @notice A function for updating prices based on price update data
   /// @param _priceUpdateData - price update data
@@ -159,6 +207,15 @@ contract PythPriceFeed is
       return _referencePrice;
     }
 
+    // Use cahced price if it has been updated at the same block
+    CachedPrice memory cachedPrice = cachedPriceOf[_token];
+    if (
+      cachedPrice.price != 0 &&
+      cachedPrice.updatedBlock == block.number.toUint64()
+    ) {
+      return cachedPrice.price;
+    }
+
     bytes32 priceID = tokenPriceId[_token];
     // Read the current value of priceID, aborting the transaction if the price has not been updated recently.
     // Every chain has a default recency threshold which can be retrieved by calling the getValidTimePeriod() function on the contract.
@@ -170,9 +227,11 @@ contract PythPriceFeed is
       uint256 tokenDecimals = _price.expo < 0
         ? (10**int256(-_price.expo).toUint256())
         : 10**int256(_price.expo).toUint256();
-      return ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
+      return
+        ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
     } catch {
-      // if some problem occurred (e.g. price is older than maxPriceAge), return reference price from primary source
+      // if some problem occurred (e.g. price is older than maxPriceAge)
+      // return reference price from primary source
       return _referencePrice;
     }
   }

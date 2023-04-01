@@ -37,6 +37,24 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
 
   function setUp() public override {
     super.setUp();
+
+    // init price price
+    bytes memory bnbPriceFeedData = FakePyth(address(pyth))
+      .createPriceFeedUpdateData({
+        id: WBNB_PRICE_ID,
+        price: int64(30000000000),
+        conf: uint64(150000000),
+        expo: int32(-8),
+        emaPrice: int64(30000000000),
+        emaConf: uint64(150000000),
+        publishTime: uint64(block.timestamp + 1)
+      });
+    bytes[] memory poolPriceFeedDatas = new bytes[](1);
+    poolPriceFeedDatas[0] = bnbPriceFeedData;
+    pyth.updatePriceFeeds{ value: FEE }(poolPriceFeedDatas);
+
+    // warp to 16 seconds later,
+    vm.warp(block.timestamp + 15);
   }
 
   function _convertPythPriceDataToTetherFormat(
@@ -46,8 +64,8 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     uint256 tokenDecimals = _price.expo < 0
       ? (10**int256(-_price.expo).toUint256())
       : 10**int256(_price.expo).toUint256();
-    return ((int256(_price.price)).toUint256() *
-          PRICE_PRECISION) / tokenDecimals;
+    return
+      ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
   }
 
   function testCorrectness_WhenPriceIsOlderThanMaxPrice() external {
@@ -229,5 +247,164 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     uint256 price = pythPriceFeed.getPrice(address(bnb), refPrice, true);
 
     assertEq(price, refPrice);
+  }
+
+  function testCorrectness_WhenGetCachedPriceAtSameBlockWithSetCachedPrice()
+    external
+  {
+    // set max price agge to 15
+    pythPriceFeed.setMaxPriceAge(15);
+
+    // set price
+    bytes memory priceFeedData = FakePyth(address(pyth))
+      .createPriceFeedUpdateData({
+        id: WBNB_PRICE_ID,
+        price: int64(28895911666),
+        conf: uint64(16436851),
+        expo: int32(-8),
+        emaPrice: int64(28895911666),
+        emaConf: uint64(16436851),
+        publishTime: uint64(block.timestamp)
+      });
+
+    // update price in a Pyth contract
+    bytes[] memory priceFeedDatas = new bytes[](1);
+    priceFeedDatas[0] = priceFeedData;
+    pyth.updatePriceFeeds{ value: FEE }(priceFeedDatas);
+
+    // warp to 5 seconds later
+    vm.warp(block.timestamp + 5);
+
+    // set token to the correct price id
+    pythPriceFeed.setTokenPriceId(address(bnb), WBNB_PRICE_ID);
+
+    // set ALICE as a updater
+    pythPriceFeed.setUpdater(ALICE, true);
+
+    // alice set cached price
+    uint256 fastWBNBPrice = 280 * 10**30;
+    vm.prank(ALICE);
+    bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
+    address[] memory tokenAddrs = new address[](1);
+    uint256[] memory cachedPrices = new uint256[](1);
+    tokenAddrs[0] = address(bnb);
+    cachedPrices[0] = fastWBNBPrice;
+    pythPriceFeed.setCachedPrices(
+      cachedPriceUpdateDatas,
+      tokenAddrs,
+      cachedPrices
+    );
+    vm.stopPrank();
+
+    // get price, should return cached price instead
+    uint256 price = pythPriceFeed.getPrice(address(bnb), 290 * 10**30, true);
+
+    assertEq(price, fastWBNBPrice);
+  }
+
+  function testCorrectness_WhenGetCachedPriceAfterSetCachedPriceBlock()
+    external
+  {
+    // set max price agge to 15
+    pythPriceFeed.setMaxPriceAge(15);
+
+    // set price
+    bytes memory priceFeedData = FakePyth(address(pyth))
+      .createPriceFeedUpdateData({
+        id: WBNB_PRICE_ID,
+        price: int64(28895911666),
+        conf: uint64(16436851),
+        expo: int32(-8),
+        emaPrice: int64(28895911666),
+        emaConf: uint64(16436851),
+        publishTime: uint64(block.timestamp)
+      });
+
+    // update price in a Pyth contract
+    bytes[] memory priceFeedDatas = new bytes[](1);
+    priceFeedDatas[0] = priceFeedData;
+    pyth.updatePriceFeeds{ value: FEE }(priceFeedDatas);
+
+    // wrap to another block
+    vm.roll(block.number + 1);
+
+    // set token to the correct price id
+    pythPriceFeed.setTokenPriceId(address(bnb), WBNB_PRICE_ID);
+
+    // set ALICE as a updater
+    pythPriceFeed.setUpdater(ALICE, true);
+
+    // alice set cached price
+    uint256 fastWBNBPrice = 280 * 10**30;
+    vm.prank(ALICE);
+    bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
+    address[] memory tokenAddrs = new address[](1);
+    uint256[] memory cachedPrices = new uint256[](1);
+    tokenAddrs[0] = address(bnb);
+    cachedPrices[0] = fastWBNBPrice;
+    pythPriceFeed.setCachedPrices(
+      cachedPriceUpdateDatas,
+      tokenAddrs,
+      cachedPrices
+    );
+    vm.stopPrank();
+
+    // wrap to another block
+    vm.roll(block.number + 1);
+
+    // get price, should return cached price instead
+    uint256 price = pythPriceFeed.getPrice(address(bnb), 290 * 10**30, true);
+
+    assertEq(price, 288959116660000000000000000000000);
+  }
+
+  function testCorrectness_WhenSomeoneUpdatePythPriceButStillSameBlock()
+    external
+  {
+    // set max price agge to 15
+    pythPriceFeed.setMaxPriceAge(15);
+
+    // set token to the correct price id
+    pythPriceFeed.setTokenPriceId(address(bnb), WBNB_PRICE_ID);
+
+    // set ALICE as a updater
+    pythPriceFeed.setUpdater(ALICE, true);
+
+    // alice set cached price
+    uint256 fastWBNBPrice = 280 * 10**30;
+    vm.prank(ALICE);
+    bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
+    address[] memory tokenAddrs = new address[](1);
+    uint256[] memory cachedPrices = new uint256[](1);
+    tokenAddrs[0] = address(bnb);
+    cachedPrices[0] = fastWBNBPrice;
+    pythPriceFeed.setCachedPrices(
+      cachedPriceUpdateDatas,
+      tokenAddrs,
+      cachedPrices
+    );
+    vm.stopPrank();
+
+    // set price
+    bytes memory priceFeedData = FakePyth(address(pyth))
+      .createPriceFeedUpdateData({
+        id: WBNB_PRICE_ID,
+        price: int64(28895911666),
+        conf: uint64(16436851),
+        expo: int32(-8),
+        emaPrice: int64(28895911666),
+        emaConf: uint64(16436851),
+        publishTime: uint64(block.timestamp)
+      });
+
+    // update price in a Pyth contract
+    bytes[] memory priceFeedDatas = new bytes[](1);
+    priceFeedDatas[0] = priceFeedData;
+    pyth.updatePriceFeeds{ value: FEE }(priceFeedDatas);
+
+    // get price, should return cached price instead
+    uint256 price = pythPriceFeed.getPrice(address(bnb), 290 * 10**30, true);
+
+    assertEq(price, fastWBNBPrice);
   }
 }
