@@ -45,7 +45,7 @@ contract PythPriceFeed is
   bool public favorRefPrice;
   mapping(address => bool) public isUpdater;
 
-  // Cached price that represent save gas price
+  // Cached price for gas saving
   mapping(address => CachedPrice) public cachedPriceOf;
 
   event SetTokenPriceId(address indexed token, bytes32 priceId);
@@ -130,7 +130,7 @@ contract PythPriceFeed is
     emit SetUpdater(_account, _isActive);
   }
 
-  /// @notice A function for updating cached prices based on price update data, price id address and price
+  /// @notice A function for updating cached prices based on price update data, tokens and prices
   /// @param _priceUpdateData - Array of price update data
   /// @param _tokens - Array of token address
   /// @param _prices - Array of price
@@ -143,7 +143,7 @@ contract PythPriceFeed is
       return;
     }
 
-    // validate parameter length
+    // Validate parameter length
     if (
       _priceUpdateData.length != _tokens.length ||
       _priceUpdateData.length != _prices.length
@@ -151,15 +151,12 @@ contract PythPriceFeed is
       revert PythPriceFeed_InvalidCachedPriceDataLength();
     }
 
-    // loop for setting price
+    // Loop for setting price
     for (uint256 i = 0; i < _priceUpdateData.length; ) {
-      address token = _tokens[i];
-      CachedPrice memory cachedPrice = cachedPriceOf[token];
+      CachedPrice storage cachedPrice = cachedPriceOf[_tokens[i]];
 
       cachedPrice.price = _prices[i].toUint192();
       cachedPrice.updatedBlock = block.number.toUint64();
-
-      cachedPriceOf[token] = cachedPrice;
 
       unchecked {
         ++i;
@@ -210,7 +207,7 @@ contract PythPriceFeed is
       return _referencePrice;
     }
 
-    // use FatPrice[priceID] if CachedPrice[priceID] has been updated at the same block
+    // Use cahced price if it has been updated at the same block
     CachedPrice memory cachedPrice = cachedPriceOf[_token];
     if (
       cachedPrice.price != 0 &&

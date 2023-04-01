@@ -163,6 +163,8 @@
     "deploy:mainnet:staking:feed_alpaca_emission_rewarder": "npx hardhat --network mainnet deploy --no-compile --reset --tags FeedALPACAEmissionRewarder",
     "deploy:mainnet:oracle:upgrade_pyth_price_feed": "npx hardhat --network mainnet deploy --no-compile --reset --tags UpgradePythPriceFeed",
     "deploy:mainnet:oracle:upgrade_orderbook": "npx hardhat --network mainnet deploy --no-compile --reset --tags UpgradeOrderBook",
+    "deploy:mainnet:staking:set-reward-distributor-params": "npx hardhat --network mainnet deploy --no-compile --reset --tags SetRewardDistributorParams",
+    "deploy:mainnet:staking:upgrade_reward_distributor": "npx hardhat --network mainnet deploy --no-compile --reset --tags UpgradeRewardDistributor",
     "deploy:mainnet:pool:pool_router_04": "hardhat --network mainnet deploy --no-compile --reset --tags PoolRouter04",
     "deploy:mainnet:miner:miner": "hardhat --network mainnet deploy --no-compile --reset --tags Miner",
     "deploy:mainnet:miner:ap_token": "hardhat --network mainnet deploy --no-compile --reset --tags APToken",

@@ -11,7 +11,7 @@ const REWARDER = config.Staking.ALPStaking.rewarders.find(
   (each: any) => each.name === "ALP Staking ALPACA Emission"
 );
 const AMOUNT = "10000";
-const DURATION = "604800";
+const EXPIRED_AT = "1680775200";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   if (!REWARDER) {
@@ -31,7 +31,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(
     `> Feeding ${AMOUNT} to ${
       REWARDER.address
-    } ${await token.symbol()} for ${DURATION} seconds`
+    } ${await token.symbol()} which will be expired at ${EXPIRED_AT}`
   );
 
   console.log(`> Checking allowance...`);
@@ -44,9 +44,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
   console.log(`> ✅ Done`);
 
-  const tx = await rewarder.feed(
+  const tx = await rewarder.feedWithExpiredAt(
     ethers.utils.parseUnits(AMOUNT, decimals),
-    BigNumber.from(DURATION),
+    EXPIRED_AT,
     { gasLimit: 10000000 }
   );
   console.log(`> Tx is submitted: ${tx.hash}`);
