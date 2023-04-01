@@ -184,7 +184,7 @@ contract RewardDistributor is OwnableUpgradeable {
   function setReferralRevenueMaxThreshold(
     uint256 newReferralRevenueMaxThreshold
   ) external onlyOwner {
-    if (newReferralRevenueMaxThreshold > 8000) {
+    if (newReferralRevenueMaxThreshold > 9500) {
       // should not exceed 80% of total revenue
       revert RewardDistributor_BadReferralRevenueMaxThreshold();
     }
