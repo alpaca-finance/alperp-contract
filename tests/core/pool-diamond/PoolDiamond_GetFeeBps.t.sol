@@ -1,19 +1,26 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, console, LibPoolConfigV1, LiquidityFacetInterface, GetterFacetInterface, PerpTradeFacetInterface } from "./PoolDiamond_BaseTest.t.sol";
+import {
+  PoolDiamond_BaseTest,
+  console,
+  LibPoolConfigV1,
+  LiquidityFacetInterface,
+  GetterFacetInterface,
+  PerpTradeFacetInterface
+} from "./PoolDiamond_BaseTest.t.sol";
 
 contract PoolDiamond_GetFeeBpsTest is PoolDiamond_BaseTest {
   function setUp() public override {
@@ -22,8 +29,8 @@ contract PoolDiamond_GetFeeBpsTest is PoolDiamond_BaseTest {
     address[] memory tokens = new address[](1);
     tokens[0] = address(bnb);
 
-    LibPoolConfigV1.TokenConfig[]
-      memory tokenConfigs = new LibPoolConfigV1.TokenConfig[](1);
+    LibPoolConfigV1.TokenConfig[] memory tokenConfigs =
+      new LibPoolConfigV1.TokenConfig[](1);
     tokenConfigs[0] = LibPoolConfigV1.TokenConfig({
       accept: true,
       isStable: false,
@@ -42,9 +49,9 @@ contract PoolDiamond_GetFeeBpsTest is PoolDiamond_BaseTest {
 
   function testCorrectness_GetFeeBps() external {
     // Initialized price feeds
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
 
     // Set Mint Burn Fee Bps to 20 BPS
     poolAdminFacet.setMintBurnFeeBps(20);
@@ -94,8 +101,8 @@ contract PoolDiamond_GetFeeBpsTest is PoolDiamond_BaseTest {
     // Add DAI to the allow token list
     address[] memory tokens = new address[](1);
     tokens[0] = address(dai);
-    LibPoolConfigV1.TokenConfig[]
-      memory tokenConfigs = new LibPoolConfigV1.TokenConfig[](1);
+    LibPoolConfigV1.TokenConfig[] memory tokenConfigs =
+      new LibPoolConfigV1.TokenConfig[](1);
     tokenConfigs[0] = LibPoolConfigV1.TokenConfig({
       accept: true,
       isStable: true,
@@ -137,8 +144,7 @@ contract PoolDiamond_GetFeeBpsTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.getRemoveLiquidityFeeBps(address(bnb), 20000), 50);
     assertEq(poolGetterFacet.getRemoveLiquidityFeeBps(address(bnb), 25000), 50);
     assertEq(
-      poolGetterFacet.getRemoveLiquidityFeeBps(address(bnb), 100000),
-      150
+      poolGetterFacet.getRemoveLiquidityFeeBps(address(bnb), 100000), 150
     );
 
     // Assuming:
@@ -197,10 +203,7 @@ contract PoolDiamond_GetFeeBpsTest is PoolDiamond_BaseTest {
     // Assert remove liquidity fee, should be high fee
     assertEq(poolGetterFacet.getRemoveLiquidityFeeBps(address(bnb), 1000), 110);
     assertEq(poolGetterFacet.getRemoveLiquidityFeeBps(address(bnb), 5000), 113);
-    assertEq(
-      poolGetterFacet.getRemoveLiquidityFeeBps(address(bnb), 10000),
-      116
-    );
+    assertEq(poolGetterFacet.getRemoveLiquidityFeeBps(address(bnb), 10000), 116);
 
     // Set fee back to what I should be.
     // 1. mintBurnFeeBps is 20 BPS

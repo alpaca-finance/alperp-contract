@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
 import "src/interfaces/ChainLinkPriceFeedInterface.sol";
@@ -47,13 +47,7 @@ contract MockChainlinkPriceFeed is ChainlinkPriceFeedInterface {
     external
     view
     override
-    returns (
-      uint80,
-      int256,
-      uint256,
-      uint256,
-      uint80
-    )
+    returns (uint80, int256, uint256, uint256, uint80)
   {
     return (_roundId, answers[_roundId], 0, 0, 0);
   }
@@ -62,13 +56,7 @@ contract MockChainlinkPriceFeed is ChainlinkPriceFeedInterface {
     external
     view
     override
-    returns (
-      uint80,
-      int256,
-      uint256,
-      uint256,
-      uint80
-    )
+    returns (uint80, int256, uint256, uint256, uint80)
   {
     return (roundId, answers[roundId], 0, 0, 0);
   }

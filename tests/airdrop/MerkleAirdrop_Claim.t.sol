@@ -1,19 +1,21 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { MerkleAirdrop_BaseTest, MerkleAirdrop } from "./MerkleAirdrop_BaseTest.t.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {
+  MerkleAirdrop_BaseTest, MerkleAirdrop
+} from "./MerkleAirdrop_BaseTest.t.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract MerkleAirdrop_Claim is MerkleAirdrop_BaseTest {
   function setUp() public override {
@@ -23,8 +25,7 @@ contract MerkleAirdrop_Claim is MerkleAirdrop_BaseTest {
     merkleAirdrop.init(weekTimestamp2, merkleRoot2);
     usdc.mint(address(this), referralAmountWeek1 + referralAmountWeek2);
     usdc.transfer(
-      address(merkleAirdrop),
-      referralAmountWeek1 + referralAmountWeek2
+      address(merkleAirdrop), referralAmountWeek1 + referralAmountWeek2
     );
   }
 
@@ -35,9 +36,8 @@ contract MerkleAirdrop_Claim is MerkleAirdrop_BaseTest {
 
   function testRevert_AlreadyClaimed() external {
     bytes32[] memory merkleProof = new bytes32[](1);
-    merkleProof[
-      0
-    ] = 0x29a67c03ffd050f5ef7d29ec5da67725ce281e209a4d795a8d0f1c3295961555;
+    merkleProof[0] =
+      0x29a67c03ffd050f5ef7d29ec5da67725ce281e209a4d795a8d0f1c3295961555;
     merkleAirdrop.claim(
       weekTimestamp1,
       0,
@@ -47,8 +47,7 @@ contract MerkleAirdrop_Claim is MerkleAirdrop_BaseTest {
     );
 
     assertEq(
-      usdc.balanceOf(0x0578C797798Ae89b688Cd5676348344d7d0EC35E),
-      3497234393
+      usdc.balanceOf(0x0578C797798Ae89b688Cd5676348344d7d0EC35E), 3497234393
     );
 
     vm.expectRevert(abi.encodeWithSignature("MerkleAirdrop_AlreadyClaimed()"));
@@ -63,9 +62,8 @@ contract MerkleAirdrop_Claim is MerkleAirdrop_BaseTest {
 
   function testCorrectness_Claim() external {
     bytes32[] memory merkleProof = new bytes32[](1);
-    merkleProof[
-      0
-    ] = 0x29a67c03ffd050f5ef7d29ec5da67725ce281e209a4d795a8d0f1c3295961555;
+    merkleProof[0] =
+      0x29a67c03ffd050f5ef7d29ec5da67725ce281e209a4d795a8d0f1c3295961555;
     merkleAirdrop.claim(
       weekTimestamp1,
       0,
@@ -75,13 +73,11 @@ contract MerkleAirdrop_Claim is MerkleAirdrop_BaseTest {
     );
 
     assertEq(
-      usdc.balanceOf(0x0578C797798Ae89b688Cd5676348344d7d0EC35E),
-      3497234393
+      usdc.balanceOf(0x0578C797798Ae89b688Cd5676348344d7d0EC35E), 3497234393
     );
 
-    merkleProof[
-      0
-    ] = 0x4a885167ba8603fa3d196e4460f287b098682ee17f030d9c2ef979244d205a1b;
+    merkleProof[0] =
+      0x4a885167ba8603fa3d196e4460f287b098682ee17f030d9c2ef979244d205a1b;
     merkleAirdrop.claim(
       weekTimestamp1,
       1,
@@ -91,13 +87,11 @@ contract MerkleAirdrop_Claim is MerkleAirdrop_BaseTest {
     );
 
     assertEq(
-      usdc.balanceOf(0x6629eC35c8Aa279BA45Dbfb575c728d3812aE31a),
-      1000000000
+      usdc.balanceOf(0x6629eC35c8Aa279BA45Dbfb575c728d3812aE31a), 1000000000
     );
 
-    merkleProof[
-      0
-    ] = 0x0764744763c44790e1c67fdb1980737eb59172fb8ff8bfff04af46d2cb00edaa;
+    merkleProof[0] =
+      0x0764744763c44790e1c67fdb1980737eb59172fb8ff8bfff04af46d2cb00edaa;
     merkleAirdrop.claim(
       weekTimestamp2,
       0,
@@ -111,9 +105,8 @@ contract MerkleAirdrop_Claim is MerkleAirdrop_BaseTest {
       100000000 + 3497234393
     );
 
-    merkleProof[
-      0
-    ] = 0x2093264bdce01a9e25cba43ac765a683400dddee4d41a092fc95f40d18d3cd8d;
+    merkleProof[0] =
+      0x2093264bdce01a9e25cba43ac765a683400dddee4d41a092fc95f40d18d3cd8d;
     merkleAirdrop.claim(
       weekTimestamp2,
       1,
@@ -123,8 +116,7 @@ contract MerkleAirdrop_Claim is MerkleAirdrop_BaseTest {
     );
 
     assertEq(
-      usdc.balanceOf(0xac0E15a038eedfc68ba3C35c73feD5bE4A07afB5),
-      400000000
+      usdc.balanceOf(0xac0E15a038eedfc68ba3C35c73feD5bE4A07afB5), 400000000
     );
 
     assertEq(usdc.balanceOf(address(merkleAirdrop)), 0);

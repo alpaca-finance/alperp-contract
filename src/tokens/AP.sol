@@ -1,25 +1,33 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { IERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import { SafeERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import { ERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { IMiningPoint } from "../interfaces/IMiningPoint.sol";
+/// OZ
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {ERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
+/// Alperp
+import {IAP} from "@alperp/interfaces/IAP.sol";
+
+contract AP is ERC20Upgradeable, OwnableUpgradeable, IAP {
+  /// Dependencies
   using SafeERC20Upgradeable for IERC20Upgradeable;
 
   struct AccountInfo {
@@ -37,19 +45,17 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
   /// @dev mapping(weekTimestamp => totalSupply)
   mapping(uint256 => uint256) public weeklyTotalSupply;
   /// @dev mapping(weekTimestamp => mapping(rewardToken => amount))
-  mapping(uint256 => mapping(address => uint256))
-    public weeklyRewardTokenBalanceOf;
+  mapping(uint256 => mapping(address => uint256)) public
+    weeklyRewardTokenBalanceOf;
   /// @dev mapping(weekTimestamp => mapping(account => AccountInfo))
-  mapping(uint256 => mapping(address => AccountInfo))
-    public weeklyAccountBalanceOf;
+  mapping(uint256 => mapping(address => AccountInfo)) public
+    weeklyAccountBalanceOf;
 
   event AP_SetMinter(address _minter, bool _newAllow);
   event AP_SetRewardToken(address _rewardToken, bool _newAllow);
   event AP_Mint(uint256 _weekTimestamp, address _to, uint256 _amount);
   event AP_FeedRewardToken(
-    uint256 _weekTimestamp,
-    address _rewardToken,
-    uint256 _amount
+    uint256 _weekTimestamp, address _rewardToken, uint256 _amount
   );
   event AP_Claim(
     uint256 _weekTimestamp,
@@ -58,9 +64,7 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     uint256 _rewardAmount
   );
   event EmergencyWithdraw(
-    address _rewardToken,
-    address _receiver,
-    uint256 _amount
+    address _rewardToken, address _receiver, uint256 _amount
   );
 
   error AP_BulkClaimInvalidParams();
@@ -95,10 +99,7 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     emit AP_SetMinter(_minter, _allow);
   }
 
-  function setRewardToken(address _rewardToken, bool _allow)
-    external
-    onlyOwner
-  {
+  function setRewardToken(address _rewardToken, bool _allow) external onlyOwner {
     isRewardToken[_rewardToken] = _allow;
     emit AP_SetRewardToken(_rewardToken, _allow);
   }
@@ -108,8 +109,7 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
 
     // accounting weekly amount
     weeklyTotalSupply[weekTimestamp] =
-      weeklyTotalSupply[weekTimestamp] +
-      _amount;
+      weeklyTotalSupply[weekTimestamp] + _amount;
     weeklyAccountBalanceOf[weekTimestamp][_to].amount = _amount;
 
     _mint(_to, _amount);
@@ -117,11 +117,10 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     emit AP_Mint(weekTimestamp, _to, _amount);
   }
 
-  function _feed(
-    uint256 _weekTimestamp,
-    address _rewardToken,
-    uint256 _amount
-  ) public onlyMinter {
+  function _feed(uint256 _weekTimestamp, address _rewardToken, uint256 _amount)
+    public
+    onlyMinter
+  {
     if (_weekTimestamp >= _parseWeekTimestamp(block.timestamp)) {
       revert AP_FeedInvalidWeekTimestamp();
     }
@@ -139,9 +138,7 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
 
     // transfer
     IERC20Upgradeable(_rewardToken).safeTransferFrom(
-      msg.sender,
-      address(this),
-      _amount
+      msg.sender, address(this), _amount
     );
 
     // update indexing
@@ -151,11 +148,10 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     emit AP_FeedRewardToken(_weekTimestamp, _rewardToken, _amount);
   }
 
-  function feed(
-    uint256 _weekTimestamp,
-    address _rewardToken,
-    uint256 _amount
-  ) public onlyMinter {
+  function feed(uint256 _weekTimestamp, address _rewardToken, uint256 _amount)
+    public
+    onlyMinter
+  {
     _feed(_weekTimestamp, _rewardToken, _amount);
   }
 
@@ -165,8 +161,8 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     uint256[] memory _amounts
   ) public onlyMinter {
     if (
-      _weekTimestamps.length != _rewardTokens.length ||
-      _weekTimestamps.length != _amounts.length
+      _weekTimestamps.length != _rewardTokens.length
+        || _weekTimestamps.length != _amounts.length
     ) {
       revert AP_BulkFeedInvalidParams();
     }
@@ -176,22 +172,20 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     }
   }
 
-  function _claim(
-    uint256 _weekTimestamp,
-    address _rewardToken,
-    address _to
-  ) public {
-    AccountInfo memory accountAmount = weeklyAccountBalanceOf[_weekTimestamp][
-      _to
-    ];
+  function _claim(uint256 _weekTimestamp, address _rewardToken, address _to)
+    public
+  {
+    AccountInfo memory accountAmount =
+      weeklyAccountBalanceOf[_weekTimestamp][_to];
     if (accountAmount.amount == 0 || accountAmount.isClaimed) {
       revert AP_InvalidClaim();
     }
 
     // calculate reward sharing
-    uint256 reward = (accountAmount.amount *
-      weeklyRewardTokenBalanceOf[_weekTimestamp][_rewardToken]) /
-      weeklyTotalSupply[_weekTimestamp];
+    uint256 reward = (
+      accountAmount.amount
+        * weeklyRewardTokenBalanceOf[_weekTimestamp][_rewardToken]
+    ) / weeklyTotalSupply[_weekTimestamp];
 
     // transfer
     IERC20Upgradeable(_rewardToken).safeTransfer(_to, reward);
@@ -205,11 +199,9 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     emit AP_Claim(_weekTimestamp, _to, accountAmount.amount, reward);
   }
 
-  function claim(
-    uint256 _weekTimestamp,
-    address _rewardToken,
-    address _to
-  ) public {
+  function claim(uint256 _weekTimestamp, address _rewardToken, address _to)
+    public
+  {
     _claim(_weekTimestamp, _rewardToken, _to);
   }
 
@@ -219,8 +211,8 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     address[] memory _tos
   ) public {
     if (
-      _weekTimestamps.length != _rewardTokens.length ||
-      _weekTimestamps.length != _tos.length
+      _weekTimestamps.length != _rewardTokens.length
+        || _weekTimestamps.length != _tos.length
     ) {
       revert AP_BulkClaimInvalidParams();
     }
@@ -241,19 +233,11 @@ contract AP is ERC20Upgradeable, OwnableUpgradeable, IMiningPoint {
     emit EmergencyWithdraw(_rewardToken, _receiver, balance);
   }
 
-  function _transfer(
-    address,
-    address,
-    uint256
-  ) internal pure override {
+  function _transfer(address, address, uint256) internal pure override {
     revert AP_Unsupported();
   }
 
-  function _approve(
-    address,
-    address,
-    uint256
-  ) internal pure override {
+  function _approve(address, address, uint256) internal pure override {
     revert AP_Unsupported();
   }
 }

@@ -1,24 +1,25 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { SafeCast } from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import { ISecondaryPriceFeed } from "../interfaces/ISecondaryPriceFeed.sol";
-import { IOnchainPriceUpdater } from "../interfaces/IOnChainPriceUpdater.sol";
-import { IPyth } from "../interfaces/IPyth.sol";
-import { PythStructs } from "@pythnetwork/pyth-sdk-solidity/PythStructs.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import {ISecondaryPriceFeed} from "../interfaces/ISecondaryPriceFeed.sol";
+import {IOnchainPriceUpdater} from "../interfaces/IOnChainPriceUpdater.sol";
+import {IPyth} from "../interfaces/IPyth.sol";
+import {PythStructs} from "@pythnetwork/pyth-sdk-solidity/PythStructs.sol";
 
 contract PythPriceFeed is
   ISecondaryPriceFeed,
@@ -29,7 +30,7 @@ contract PythPriceFeed is
   using SafeCast for uint256;
   using SafeCast for int32;
 
-  uint256 public constant PRICE_PRECISION = 10**30;
+  uint256 public constant PRICE_PRECISION = 10 ** 30;
   uint256 public constant MAXIMUM_PRICE_AGE = 120; // 2 mins
 
   struct CachedPrice {
@@ -53,9 +54,7 @@ contract PythPriceFeed is
   event SetFavorRefPrice(bool favorRefPrice);
   event SetUpdater(address indexed account, bool isActive);
   event SetCachedPrices(
-    bytes[] _priceUpdateData,
-    address[] _tokens,
-    uint256[] _prices
+    bytes[] _priceUpdateData, address[] _tokens, uint256[] _prices
   );
 
   error PythPriceFeed_OnlyUpdater();
@@ -145,14 +144,14 @@ contract PythPriceFeed is
 
     // Validate parameter length
     if (
-      _priceUpdateData.length != _tokens.length ||
-      _priceUpdateData.length != _prices.length
+      _priceUpdateData.length != _tokens.length
+        || _priceUpdateData.length != _prices.length
     ) {
       revert PythPriceFeed_InvalidCachedPriceDataLength();
     }
 
     // Loop for setting price
-    for (uint256 i = 0; i < _priceUpdateData.length; ) {
+    for (uint256 i = 0; i < _priceUpdateData.length;) {
       CachedPrice storage cachedPrice = cachedPriceOf[_tokens[i]];
 
       cachedPrice.price = _prices[i].toUint192();
@@ -177,7 +176,7 @@ contract PythPriceFeed is
       return;
     }
     uint256 fee = pyth.getUpdateFee(_priceUpdateData);
-    pyth.updatePriceFeeds{ value: fee }(_priceUpdateData);
+    pyth.updatePriceFeeds{value: fee}(_priceUpdateData);
   }
 
   /// @notice A function for getting update fee based on price update data
@@ -210,8 +209,8 @@ contract PythPriceFeed is
     // Use cahced price if it has been updated at the same block
     CachedPrice memory cachedPrice = cachedPriceOf[_token];
     if (
-      cachedPrice.price != 0 &&
-      cachedPrice.updatedBlock == block.number.toUint64()
+      cachedPrice.price != 0
+        && cachedPrice.updatedBlock == block.number.toUint64()
     ) {
       return cachedPrice.price;
     }
@@ -225,8 +224,8 @@ contract PythPriceFeed is
       PythStructs.Price memory _price
     ) {
       uint256 tokenDecimals = _price.expo < 0
-        ? (10**int256(-_price.expo).toUint256())
-        : 10**int256(_price.expo).toUint256();
+        ? (10 ** int256(-_price.expo).toUint256())
+        : 10 ** int256(_price.expo).toUint256();
       return
         ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
     } catch {

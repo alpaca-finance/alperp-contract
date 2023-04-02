@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { LinkedList } from "../../../libraries/LinkedList.sol";
-import { StrategyInterface } from "../../../interfaces/StrategyInterface.sol";
+import {LinkedList} from "../../../libraries/LinkedList.sol";
+import {StrategyInterface} from "../../../interfaces/StrategyInterface.sol";
 
 library LibPoolConfigV1 {
   using LinkedList for LinkedList.List;
@@ -134,16 +134,16 @@ library LibPoolConfigV1 {
     returns (bool, uint256)
   {
     // Load pool config diamond storage
-    PoolConfigV1DiamondStorage
-      storage poolConfigV1Ds = poolConfigV1DiamondStorage();
+    PoolConfigV1DiamondStorage storage poolConfigV1Ds =
+      poolConfigV1DiamondStorage();
 
-    if (address(poolConfigV1Ds.strategyOf[token]) == address(0))
+    if (address(poolConfigV1Ds.strategyOf[token]) == address(0)) {
       return (false, 0);
+    }
 
-    return
-      poolConfigV1DiamondStorage().strategyOf[token].getStrategyDelta(
-        poolConfigV1Ds.strategyDataOf[token].principle
-      );
+    return poolConfigV1DiamondStorage().strategyOf[token].getStrategyDelta(
+      poolConfigV1Ds.strategyDataOf[token].principle
+    );
   }
 
   function getTokenBufferLiquidityOf(address token)
@@ -205,13 +205,12 @@ library LibPoolConfigV1 {
     returns (bool)
   {
     // Load PoolConfigV1 diamond storage
-    PoolConfigV1DiamondStorage
-      storage poolConfigV1Ds = poolConfigV1DiamondStorage();
+    PoolConfigV1DiamondStorage storage poolConfigV1Ds =
+      poolConfigV1DiamondStorage();
 
-    return
-      poolConfigV1Ds.isAllowAllLiquidators
-        ? true
-        : poolConfigV1Ds.allowLiquidators[liquidator];
+    return poolConfigV1Ds.isAllowAllLiquidators
+      ? true
+      : poolConfigV1Ds.allowLiquidators[liquidator];
   }
 
   function isDynamicFeeEnable() internal view returns (bool) {

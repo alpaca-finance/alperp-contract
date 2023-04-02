@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { StrategyInterface } from "src/interfaces/StrategyInterface.sol";
-import { MockDonateVault } from "./MockDonateVault.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {StrategyInterface} from "src/interfaces/StrategyInterface.sol";
+import {MockDonateVault} from "./MockDonateVault.sol";
 
 /// @title MockStrategy - For testing purpuse only. DO NOT USE IN PROD.
 contract MockStrategy is StrategyInterface {
@@ -28,11 +28,7 @@ contract MockStrategy is StrategyInterface {
     _;
   }
 
-  constructor(
-    address token_,
-    MockDonateVault vault_,
-    address pool_
-  ) {
+  constructor(address token_, MockDonateVault vault_, address pool_) {
     token = token_;
     vault = vault_;
     pool = pool_;
@@ -40,18 +36,12 @@ contract MockStrategy is StrategyInterface {
     IERC20(token).approve(address(vault), type(uint256).max);
   }
 
-  function run(
-    uint256 /* amount */
-  ) external onlyPool {
+  function run(uint256 /* amount */ ) external onlyPool {
     // Deposit funds into vault
     vault.deposit(IERC20(token).balanceOf(address(this)));
   }
 
-  function _roundedValueToShare(uint256 amount)
-    internal
-    view
-    returns (uint256)
-  {
+  function _roundedValueToShare(uint256 amount) internal view returns (uint256) {
     uint256 share = vault.valueToShare(amount);
     uint256 convertedAmount = vault.shareToValue(share);
     // If calculated share converting back to value is less than the actual value, increase 1 WEI of share

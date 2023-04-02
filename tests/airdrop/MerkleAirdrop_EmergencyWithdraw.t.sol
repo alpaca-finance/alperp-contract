@@ -1,19 +1,21 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { MerkleAirdrop_BaseTest, MerkleAirdrop } from "./MerkleAirdrop_BaseTest.t.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {
+  MerkleAirdrop_BaseTest, MerkleAirdrop
+} from "./MerkleAirdrop_BaseTest.t.sol";
 
 contract MerkleAirdrop_EmergencyWithdraw is MerkleAirdrop_BaseTest {
   function setUp() public override {
@@ -23,8 +25,7 @@ contract MerkleAirdrop_EmergencyWithdraw is MerkleAirdrop_BaseTest {
     merkleAirdrop.init(weekTimestamp2, merkleRoot2);
     usdc.mint(address(this), referralAmountWeek1 + referralAmountWeek2);
     usdc.transfer(
-      address(merkleAirdrop),
-      referralAmountWeek1 + referralAmountWeek2
+      address(merkleAirdrop), referralAmountWeek1 + referralAmountWeek2
     );
   }
 

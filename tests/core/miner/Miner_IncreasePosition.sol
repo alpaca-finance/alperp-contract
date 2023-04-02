@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity >=0.8.4 <0.9.0;
 
-import { Miner_BaseTest } from "./Miner_BaseTest.t.sol";
+import {Miner_BaseTest} from "./Miner_BaseTest.t.sol";
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Miner_IncreasePosition is Miner_BaseTest {
   function setUp() public override {
@@ -32,15 +32,7 @@ contract Miner_IncreasePosition is Miner_BaseTest {
     vm.warp(1_680_086_400);
 
     vm.startPrank(address(poolRouter));
-    miner.increasePosition(
-      ALICE,
-      0,
-      address(0),
-      address(0),
-      100 ether,
-      0,
-      true
-    );
+    miner.increasePosition(ALICE, 0, address(0), address(0), 100 ether, 0, true);
     vm.stopPrank();
 
     assertEq(miningPoint.balanceOf(ALICE), 100 ether);
@@ -50,15 +42,7 @@ contract Miner_IncreasePosition is Miner_BaseTest {
     miner.setMiningPoint(address(miningPoint));
 
     vm.startPrank(address(poolRouter));
-    miner.increasePosition(
-      ALICE,
-      0,
-      address(0),
-      address(0),
-      100 ether,
-      0,
-      true
-    );
+    miner.increasePosition(ALICE, 0, address(0), address(0), 100 ether, 0, true);
     vm.stopPrank();
 
     assertEq(miningPoint.balanceOf(ALICE), 0);
@@ -71,15 +55,7 @@ contract Miner_IncreasePosition is Miner_BaseTest {
     vm.warp(1_700_086_400);
 
     vm.startPrank(address(poolRouter));
-    miner.increasePosition(
-      ALICE,
-      0,
-      address(0),
-      address(0),
-      100 ether,
-      0,
-      true
-    );
+    miner.increasePosition(ALICE, 0, address(0), address(0), 100 ether, 0, true);
     vm.stopPrank();
 
     assertEq(miningPoint.balanceOf(ALICE), 0);
@@ -90,30 +66,14 @@ contract Miner_IncreasePosition is Miner_BaseTest {
 
     vm.expectRevert(abi.encodeWithSignature("Miner_InvlidMiningPoint()"));
 
-    miner.increasePosition(
-      ALICE,
-      0,
-      address(0),
-      address(0),
-      100 ether,
-      0,
-      true
-    );
+    miner.increasePosition(ALICE, 0, address(0), address(0), 100 ether, 0, true);
     vm.stopPrank();
   }
 
   function testRevert_WhenCalledByNonWhitelisted() external {
     vm.startPrank(address(orderbook));
     vm.expectRevert(abi.encodeWithSignature("Miner_NotWhitelisted()"));
-    miner.increasePosition(
-      ALICE,
-      0,
-      address(0),
-      address(0),
-      100 ether,
-      0,
-      true
-    );
+    miner.increasePosition(ALICE, 0, address(0), address(0), 100 ether, 0, true);
     vm.stopPrank();
   }
 }

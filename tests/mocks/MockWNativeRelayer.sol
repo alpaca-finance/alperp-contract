@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
@@ -50,7 +50,7 @@ contract MockWNativeRelayer is Ownable, ReentrancyGuard {
     nonReentrant
   {
     IWNative(wnative).withdraw(_amount);
-    (bool success, ) = msg.sender.call{ value: _amount }("");
+    (bool success,) = msg.sender.call{value: _amount}("");
     require(success, "WNativeRelayer::onlyWhitelistedCaller:: can't withdraw");
   }
 

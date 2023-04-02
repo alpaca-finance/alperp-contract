@@ -1,31 +1,38 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { AddressUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import { SafeERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import { IERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import { IWNative } from "../../../interfaces/IWNative.sol";
+import {ReentrancyGuardUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {AddressUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {IWNative} from "../../../interfaces/IWNative.sol";
 
-import { IWNativeRelayer } from "../../../interfaces/IWNativeRelayer.sol";
-import { IPoolOracle } from "../../../interfaces/IPoolOracle.sol";
-import { GetterFacetInterface } from "../interfaces/GetterFacetInterface.sol";
-import { LiquidityFacetInterface } from "../interfaces/LiquidityFacetInterface.sol";
-import { PerpTradeFacetInterface } from "../interfaces/PerpTradeFacetInterface.sol";
-import { LibPoolConfigV1 } from "../libraries/LibPoolConfigV1.sol";
+import {IWNativeRelayer} from "../../../interfaces/IWNativeRelayer.sol";
+import {IPoolOracle} from "../../../interfaces/IPoolOracle.sol";
+import {GetterFacetInterface} from "../interfaces/GetterFacetInterface.sol";
+import {LiquidityFacetInterface} from
+  "../interfaces/LiquidityFacetInterface.sol";
+import {PerpTradeFacetInterface} from
+  "../interfaces/PerpTradeFacetInterface.sol";
+import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
 
 /// @notice This contract will be deprecated after 0.3.1
 contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
@@ -264,9 +271,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 swapOrderRequestKeysStart
   );
   event CollectFee(
-    address indexed token,
-    uint256 feeAmount,
-    uint256 feeReserve
+    address indexed token, uint256 feeAmount, uint256 feeReserve
   );
   event SetPoolOracle(address indexed poolOracle);
 
@@ -359,11 +364,10 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     emit WithdrawFees(_token, _receiver, amount);
   }
 
-  function approve(
-    address _token,
-    address _spender,
-    uint256 _amount
-  ) external onlyOwner {
+  function approve(address _token, address _spender, uint256 _amount)
+    external
+    onlyOwner
+  {
     IERC20Upgradeable(_token).approve(_spender, _amount);
   }
 
@@ -401,9 +405,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     minTimeDelayPublic = _minTimeDelayPublic;
     maxTimeDelay = _maxTimeDelay;
     emit SetDelayValues(
-      _minBlockDelayKeeper,
-      _minTimeDelayPublic,
-      _maxTimeDelay
+      _minBlockDelayKeeper, _minTimeDelayPublic, _maxTimeDelay
     );
   }
 
@@ -447,16 +449,14 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       // an error could be thrown if the request is too old or if the slippage is
       // higher than what the user specified, or if there is insufficient liquidity for the position
       // in case an error was thrown, cancel the request
-      try
-        this.executeIncreasePosition(key, _executionFeeReceiver, index)
+      try this.executeIncreasePosition(key, _executionFeeReceiver, index)
       returns (bool _wasExecuted) {
         if (!_wasExecuted) {
           break;
         }
       } catch {
         // wrap this call in a try catch to prevent invalid cancels from blocking the loop
-        try
-          this.cancelIncreasePosition(key, _executionFeeReceiver, index)
+        try this.cancelIncreasePosition(key, _executionFeeReceiver, index)
         returns (bool _wasCancelled) {
           if (!_wasCancelled) {
             break;
@@ -494,16 +494,14 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       // minimum number of blocks has not yet passed
       // an error could be thrown if the request is too old
       // in case an error was thrown, cancel the request
-      try
-        this.executeDecreasePosition(key, _executionFeeReceiver, index)
+      try this.executeDecreasePosition(key, _executionFeeReceiver, index)
       returns (bool _wasExecuted) {
         if (!_wasExecuted) {
           break;
         }
       } catch {
         // wrap this call in a try catch to prevent invalid cancels from blocking the loop
-        try
-          this.cancelDecreasePosition(key, _executionFeeReceiver, index)
+        try this.cancelDecreasePosition(key, _executionFeeReceiver, index)
         returns (bool _wasCancelled) {
           if (!_wasCancelled) {
             break;
@@ -584,26 +582,23 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     if (_amountIn > 0) {
       IERC20Upgradeable(_path[0]).safeTransferFrom(
-        msg.sender,
-        address(this),
-        _amountIn
+        msg.sender, address(this), _amountIn
       );
     }
 
-    return
-      _createIncreasePosition(
-        msg.sender,
-        _subAccountId,
-        _path,
-        _indexToken,
-        _amountIn,
-        _minOut,
-        _sizeDelta,
-        _isLong,
-        _acceptablePrice,
-        _executionFee,
-        false
-      );
+    return _createIncreasePosition(
+      msg.sender,
+      _subAccountId,
+      _path,
+      _indexToken,
+      _amountIn,
+      _minOut,
+      _sizeDelta,
+      _isLong,
+      _acceptablePrice,
+      _executionFee,
+      false
+    );
   }
 
   function createIncreasePositionNative(
@@ -625,20 +620,19 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     uint256 amountIn = msg.value - _executionFee;
 
-    return
-      _createIncreasePosition(
-        msg.sender,
-        _subAccountId,
-        _path,
-        _indexToken,
-        amountIn,
-        _minOut,
-        _sizeDelta,
-        _isLong,
-        _acceptablePrice,
-        _executionFee,
-        true
-      );
+    return _createIncreasePosition(
+      msg.sender,
+      _subAccountId,
+      _path,
+      _indexToken,
+      amountIn,
+      _minOut,
+      _sizeDelta,
+      _isLong,
+      _acceptablePrice,
+      _executionFee,
+      true
+    );
   }
 
   function createDecreasePosition(
@@ -666,21 +660,20 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     _transferInETH();
 
-    return
-      _createDecreasePosition(
-        msg.sender,
-        _subAccountId,
-        _path,
-        _indexToken,
-        _collateralDelta,
-        _sizeDelta,
-        _isLong,
-        _receiver,
-        _acceptablePrice,
-        _minOut,
-        _executionFee,
-        _withdrawETH
-      );
+    return _createDecreasePosition(
+      msg.sender,
+      _subAccountId,
+      _path,
+      _indexToken,
+      _collateralDelta,
+      _sizeDelta,
+      _isLong,
+      _receiver,
+      _acceptablePrice,
+      _minOut,
+      _executionFee,
+      _withdrawETH
+    );
   }
 
   function createSwapOrder(
@@ -701,39 +694,25 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     if (_shouldWrap) {
       if (_path[0] != weth) revert OnlyNativeShouldWrap();
-      if (msg.value != _executionFee + _amountIn)
+      if (msg.value != _executionFee + _amountIn) {
         revert IncorrectValueTransferred();
+      }
     } else {
       if (msg.value != _executionFee) revert IncorrectValueTransferred();
       IERC20Upgradeable(_path[0]).safeTransferFrom(
-        msg.sender,
-        address(this),
-        _amountIn
+        msg.sender, address(this), _amountIn
       );
     }
 
-    return
-      _createSwapOrder(
-        msg.sender,
-        _path,
-        _amountIn,
-        _minOut,
-        _shouldUnwrap,
-        _executionFee
-      );
+    return _createSwapOrder(
+      msg.sender, _path, _amountIn, _minOut, _shouldUnwrap, _executionFee
+    );
   }
 
   function getRequestQueueLengths()
     external
     view
-    returns (
-      uint256,
-      uint256,
-      uint256,
-      uint256,
-      uint256,
-      uint256
-    )
+    returns (uint256, uint256, uint256, uint256, uint256, uint256)
   {
     return (
       increasePositionRequestKeysStart,
@@ -757,9 +736,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     }
 
     bool shouldExecute = _validateExecution(
-      request.blockNumber,
-      request.blockTime,
-      request.account
+      request.blockNumber, request.blockTime, request.account
     );
     if (!shouldExecute) {
       return false;
@@ -772,12 +749,8 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
       if (request.path.length > 1) {
         IERC20Upgradeable(request.path[0]).safeTransfer(pool, request.amountIn);
-        amountIn = _swap(
-          request.account,
-          request.path,
-          request.minOut,
-          address(this)
-        );
+        amountIn =
+          _swap(request.account, request.path, request.minOut, address(this));
       }
 
       uint256 afterFeeAmount = _collectFees(
@@ -789,8 +762,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
         request.sizeDelta
       );
       IERC20Upgradeable(request.path[request.path.length - 1]).safeTransfer(
-        pool,
-        afterFeeAmount
+        pool, afterFeeAmount
       );
     }
 
@@ -805,8 +777,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     );
 
     _transferOutETHWithGasLimitIgnoreFail(
-      request.executionFee,
-      _executionFeeReceiver
+      request.executionFee, _executionFeeReceiver
     );
 
     emit ExecuteIncreasePosition(
@@ -841,9 +812,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     }
 
     bool shouldCancel = _validateCancellation(
-      request.blockNumber,
-      request.blockTime,
-      request.account
+      request.blockNumber, request.blockTime, request.account
     );
     if (!shouldCancel) {
       return false;
@@ -853,19 +822,16 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     if (request.hasCollateralInETH) {
       _transferOutETHWithGasLimitIgnoreFail(
-        request.amountIn,
-        payable(request.account)
+        request.amountIn, payable(request.account)
       );
     } else {
       IERC20Upgradeable(request.path[0]).safeTransfer(
-        request.account,
-        request.amountIn
+        request.account, request.amountIn
       );
     }
 
     _transferOutETHWithGasLimitIgnoreFail(
-      request.executionFee,
-      _executionFeeReceiver
+      request.executionFee, _executionFeeReceiver
     );
 
     emit CancelIncreasePosition(
@@ -897,9 +863,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     }
 
     bool shouldExecute = _validateExecution(
-      request.blockNumber,
-      request.blockTime,
-      request.account
+      request.blockNumber, request.blockTime, request.account
     );
     if (!shouldExecute) {
       return false;
@@ -922,30 +886,23 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     if (amountOut > 0) {
       if (request.path.length > 1) {
         IERC20Upgradeable(request.path[0]).safeTransfer(pool, amountOut);
-        amountOut = _swap(
-          request.account,
-          request.path,
-          request.minOut,
-          address(this)
-        );
+        amountOut =
+          _swap(request.account, request.path, request.minOut, address(this));
       }
 
       if (request.withdrawETH) {
         _transferOutETHWithGasLimitIgnoreFail(
-          amountOut,
-          payable(request.receiver)
+          amountOut, payable(request.receiver)
         );
       } else {
         IERC20Upgradeable(request.path[request.path.length - 1]).safeTransfer(
-          request.receiver,
-          amountOut
+          request.receiver, amountOut
         );
       }
     }
 
     _transferOutETHWithGasLimitIgnoreFail(
-      request.executionFee,
-      _executionFeeReceiver
+      request.executionFee, _executionFeeReceiver
     );
 
     emit ExecuteDecreasePosition(
@@ -979,9 +936,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     }
 
     bool shouldCancel = _validateCancellation(
-      request.blockNumber,
-      request.blockTime,
-      request.account
+      request.blockNumber, request.blockTime, request.account
     );
     if (!shouldCancel) {
       return false;
@@ -990,8 +945,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     delete decreasePositionRequests[_key];
 
     _transferOutETHWithGasLimitIgnoreFail(
-      request.executionFee,
-      _executionFeeReceiver
+      request.executionFee, _executionFeeReceiver
     );
 
     emit CancelDecreasePosition(
@@ -1022,9 +976,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     }
 
     bool shouldExecute = _validateExecution(
-      request.blockNumber,
-      request.blockTime,
-      request.account
+      request.blockNumber, request.blockTime, request.account
     );
     if (!shouldExecute) {
       return false;
@@ -1036,29 +988,19 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     uint256 _amountOut;
     if (request.path[request.path.length - 1] == weth && request.shouldUnwrap) {
-      _amountOut = _swap(
-        request.account,
-        request.path,
-        request.minOut,
-        address(this)
-      );
+      _amountOut =
+        _swap(request.account, request.path, request.minOut, address(this));
       _transferOutETHWithGasLimitIgnoreFail(
-        _amountOut,
-        payable(request.account)
+        _amountOut, payable(request.account)
       );
     } else {
-      _amountOut = _swap(
-        request.account,
-        request.path,
-        request.minOut,
-        request.account
-      );
+      _amountOut =
+        _swap(request.account, request.path, request.minOut, request.account);
     }
 
     // pay executor
     _transferOutETHWithGasLimitIgnoreFail(
-      request.executionFee,
-      _executionFeeReceiver
+      request.executionFee, _executionFeeReceiver
     );
 
     emit ExecuteSwapOrder(
@@ -1089,9 +1031,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     }
 
     bool shouldCancel = _validateCancellation(
-      request.blockNumber,
-      request.blockTime,
-      request.account
+      request.blockNumber, request.blockTime, request.account
     );
 
     if (!shouldCancel) {
@@ -1102,20 +1042,17 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     if (request.path[0] == weth) {
       _transferOutETHWithGasLimitIgnoreFail(
-        request.amountIn,
-        payable(request.account)
+        request.amountIn, payable(request.account)
       );
     } else {
       IERC20Upgradeable(request.path[0]).safeTransfer(
-        request.account,
-        request.amountIn
+        request.account, request.amountIn
       );
     }
 
     // pay executor
     _transferOutETHWithGasLimitIgnoreFail(
-      request.executionFee,
-      _executionFeeReceiver
+      request.executionFee, _executionFeeReceiver
     );
 
     emit CancelSwapOrder(
@@ -1177,27 +1114,26 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       return;
     }
 
-    LibPoolConfigV1.TokenConfig memory config = GetterFacetInterface(pool)
-      .tokenMetas(_indexToken);
+    LibPoolConfigV1.TokenConfig memory config =
+      GetterFacetInterface(pool).tokenMetas(_indexToken);
 
     if (_isLong) {
       uint256 openInterestDelta = GetterFacetInterface(pool)
         .convertUsde30ToTokens(_indexToken, _sizeDelta, true);
       uint256 maxGlobalLongSize = config.openInterestLongCeiling;
       if (
-        maxGlobalLongSize > 0 &&
-        GetterFacetInterface(pool).openInterestLong(_indexToken) +
-          openInterestDelta >
-        maxGlobalLongSize
+        maxGlobalLongSize > 0
+          && GetterFacetInterface(pool).openInterestLong(_indexToken)
+            + openInterestDelta > maxGlobalLongSize
       ) {
         revert MaxGlobalLongSizesExceeded();
       }
     } else {
       uint256 maxGlobalShortSize = config.shortCeiling;
       if (
-        maxGlobalShortSize > 0 &&
-        GetterFacetInterface(pool).shortSizeOf(_indexToken) + _sizeDelta >
-        maxGlobalShortSize
+        maxGlobalShortSize > 0
+          && GetterFacetInterface(pool).shortSizeOf(_indexToken) + _sizeDelta
+            > maxGlobalShortSize
       ) {
         revert MaxGlobalShortSizesExceeded();
       }
@@ -1301,11 +1237,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address _receiver
   ) internal returns (uint256) {
     uint256 amountOut = LiquidityFacetInterface(pool).swap(
-      _account,
-      _tokenIn,
-      _tokenOut,
-      _minOut,
-      _receiver
+      _account, _tokenIn, _tokenOut, _minOut, _receiver
     );
     if (amountOut < _minOut) {
       revert InsufficientAmountOut();
@@ -1315,7 +1247,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
   function _transferInETH() internal {
     if (msg.value != 0) {
-      IWNative(weth).deposit{ value: msg.value }();
+      IWNative(weth).deposit{value: msg.value}();
     }
   }
 
@@ -1342,17 +1274,13 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _sizeDelta
   ) internal returns (uint256) {
     bool shouldDeductFee = _shouldDeductFee(
-      _account,
-      _path,
-      _amountIn,
-      _indexToken,
-      _isLong,
-      _sizeDelta
+      _account, _path, _amountIn, _indexToken, _isLong, _sizeDelta
     );
 
     if (shouldDeductFee) {
-      uint256 afterFeeAmount = (_amountIn *
-        (BASIS_POINTS_DIVISOR - depositFeeBps)) / (BASIS_POINTS_DIVISOR);
+      uint256 afterFeeAmount = (
+        _amountIn * (BASIS_POINTS_DIVISOR - depositFeeBps)
+      ) / (BASIS_POINTS_DIVISOR);
       uint256 feeAmount = _amountIn - afterFeeAmount;
       address feeToken = _path[_path.length - 1];
       feeReserves[feeToken] = feeReserves[feeToken] + feeAmount;
@@ -1385,13 +1313,10 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     address collateralToken = _path[_path.length - 1];
 
-    GetterFacetInterface.GetPositionReturnVars
-      memory position = GetterFacetInterface(pool).getPosition(
-        _account,
-        collateralToken,
-        _indexToken,
-        _isLong
-      );
+    GetterFacetInterface.GetPositionReturnVars memory position =
+    GetterFacetInterface(pool).getPosition(
+      _account, collateralToken, _indexToken, _isLong
+    );
 
     // if there is no existing position, do not charge a fee
     if (position.size == 0) {
@@ -1400,17 +1325,16 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     uint256 nextSize = position.size + _sizeDelta;
     uint256 collateralDelta = GetterFacetInterface(pool).convertTokensToUsde30(
-      collateralToken,
-      _amountIn,
-      false
+      collateralToken, _amountIn, false
     );
     uint256 nextCollateral = position.collateral + collateralDelta;
 
-    uint256 prevLeverage = (position.size * (BASIS_POINTS_DIVISOR)) /
-      (position.collateral);
+    uint256 prevLeverage =
+      (position.size * (BASIS_POINTS_DIVISOR)) / (position.collateral);
     // allow for a maximum of a increasePositionBufferBps decrease since there might be some swap fees taken from the collateral
-    uint256 nextLeverage = (nextSize *
-      (BASIS_POINTS_DIVISOR + increasePositionBufferBps)) / nextCollateral;
+    uint256 nextLeverage = (
+      nextSize * (BASIS_POINTS_DIVISOR + increasePositionBufferBps)
+    ) / nextCollateral;
 
     // deduct a fee if the leverage is decreased
     return nextLeverage < prevLeverage;
@@ -1425,8 +1349,8 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       revert Expired();
     }
 
-    bool isKeeperCall = msg.sender == address(this) ||
-      isPositionKeeper[msg.sender];
+    bool isKeeperCall =
+      msg.sender == address(this) || isPositionKeeper[msg.sender];
 
     if (!isLeverageEnabled && !isKeeperCall) {
       revert Forbidden();
@@ -1452,8 +1376,8 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _positionBlockTime,
     address _account
   ) internal view returns (bool) {
-    bool isKeeperCall = msg.sender == address(this) ||
-      isPositionKeeper[msg.sender];
+    bool isKeeperCall =
+      msg.sender == address(this) || isPositionKeeper[msg.sender];
 
     if (!isLeverageEnabled && !isKeeperCall) {
       revert Forbidden();
@@ -1503,9 +1427,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       _hasCollateralInETH
     );
 
-    (uint256 index, bytes32 requestKey) = _storeIncreasePositionRequest(
-      request
-    );
+    (uint256 index, bytes32 requestKey) = _storeIncreasePositionRequest(request);
     emit CreateIncreasePosition(
       _account,
       _subAccountId,
@@ -1570,9 +1492,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       _withdrawETH
     );
 
-    (uint256 index, bytes32 requestKey) = _storeDecreasePositionRequest(
-      request
-    );
+    (uint256 index, bytes32 requestKey) = _storeDecreasePositionRequest(request);
     emit CreateDecreasePosition(
       request.account,
       request.subAccountId,

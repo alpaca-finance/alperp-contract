@@ -1,29 +1,31 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { LibDiamond } from "../libraries/LibDiamond.sol";
-import { LibPoolV1 } from "../libraries/LibPoolV1.sol";
-import { LibPoolConfigV1 } from "../libraries/LibPoolConfigV1.sol";
-import { LibAccessControl } from "../libraries/LibAccessControl.sol";
-import { LibReentrancyGuard } from "../libraries/LibReentrancyGuard.sol";
-import { AccessControlFacetInterface } from "../interfaces/AccessControlFacetInterface.sol";
-import { SafeCast } from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {LibDiamond} from "../libraries/LibDiamond.sol";
+import {LibPoolV1} from "../libraries/LibPoolV1.sol";
+import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
+import {LibAccessControl} from "../libraries/LibAccessControl.sol";
+import {LibReentrancyGuard} from "../libraries/LibReentrancyGuard.sol";
+import {AccessControlFacetInterface} from
+  "../interfaces/AccessControlFacetInterface.sol";
+import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import {SafeERC20} from
+  "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import { FarmFacetInterface } from "../interfaces/FarmFacetInterface.sol";
-import { StrategyInterface } from "../../../interfaces/StrategyInterface.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {FarmFacetInterface} from "../interfaces/FarmFacetInterface.sol";
+import {StrategyInterface} from "../../../interfaces/StrategyInterface.sol";
 
 contract FarmFacet is FarmFacetInterface {
   using SafeERC20 for ERC20;
@@ -59,11 +61,10 @@ contract FarmFacet is FarmFacetInterface {
 
   modifier onlyPoolDiamondOrFarmKeeper() {
     if (
-      msg.sender != address(this) &&
-      !AccessControlFacetInterface(address(this)).hasRole(
-        LibAccessControl.FARM_KEEPER,
-        msg.sender
-      )
+      msg.sender != address(this)
+        && !AccessControlFacetInterface(address(this)).hasRole(
+          LibAccessControl.FARM_KEEPER, msg.sender
+        )
     ) {
       revert FarmFacet_InvalidFarmCaller();
     }
@@ -76,11 +77,11 @@ contract FarmFacet is FarmFacetInterface {
     nonReentrant
   {
     // Load PoolConfig Diamond storage
-    LibPoolConfigV1.PoolConfigV1DiamondStorage
-      storage poolConfigDs = LibPoolConfigV1.poolConfigV1DiamondStorage();
+    LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigDs =
+      LibPoolConfigV1.poolConfigV1DiamondStorage();
 
-    LibPoolConfigV1.StrategyData memory strategyData = poolConfigDs
-      .strategyDataOf[token];
+    LibPoolConfigV1.StrategyData memory strategyData =
+      poolConfigDs.strategyDataOf[token];
     StrategyInterface pendingStrategy = poolConfigDs.pendingStrategyOf[token];
     if (strategyData.startTimestamp == 0 || pendingStrategy != newStrategy) {
       // When adding new strategy or changing strategy
@@ -90,14 +91,13 @@ contract FarmFacet is FarmFacetInterface {
     } else {
       // When committing a new strategy
       if (
-        strategyData.startTimestamp == 0 ||
-        block.timestamp < strategyData.startTimestamp
+        strategyData.startTimestamp == 0
+          || block.timestamp < strategyData.startTimestamp
       ) revert FarmFacet_TooEarlyToCommitStrategy();
       if (address(poolConfigDs.strategyOf[token]) != address(0)) {
         // If there is previous strategy, we need to withdraw all funds from it
-        int256 balanceChange = poolConfigDs.strategyOf[token].exit(
-          strategyData.principle
-        );
+        int256 balanceChange =
+          poolConfigDs.strategyOf[token].exit(strategyData.principle);
         // Update totalOf[token] to sync physical balance with pool state
         LibPoolV1.updateTotalOf(token);
         // Realized profits/losses
@@ -132,8 +132,8 @@ contract FarmFacet is FarmFacetInterface {
   {
     if (targetBps > MAX_TARGET_BPS) revert FarmFacet_BadTargetBps();
 
-    LibPoolConfigV1.PoolConfigV1DiamondStorage
-      storage poolConfigDs = LibPoolConfigV1.poolConfigV1DiamondStorage();
+    LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigDs =
+      LibPoolConfigV1.poolConfigV1DiamondStorage();
     poolConfigDs.strategyDataOf[token].targetBps = targetBps;
 
     emit SetStrategyTargetBps(token, targetBps);
@@ -144,16 +144,16 @@ contract FarmFacet is FarmFacetInterface {
     onlyPoolDiamondOrFarmKeeper
   {
     // Load PoolV1 diamond storage
-    LibPoolV1.PoolV1DiamondStorage storage poolV1ds = LibPoolV1
-      .poolV1DiamondStorage();
+    LibPoolV1.PoolV1DiamondStorage storage poolV1ds =
+      LibPoolV1.poolV1DiamondStorage();
 
     // Load PoolConfig Diamond storage
-    LibPoolConfigV1.PoolConfigV1DiamondStorage
-      storage poolConfigDs = LibPoolConfigV1.poolConfigV1DiamondStorage();
+    LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigDs =
+      LibPoolConfigV1.poolConfigV1DiamondStorage();
 
     // Load relevant variables
-    LibPoolConfigV1.StrategyData memory strategyData = poolConfigDs
-      .strategyDataOf[token];
+    LibPoolConfigV1.StrategyData memory strategyData =
+      poolConfigDs.strategyDataOf[token];
     StrategyInterface strategy = poolConfigDs.strategyOf[token];
 
     // Realized profits or losses from strategy
@@ -181,8 +181,10 @@ contract FarmFacet is FarmFacetInterface {
     // If rebalance to make sure the strategy has the right amount of funds to deploy, then do it.
     if (isRebalanceNeeded) {
       // Calculate the target amount of funds to be deployed
-      uint256 targetDeployedFunds = ((poolV1ds.liquidityOf[token] -
-        poolV1ds.reservedOf[token]) * strategyData.targetBps) / 10000;
+      uint256 targetDeployedFunds = (
+        (poolV1ds.liquidityOf[token] - poolV1ds.reservedOf[token])
+          * strategyData.targetBps
+      ) / 10000;
 
       if (strategyData.principle < targetDeployedFunds) {
         // If strategy short of funds, then deposit more funds

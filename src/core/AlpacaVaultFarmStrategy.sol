@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { StrategyInterface } from "../interfaces/StrategyInterface.sol";
-import { IVault } from "../apis/alpaca/IVault.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {StrategyInterface} from "../interfaces/StrategyInterface.sol";
+import {IVault} from "../apis/alpaca/IVault.sol";
 
 contract AlpacaVaultFarmStrategy is StrategyInterface {
   address public token;
@@ -32,11 +32,7 @@ contract AlpacaVaultFarmStrategy is StrategyInterface {
     _;
   }
 
-  constructor(
-    address _token,
-    address _vault,
-    address _pool
-  ) {
+  constructor(address _token, address _vault, address _pool) {
     token = _token;
     pool = _pool;
 
@@ -65,8 +61,9 @@ contract AlpacaVaultFarmStrategy is StrategyInterface {
   /// @param amount amount to be deposit
   function run(uint256 amount) external onlyPool {
     uint256 availableAmount = IERC20(token).balanceOf(address(this));
-    if (amount > availableAmount)
+    if (amount > availableAmount) {
       revert("AlpacaFarmStrategy: Insufficient amount to deposit");
+    }
     // Deposit funds into vault
     vault.deposit(amount);
   }
@@ -74,11 +71,7 @@ contract AlpacaVaultFarmStrategy is StrategyInterface {
   /// @dev Rounding the share to the nearest whole number.
   /// @param amount amount to round
   /// @return share share of the amount after rounded.
-  function _roundedValueToShare(uint256 amount)
-    internal
-    view
-    returns (uint256)
-  {
+  function _roundedValueToShare(uint256 amount) internal view returns (uint256) {
     uint256 share = _valueToShare(amount);
     uint256 convertedAmount = _shareToValue(share);
     // If calculated share converting back to value is less than the actual value, increase 1 WEI of share

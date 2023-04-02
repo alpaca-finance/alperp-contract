@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity >=0.8.4 <0.9.0;
 
-import { AP_BaseTest } from "./AP_BaseTest.t.sol";
-import { AP } from "src/tokens/AP.sol";
+import {AP_BaseTest} from "./AP_BaseTest.t.sol";
+import {AP} from "src/tokens/AP.sol";
 
 contract AP_Mint is AP_BaseTest {
   function setUp() public override {
@@ -28,7 +28,7 @@ contract AP_Mint is AP_BaseTest {
     internal
     returns (uint256)
   {
-    (uint256 amount, ) = ap.weeklyAccountBalanceOf(_weekTimestamp, _owner);
+    (uint256 amount,) = ap.weeklyAccountBalanceOf(_weekTimestamp, _owner);
 
     return amount;
   }

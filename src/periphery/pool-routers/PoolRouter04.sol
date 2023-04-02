@@ -1,71 +1,83 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { IERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import { SafeERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+/// OZ
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {ReentrancyGuardUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import { IWNative } from "../../interfaces/IWNative.sol";
-import { LiquidityFacetInterface } from "./interfaces/LiquidityFacetInterface.sol";
-import { GetterFacetInterface } from "./interfaces/GetterFacetInterface.sol";
-import { PerpTradeFacetInterface } from "./interfaces/PerpTradeFacetInterface.sol";
-import { IOnchainPriceUpdater } from "../../interfaces/IOnChainPriceUpdater.sol";
-import { PoolOracle } from "../PoolOracle.sol";
-import { IMiner } from "../../interfaces/IMiner.sol";
+/// Alperp
+import {IWNative} from "@alperp/interfaces/IWNative.sol";
+import {LiquidityFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
+import {GetterFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {PerpTradeFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
+import {IOnchainPriceUpdater} from "@alperp/interfaces/IOnChainPriceUpdater.sol";
+import {PoolOracle} from "@alperp/core/PoolOracle.sol";
+import {ITradeMiningManager} from "@alperp/interfaces/ITradeMiningManager.sol";
 
 /// @title PoolRouter04 is responsible for swapping tokens and managing liquidity
 /// @notice  This Router will apply pyth oracle mechanism
 contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
+  /// Dependencies
   using SafeERC20Upgradeable for IERC20Upgradeable;
 
+  /// Errors
+  error PoolRouter_InsufficientOutputAmount(
+    uint256 expectedAmount, uint256 actualAmount
+  );
+  error PoolRouter_MarkPriceTooHigh(
+    uint256 acceptablePrice, uint256 actualPrice
+  );
+  error PoolRouter_MarkPriceTooLow(uint256 acceptablePrice, uint256 actualPrice);
+  error PoolRouter_InsufficientUpdatedFee(uint256 expectedFee, uint256 msgValue);
+
+  /// Configs
   IWNative public WNATIVE;
   address public pool;
   IOnchainPriceUpdater public oraclePriceUpdater;
+  ITradeMiningManager public tradeMiningManager;
 
-  IMiner miner;
+  event SetTradeMiningManager(
+    address _prevTradeMiningManager, address _newTradeMiningManager
+  );
 
-  event SetMiner(address _miner);
-
-  error PoolRouter_InsufficientOutputAmount(
-    uint256 expectedAmount,
-    uint256 actualAmount
-  );
-  error PoolRouter_MarkPriceTooHigh(
-    uint256 acceptablePrice,
-    uint256 actualPrice
-  );
-  error PoolRouter_MarkPriceTooLow(
-    uint256 acceptablePrice,
-    uint256 actualPrice
-  );
-  error PoolRouter_InsufficientUpdatedFee(
-    uint256 expectedFee,
-    uint256 msgValue
-  );
+  /// @custom:oz-upgrades-unsafe-allow constructor
+  constructor() {
+    _disableInitializers();
+  }
 
   function initialize(
-    address wNative_,
-    address pool_,
-    address oraclePriceUpdater_
+    IWNative _wNative,
+    address _pool,
+    IOnchainPriceUpdater _oraclePriceUpdater,
+    ITradeMiningManager _tradeMiningManager
   ) external initializer {
     OwnableUpgradeable.__Ownable_init();
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
-    WNATIVE = IWNative(wNative_);
-    pool = pool_;
-    oraclePriceUpdater = IOnchainPriceUpdater(oraclePriceUpdater_);
+    WNATIVE = _wNative;
+    pool = _pool;
+    oraclePriceUpdater = _oraclePriceUpdater;
+    tradeMiningManager = _tradeMiningManager;
   }
 
   function _updatePrices(bytes[] memory _priceUpdateData)
@@ -74,9 +86,10 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   {
     uint256 fee = oraclePriceUpdater.getUpdateFee(_priceUpdateData);
     if (fee == 0) return 0;
-    if (fee > msg.value)
+    if (fee > msg.value) {
       revert PoolRouter_InsufficientUpdatedFee(fee, msg.value);
-    oraclePriceUpdater.updatePrices{ value: fee }(_priceUpdateData);
+    }
+    oraclePriceUpdater.updatePrices{value: fee}(_priceUpdateData);
     return fee;
   }
 
@@ -90,31 +103,39 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     if (isIncreasePosiiton) {
       if (isLong) {
         uint256 actualPrice = oracle.getMaxPrice(indexToken);
-        if (!(actualPrice <= acceptablePrice))
+        if (!(actualPrice <= acceptablePrice)) {
           revert PoolRouter_MarkPriceTooHigh(acceptablePrice, actualPrice);
+        }
       } else {
         uint256 actualPrice = oracle.getMinPrice(indexToken);
-        if (!(actualPrice >= acceptablePrice))
+        if (!(actualPrice >= acceptablePrice)) {
           revert PoolRouter_MarkPriceTooLow(acceptablePrice, actualPrice);
+        }
       }
       return;
     }
 
     if (isLong) {
       uint256 actualPrice = oracle.getMinPrice(indexToken);
-      if (!(actualPrice >= acceptablePrice))
+      if (!(actualPrice >= acceptablePrice)) {
         revert PoolRouter_MarkPriceTooLow(acceptablePrice, actualPrice);
+      }
     } else {
       uint256 actualPrice = oracle.getMaxPrice(indexToken);
-      if (!(actualPrice <= acceptablePrice))
+      if (!(actualPrice <= acceptablePrice)) {
         revert PoolRouter_MarkPriceTooHigh(acceptablePrice, actualPrice);
+      }
     }
   }
 
-  function setMiner(address _miner) external onlyOwner {
-    miner = IMiner(_miner);
-
-    emit SetMiner(_miner);
+  function setTradeMiningManager(ITradeMiningManager _newTradeMiningManager)
+    external
+    onlyOwner
+  {
+    emit SetTradeMiningManager(
+      address(tradeMiningManager), address(_newTradeMiningManager)
+    );
+    tradeMiningManager = _newTradeMiningManager;
   }
 
   function addLiquidity(
@@ -125,20 +146,14 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     bytes[] memory _priceUpdateData
   ) external payable nonReentrant returns (uint256) {
     _updatePrices(_priceUpdateData);
-    IERC20Upgradeable(token).safeTransferFrom(
-      msg.sender,
-      address(pool),
-      amount
-    );
+    IERC20Upgradeable(token).safeTransferFrom(msg.sender, address(pool), amount);
 
-    uint256 receivedAmount = LiquidityFacetInterface(pool).addLiquidity(
-      msg.sender,
-      token,
-      receiver
-    );
+    uint256 receivedAmount =
+      LiquidityFacetInterface(pool).addLiquidity(msg.sender, token, receiver);
 
-    if (receivedAmount < minLiquidity)
+    if (receivedAmount < minLiquidity) {
       revert PoolRouter_InsufficientOutputAmount(minLiquidity, receivedAmount);
+    }
 
     return receivedAmount;
   }
@@ -151,20 +166,17 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   ) external payable nonReentrant returns (uint256) {
     uint256 fee = _updatePrices(_priceUpdateData);
     uint256 actualMsgValue = msg.value - fee;
-    WNATIVE.deposit{ value: actualMsgValue }();
+    WNATIVE.deposit{value: actualMsgValue}();
     IERC20Upgradeable(address(WNATIVE)).safeTransfer(
-      address(pool),
-      actualMsgValue
+      address(pool), actualMsgValue
     );
 
-    uint256 receivedAmount = LiquidityFacetInterface(pool).addLiquidity(
-      msg.sender,
-      token,
-      receiver
-    );
+    uint256 receivedAmount =
+      LiquidityFacetInterface(pool).addLiquidity(msg.sender, token, receiver);
 
-    if (receivedAmount < minLiquidity)
+    if (receivedAmount < minLiquidity) {
       revert PoolRouter_InsufficientOutputAmount(minLiquidity, receivedAmount);
+    }
 
     return receivedAmount;
   }
@@ -181,13 +193,12 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       .safeTransferFrom(msg.sender, address(pool), liquidity);
 
     uint256 receivedAmount = LiquidityFacetInterface(pool).removeLiquidity(
-      msg.sender,
-      tokenOut,
-      receiver
+      msg.sender, tokenOut, receiver
     );
 
-    if (receivedAmount < minAmountOut)
+    if (receivedAmount < minAmountOut) {
       revert PoolRouter_InsufficientOutputAmount(minAmountOut, receivedAmount);
+    }
 
     return receivedAmount;
   }
@@ -204,13 +215,12 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       .safeTransferFrom(msg.sender, address(pool), liquidity);
 
     uint256 receivedAmount = LiquidityFacetInterface(pool).removeLiquidity(
-      msg.sender,
-      tokenOut,
-      address(this)
+      msg.sender, tokenOut, address(this)
     );
 
-    if (receivedAmount < minAmountOut)
+    if (receivedAmount < minAmountOut) {
       revert PoolRouter_InsufficientOutputAmount(minAmountOut, receivedAmount);
+    }
 
     WNATIVE.withdraw(receivedAmount);
     payable(receiver).transfer(receivedAmount);
@@ -245,30 +255,19 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       IERC20Upgradeable(collateralToken).safeTransfer(pool, amountOutFromSwap);
     } else {
       IERC20Upgradeable(collateralToken).safeTransferFrom(
-        msg.sender,
-        pool,
-        amountIn
+        msg.sender, pool, amountIn
       );
     }
     PerpTradeFacetInterface(pool).increasePosition(
-      msg.sender,
-      subAccountId,
-      collateralToken,
-      indexToken,
-      sizeDelta,
-      isLong
+      msg.sender, subAccountId, collateralToken, indexToken, sizeDelta, isLong
     );
 
-    // miner
-    miner.increasePosition(
-      msg.sender,
-      subAccountId,
-      collateralToken,
-      indexToken,
-      sizeDelta,
-      0, // no use as of now, then fixed 0 for reducing gas used
-      isLong
-    );
+    if (address(tradeMiningManager) != address(0)) {
+      // If trade mining is enabled, call the trade mining manager to its state
+      tradeMiningManager.onIncreasePosition(
+        msg.sender, subAccountId, collateralToken, indexToken, sizeDelta, isLong
+      );
+    }
   }
 
   function increasePositionNative(
@@ -287,7 +286,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     _validatePrice(indexToken, isLong, true, acceptablePrice);
 
     if (tokenIn != collateralToken && tokenIn == address(WNATIVE)) {
-      WNATIVE.deposit{ value: actualMsgValue }();
+      WNATIVE.deposit{value: actualMsgValue}();
       uint256 amountOut = _swap(
         address(this),
         tokenIn,
@@ -298,28 +297,19 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       );
       IERC20Upgradeable(collateralToken).safeTransfer(pool, amountOut);
     } else {
-      WNATIVE.deposit{ value: actualMsgValue }();
+      WNATIVE.deposit{value: actualMsgValue}();
       IERC20Upgradeable(address(WNATIVE)).safeTransfer(pool, actualMsgValue);
     }
     PerpTradeFacetInterface(pool).increasePosition(
-      msg.sender,
-      subAccountId,
-      collateralToken,
-      indexToken,
-      sizeDelta,
-      isLong
+      msg.sender, subAccountId, collateralToken, indexToken, sizeDelta, isLong
     );
 
-    // miner
-    miner.increasePosition(
-      msg.sender,
-      subAccountId,
-      collateralToken,
-      indexToken,
-      sizeDelta,
-      actualMsgValue,
-      isLong
-    );
+    if (address(tradeMiningManager) != address(0)) {
+      // If trade mining is enabled, call the trade mining manager to its state
+      tradeMiningManager.onIncreasePosition(
+        msg.sender, subAccountId, collateralToken, indexToken, sizeDelta, isLong
+      );
+    }
   }
 
   function decreasePosition(
@@ -340,21 +330,21 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     uint256 amountOutFromPosition = PerpTradeFacetInterface(pool)
       .decreasePosition(
-        msg.sender,
-        subAccountId,
-        collateralToken,
-        indexToken,
-        collateralDelta,
-        sizeDelta,
-        isLong,
-        address(this)
-      );
+      msg.sender,
+      subAccountId,
+      collateralToken,
+      indexToken,
+      collateralDelta,
+      sizeDelta,
+      isLong,
+      address(this)
+    );
     if (collateralToken == tokenOut) {
-      if (amountOutFromPosition < minAmountOut)
+      if (amountOutFromPosition < minAmountOut) {
         revert PoolRouter_InsufficientOutputAmount(
-          minAmountOut,
-          amountOutFromPosition
+          minAmountOut, amountOutFromPosition
         );
+      }
       IERC20Upgradeable(tokenOut).safeTransfer(receiver, amountOutFromPosition);
     } else {
       _swap(
@@ -386,21 +376,21 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     uint256 amountOutFromPosition = PerpTradeFacetInterface(pool)
       .decreasePosition(
-        msg.sender,
-        subAccountId,
-        collateralToken,
-        indexToken,
-        collateralDelta,
-        sizeDelta,
-        isLong,
-        address(this)
-      );
+      msg.sender,
+      subAccountId,
+      collateralToken,
+      indexToken,
+      collateralDelta,
+      sizeDelta,
+      isLong,
+      address(this)
+    );
     if (collateralToken == tokenOut) {
-      if (amountOutFromPosition < minAmountOut)
+      if (amountOutFromPosition < minAmountOut) {
         revert PoolRouter_InsufficientOutputAmount(
-          minAmountOut,
-          amountOutFromPosition
+          minAmountOut, amountOutFromPosition
         );
+      }
       WNATIVE.withdraw(amountOutFromPosition);
       payable(receiver).transfer(amountOutFromPosition);
     } else {
@@ -443,20 +433,13 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       IERC20Upgradeable(tokenIn).safeTransfer(address(pool), amountIn);
     } else {
       IERC20Upgradeable(tokenIn).safeTransferFrom(
-        sender,
-        address(pool),
-        amountIn
+        sender, address(pool), amountIn
       );
     }
 
-    return
-      LiquidityFacetInterface(pool).swap(
-        msg.sender,
-        tokenIn,
-        tokenOut,
-        minAmountOut,
-        receiver
-      );
+    return LiquidityFacetInterface(pool).swap(
+      msg.sender, tokenIn, tokenOut, minAmountOut, receiver
+    );
   }
 
   function swapNative(
@@ -470,47 +453,31 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 fee = _updatePrices(_priceUpdateData);
     uint256 actualMsgValue = msg.value - fee;
     if (tokenIn == address(WNATIVE)) {
-      WNATIVE.deposit{ value: actualMsgValue }();
+      WNATIVE.deposit{value: actualMsgValue}();
       IERC20Upgradeable(address(WNATIVE)).safeTransfer(pool, actualMsgValue);
       amountIn = actualMsgValue;
     } else {
       IERC20Upgradeable(tokenIn).safeTransferFrom(
-        msg.sender,
-        address(pool),
-        amountIn
+        msg.sender, address(pool), amountIn
       );
     }
 
     if (tokenOut == address(WNATIVE)) {
       uint256 amountOut = LiquidityFacetInterface(pool).swap(
-        msg.sender,
-        tokenIn,
-        tokenOut,
-        minAmountOut,
-        address(this)
+        msg.sender, tokenIn, tokenOut, minAmountOut, address(this)
       );
 
       WNATIVE.withdraw(amountOut);
       payable(receiver).transfer(amountOut);
       return amountOut;
     } else {
-      return
-        LiquidityFacetInterface(pool).swap(
-          msg.sender,
-          tokenIn,
-          tokenOut,
-          minAmountOut,
-          receiver
-        );
+      return LiquidityFacetInterface(pool).swap(
+        msg.sender, tokenIn, tokenOut, minAmountOut, receiver
+      );
     }
   }
 
   receive() external payable {
     assert(msg.sender == address(WNATIVE)); // only accept NATIVE via fallback from the WNATIVE contract
-  }
-
-  /// @custom:oz-upgrades-unsafe-allow constructor
-  constructor() {
-    _disableInitializers();
   }
 }

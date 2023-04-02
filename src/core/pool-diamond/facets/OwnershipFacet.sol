@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { LibDiamond } from "../libraries/LibDiamond.sol";
-import { OwnershipFacetInterface } from "../interfaces/OwnershipFacetInterface.sol";
+import {LibDiamond} from "../libraries/LibDiamond.sol";
+import {OwnershipFacetInterface} from
+  "../interfaces/OwnershipFacetInterface.sol";
 
 contract OwnershipFacet is OwnershipFacetInterface {
   function transferOwnership(address _newOwner) external {

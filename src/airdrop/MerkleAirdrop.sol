@@ -1,22 +1,23 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { IMerkleAirdrop } from "../interfaces/IMerkleAirdrop.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { MerkleProof } from "./MerkleProof.sol";
+import {IMerkleAirdrop} from "../interfaces/IMerkleAirdrop.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {SafeERC20} from
+  "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {MerkleProof} from "./MerkleProof.sol";
 
 contract MerkleAirdrop is Ownable {
   using SafeERC20 for IERC20;
@@ -30,10 +31,7 @@ contract MerkleAirdrop is Ownable {
 
   // This event is triggered whenever a call to #claim succeeds.
   event Claimed(
-    uint256 weekTimestamp,
-    uint256 index,
-    address account,
-    uint256 amount
+    uint256 weekTimestamp, uint256 index, address account, uint256 amount
   );
   event SetFeeder(address oldFeeder, address newFeeder);
   event Init(uint256 weekTimestamp, bytes32 merkleRoot);
@@ -53,8 +51,9 @@ contract MerkleAirdrop is Ownable {
   }
 
   modifier onlyFeederOrOwner() {
-    if (msg.sender != feeder && msg.sender != owner())
+    if (msg.sender != feeder && msg.sender != owner()) {
       revert MerkleAirdrop_Unauthorized();
+    }
     _;
   }
 
@@ -68,8 +67,9 @@ contract MerkleAirdrop is Ownable {
     onlyFeederOrOwner
   {
     uint256 currentWeekTimestamp = block.timestamp / (60 * 60 * 24 * 7);
-    if (currentWeekTimestamp <= weekTimestamp)
+    if (currentWeekTimestamp <= weekTimestamp) {
       revert MerkleAirdrop_CannotInitFutureWeek();
+    }
     if (initialized[weekTimestamp]) revert MerkleAirdrop_Initialized();
 
     merkleRoot[weekTimestamp] = merkleRoot_;
@@ -94,8 +94,7 @@ contract MerkleAirdrop is Ownable {
     uint256 claimedWordIndex = index / 256;
     uint256 claimedBitIndex = index % 256;
     claimedBitMap[weekTimestamp][claimedWordIndex] =
-      claimedBitMap[weekTimestamp][claimedWordIndex] |
-      (1 << claimedBitIndex);
+      claimedBitMap[weekTimestamp][claimedWordIndex] | (1 << claimedBitIndex);
   }
 
   function claim(
@@ -116,19 +115,15 @@ contract MerkleAirdrop is Ownable {
     bytes32[][] calldata merkleProof
   ) external {
     if (
-      weekTimestamps.length != indices.length ||
-      weekTimestamps.length != accounts.length ||
-      weekTimestamps.length != amounts.length ||
-      weekTimestamps.length != merkleProof.length
+      weekTimestamps.length != indices.length
+        || weekTimestamps.length != accounts.length
+        || weekTimestamps.length != amounts.length
+        || weekTimestamps.length != merkleProof.length
     ) revert MerkleAirdrop_InvalidLength();
 
-    for (uint256 i = 0; i < weekTimestamps.length; ) {
+    for (uint256 i = 0; i < weekTimestamps.length;) {
       _claim(
-        weekTimestamps[i],
-        indices[i],
-        accounts[i],
-        amounts[i],
-        merkleProof[i]
+        weekTimestamps[i], indices[i], accounts[i], amounts[i], merkleProof[i]
       );
       unchecked {
         i++;
@@ -147,8 +142,9 @@ contract MerkleAirdrop is Ownable {
 
     // Verify the merkle proof.
     bytes32 node = keccak256(abi.encodePacked(index, account, amount));
-    if (!MerkleProof.verify(merkleProof, merkleRoot[weekTimestamp], node))
+    if (!MerkleProof.verify(merkleProof, merkleRoot[weekTimestamp], node)) {
       revert MerkleAirdrop_InvalidProof();
+    }
 
     // Mark it claimed and send the token.
     _setClaimed(weekTimestamp, index);

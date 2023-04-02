@@ -1,54 +1,53 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-interface IMiner {
-  function setWhitelist(address _whitelisted, bool _allow) external;
+import {IAP} from "@alperp/interfaces/IAP.sol";
 
-  function setMiningPoint(address _point) external;
+interface ITradeMiningManager {
+  function setAuth(address _user, bool _allow) external;
 
-  function increasePosition(
+  function setAp(IAP _alpacaPoint) external;
+
+  function onIncreasePosition(
     address _primaryAccount,
     uint256 _subAccountId,
     address _collateralToken,
     address _indexToken,
     uint256 _sizeDelta,
-    uint256 _collateralDeltaUsd,
     bool _isLong
   ) external;
 
-  function decreasePosition(
+  function onDecreasePosition(
     address _primaryAccount,
     uint256 _subAccountId,
     address _collateralToken,
     address _indexToken,
     uint256 _sizeDelta,
-    uint256 _collateralDelta,
     bool _isLong
   ) external;
 
-  function liquidatePosition(
+  function onLiquidatePosition(
     address _primaryAccount,
     uint256 _subAccountId,
     address _collateralToken,
     address _indexToken,
     uint256 _size,
-    uint256 _collateral,
     bool _isLong
   ) external;
 
-  function swap(
+  function onSwap(
     address _account,
     address _tokenIn,
     address _tokenOut,
@@ -56,7 +55,7 @@ interface IMiner {
     uint256 _amountOut
   ) external;
 
-  function addLiquidity(
+  function onAddLiquidity(
     address _account,
     address _tokenIn,
     uint256 _amountIn,
@@ -64,7 +63,7 @@ interface IMiner {
     address _receiver
   ) external;
 
-  function removeLiquidity(
+  function onRemoveLiquidity(
     address _account,
     address _tokenOut,
     uint256 _liquidityAmount, // ALP amount

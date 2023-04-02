@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { PoolOracle } from "../../PoolOracle.sol";
+import {PoolOracle} from "../../PoolOracle.sol";
 
-import { LibPoolConfigV1 } from "../libraries/LibPoolConfigV1.sol";
+import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
 
 interface AdminFacetInterface {
   function deleteTokenConfig(address token) external;
@@ -65,11 +65,8 @@ interface AdminFacetInterface {
 
   function setTreasury(address newTreasury) external;
 
-  function withdrawFeeReserve(
-    address token,
-    address to,
-    uint256 amount
-  ) external;
+  function withdrawFeeReserve(address token, address to, uint256 amount)
+    external;
 
   function setPlugin(address plugin, bool allow) external;
 }

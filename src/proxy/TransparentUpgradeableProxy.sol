@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 // OpenZeppelin Contracts (last updated v4.7.0) (proxy/transparent/TransparentUpgradeableProxy.sol)
 
@@ -43,11 +43,10 @@ contract TransparentUpgradeableProxy is ERC1967Proxy {
    * @dev Initializes an upgradeable proxy managed by `_admin`, backed by the implementation at `_logic`, and
    * optionally initialized with `_data` as explained in {ERC1967Proxy-constructor}.
    */
-  constructor(
-    address _logic,
-    address admin_,
-    bytes memory _data
-  ) payable ERC1967Proxy(_logic, _data) {
+  constructor(address _logic, address admin_, bytes memory _data)
+    payable
+    ERC1967Proxy(_logic, _data)
+  {
     _changeAdmin(admin_);
   }
 

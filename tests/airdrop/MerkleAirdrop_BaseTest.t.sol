@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { BaseTest, console, MerkleAirdrop } from "../base/BaseTest.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {BaseTest, console, MerkleAirdrop} from "../base/BaseTest.sol";
 
 abstract contract MerkleAirdrop_BaseTest is BaseTest {
   MerkleAirdrop internal merkleAirdrop;
@@ -25,8 +25,8 @@ abstract contract MerkleAirdrop_BaseTest is BaseTest {
   bytes32 internal ipfsHash = keccak256("1");
   uint256 internal weekTimestamp1 = 1 weeks / 1 weeks;
   uint256 internal weekTimestamp2 = 2 weeks / 1 weeks;
-  uint256 internal referralAmountWeek1 = 4497.234393 * 10**6;
-  uint256 internal referralAmountWeek2 = 500 * 10**6;
+  uint256 internal referralAmountWeek1 = 4497.234393 * 10 ** 6;
+  uint256 internal referralAmountWeek2 = 500 * 10 ** 6;
 
   function setUp() public virtual {
     merkleAirdrop = deployMerkleAirdrop(address(usdc), address(this));

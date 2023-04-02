@@ -1,19 +1,35 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, console, LibAccessControl, PoolOracle, LibPoolConfigV1, IERC20, ALP, FundingRateFacetInterface, AccessControlFacetInterface, PerpTradeFacetInterface, AdminFacetInterface, GetterFacetInterface, FarmFacetInterface, LiquidityFacetInterface, math } from "./PoolDiamond_BaseTest.t.sol";
-import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import {
+  PoolDiamond_BaseTest,
+  console,
+  LibAccessControl,
+  PoolOracle,
+  LibPoolConfigV1,
+  IERC20,
+  ALP,
+  FundingRateFacetInterface,
+  AccessControlFacetInterface,
+  PerpTradeFacetInterface,
+  AdminFacetInterface,
+  GetterFacetInterface,
+  FarmFacetInterface,
+  LiquidityFacetInterface,
+  math
+} from "./PoolDiamond_BaseTest.t.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 struct OraclePrice {
   uint256 wbtcMinPrice;
@@ -37,10 +53,8 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     vm.prank(BUSD_PHILANTROPHIST);
     busd.transfer(address(this), 1000 ether);
 
-    (
-      address[] memory tokens,
-      PoolOracle.PriceFeedInfo[] memory priceFeedInfo
-    ) = buildDefaultSetPriceFeedInput();
+    (address[] memory tokens, PoolOracle.PriceFeedInfo[] memory priceFeedInfo) =
+      buildDefaultSetPriceFeedInput();
     poolOracle.setPriceFeed(tokens, priceFeedInfo);
 
     (
@@ -87,11 +101,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     wbtc.approve(address(poolRouter), 5 ether);
     // 1. adding liquidity into an empty pool
     poolRouter.addLiquidity(
-      address(wbtc),
-      5 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(wbtc), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // there are 0.003% deposit fee
@@ -129,9 +139,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // = 4.985 / 2
     // = 2.4925 in both pool and farm module
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
     // 2.4925 + 0.015 (0.003% deposit fee in the reserve)
     assertEq(wbtc.balanceOf(address(poolDiamond)), 2.5075 ether);
@@ -156,18 +164,12 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     wbtc.approve(address(poolRouter), 5 ether);
     // adding liquidity will also realizeFarmPnL
     poolRouter.addLiquidity(
-      address(wbtc),
-      5 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(wbtc), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // principle is left unchanged as there are no rebalancing, 2 wei is from precision loss
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // current liquidity
@@ -200,11 +202,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     wbtc.approve(address(poolRouter), 5 ether);
     // 1. adding liquidity into an empty pool
     poolRouter.addLiquidity(
-      address(wbtc),
-      5 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(wbtc), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // there are 0.003% deposit fee
@@ -242,9 +240,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // = 4.985 / 2
     // = 2.4925 in both pool and farm module
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
     // 2.4925 + 0.015 (0.003% deposit fee in the reserve)
     assertEq(wbtc.balanceOf(address(poolDiamond)), 2.5075 ether);
@@ -269,18 +265,12 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     wbtc.approve(address(poolRouter), 5 ether);
     // adding liquidity will also realizeFarmPnL
     poolRouter.addLiquidity(
-      address(wbtc),
-      5 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(wbtc), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // principle is left unchanged as there are no rebalancing, 2 wei is from precision loss
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // current liquidity
@@ -339,24 +329,18 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // 9.97 - (4.939927029373892898)
     // = 5.030072970626107102
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      5.030072970626107102 ether,
-      2
+      poolGetterFacet.liquidityOf(address(wbtc)), 5.030072970626107102 ether, 2
     );
 
     // total fee collected
     // 0.03 + 0.014819781088121678
     assertCloseWei(
-      poolGetterFacet.feeReserveOf(address(wbtc)),
-      0.044819781088121678 ether,
-      2
+      poolGetterFacet.feeReserveOf(address(wbtc)), 0.044819781088121678 ether, 2
     );
 
     // principle is left unchanged as there are no rebalancing
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // min AUM = liquidity * min price
@@ -381,9 +365,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     poolFarmFacet.farm(address(wbtc), true);
 
     assertCloseBps(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      5.030072970626107102 ether,
-      2
+      poolGetterFacet.liquidityOf(address(wbtc)), 5.030072970626107102 ether, 2
     );
 
     // principle can be different from targetDeloyedFund because of share calculation during a withdrawl, but it shouldn't be that different (10 BPS delta)
@@ -402,11 +384,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     wbtc.approve(address(poolRouter), 5 ether);
     // 1. adding liquidity into an empty pool
     poolRouter.addLiquidity(
-      address(wbtc),
-      5 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(wbtc), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // there are 0.003% deposit fee
@@ -440,18 +418,13 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), 4.985 ether, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     uint256 valueConvertFromShare;
-    uint256 ibWbtcBalance = alpacaWbtcVault.balanceOf(
-      address(wbtcFarmStrategy)
-    );
-    valueConvertFromShare =
-      (ibWbtcBalance * (alpacaWbtcVault.totalToken())) /
-      (alpacaWbtcVault.totalSupply());
+    uint256 ibWbtcBalance = alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy));
+    valueConvertFromShare = (ibWbtcBalance * (alpacaWbtcVault.totalToken()))
+      / (alpacaWbtcVault.totalSupply());
 
     assertCloseWei(
       valueConvertFromShare,
@@ -488,9 +461,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), 4.985 ether, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // Getting AUM will include unaccrued pnl
@@ -511,13 +482,11 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     uint256 wbtcLiquidity = 4.985 ether;
     {
       wbtcShare = alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy));
-      wbtcExpectedValue =
-        (wbtcShare * (alpacaWbtcVault.totalToken())) /
-        (alpacaWbtcVault.totalSupply());
+      wbtcExpectedValue = (wbtcShare * (alpacaWbtcVault.totalToken()))
+        / (alpacaWbtcVault.totalSupply());
 
-      wbtcDelta =
-        wbtcExpectedValue -
-        poolGetterFacet.strategyDataOf(address(wbtc)).principle;
+      wbtcDelta = wbtcExpectedValue
+        - poolGetterFacet.strategyDataOf(address(wbtc)).principle;
 
       // TODO: find a way to accurately calculate the delta
       // assertEq(delta, 275816295065400);
@@ -527,7 +496,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
 
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+      (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) // 20240.97 * 2 rounded up
     );
 
@@ -536,7 +505,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     //  = 100906793931518405982021
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      (((20245.458 * 10**8) * wbtcLiquidity) / 10**8),
+      (((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) // 20245.458 * 2 rounded up
     );
 
@@ -544,27 +513,21 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     vm.prank(EVE);
     poolFarmFacet.farm(address(wbtc), false);
 
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // AUM should remain unchange since getting AUM before is already include the interests
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+      (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) // 20240.97 * 2 rounded up
     );
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      (((20245.458 * 10**8) * wbtcLiquidity) / 10**8),
+      (((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) // 20245.458 * 2 rounded up
     );
 
@@ -576,16 +539,10 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     alpacaWbtcVault.deposit(100 ether);
     vm.stopPrank();
 
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // Getting AUM includes any unaccrued pnl
@@ -598,25 +555,23 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // prices * (4.985274615372603486 + 0.001146193878221987)
     {
       wbtcShare = alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy));
-      wbtcExpectedValue =
-        (wbtcShare * (alpacaWbtcVault.totalToken())) /
-        (alpacaWbtcVault.totalSupply());
+      wbtcExpectedValue = (wbtcShare * (alpacaWbtcVault.totalToken()))
+        / (alpacaWbtcVault.totalSupply());
 
-      wbtcDelta =
-        wbtcExpectedValue -
-        poolGetterFacet.strategyDataOf(address(wbtc)).principle;
+      wbtcDelta = wbtcExpectedValue
+        - poolGetterFacet.strategyDataOf(address(wbtc)).principle;
 
       wbtcLiquidity = wbtcLiquidity + wbtcDelta;
     }
 
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+      (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) // 20240.97 * 2 rounded up
     );
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      (((20245.458 * 10**8) * wbtcLiquidity) / 10**8),
+      (((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) // 20245.458 * 2 rounded up
     );
 
@@ -624,27 +579,21 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     poolFarmFacet.farm(address(wbtc), false);
 
     // only liquidity changes as the interest is accrued
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
 
     // other should still remains the same
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+      (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) // 20240.97 * 2 rounded up
     );
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      (((20245.458 * 10**8) * wbtcLiquidity) / 10**8),
+      (((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) // 20245.458 * 2 rounded up
     );
 
@@ -656,24 +605,14 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
 
     busd.approve(address(poolRouter), 10000 ether);
     poolRouter.addLiquidity(
-      address(busd),
-      10000 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(busd), 10000 ether, address(this), 0, zeroBytesArr()
     );
 
     // wbtc should remain the same
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // there are 0.003% deposit fee
@@ -686,12 +625,12 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // AUMs = wbtc aum + busd aum
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      9970 ether + (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+      9970 ether + (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      9970.0758717 ether + (((20245.458 * 10**8) * wbtcLiquidity) / 10**8),
+      9970.0758717 ether + (((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) + 2 // 20245.458 * 2 rounded up
     );
 
@@ -725,16 +664,10 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // 0.02 / 1.00000761
     // = 0.019999847801158233
 
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     assertCloseWei(poolGetterFacet.liquidityOf(address(busd)), 9970 ether, 2);
@@ -746,21 +679,16 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
 
     GetterFacetInterface.GetPositionReturnVars memory position;
     {
-      position = poolGetterFacet.getPosition(
-        BOB,
-        address(busd),
-        address(wbtc),
-        false
-      );
+      position =
+        poolGetterFacet.getPosition(BOB, address(busd), address(wbtc), false);
       assertEq(position.size, 20 * PRICE_PRECISION);
     }
 
     // AUMs = wbtc aum + busd aum
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-        9970 ether +
-        0.004434570082362653 ether +
-        (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+      9970 ether + 0.004434570082362653 ether
+        + (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
 
@@ -774,9 +702,8 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // = (100952.373064013598578951 + 0.004434570082362653) + 9970.0758717
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      9970.0758717 ether +
-        0.004434570082362653 ether +
-        (((20245.458 * 10**8) * wbtcLiquidity) / 10**8),
+      9970.0758717 ether + 0.004434570082362653 ether
+        + (((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) + 2 // 20245.458 * 2 rounded up
     );
   }
@@ -790,11 +717,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     wbtc.approve(address(poolRouter), 5 ether);
     // 1. adding liquidity into an empty pool
     poolRouter.addLiquidity(
-      address(wbtc),
-      5 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(wbtc), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // there are 0.003% deposit fee
@@ -828,18 +751,13 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), 4.985 ether, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     uint256 valueConvertFromShare;
-    uint256 ibWbtcBalance = alpacaWbtcVault.balanceOf(
-      address(wbtcFarmStrategy)
-    );
-    valueConvertFromShare =
-      (ibWbtcBalance * (alpacaWbtcVault.totalToken())) /
-      (alpacaWbtcVault.totalSupply());
+    uint256 ibWbtcBalance = alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy));
+    valueConvertFromShare = (ibWbtcBalance * (alpacaWbtcVault.totalToken()))
+      / (alpacaWbtcVault.totalSupply());
 
     assertCloseWei(
       valueConvertFromShare,
@@ -876,9 +794,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), 4.985 ether, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // Getting AUM includes any unaccrued pnl
@@ -890,13 +806,11 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     uint256 wbtcLiquidity = 4.985 ether;
     {
       wbtcShare = alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy));
-      wbtcExpectedValue =
-        (wbtcShare * (alpacaWbtcVault.totalToken())) /
-        (alpacaWbtcVault.totalSupply());
+      wbtcExpectedValue = (wbtcShare * (alpacaWbtcVault.totalToken()))
+        / (alpacaWbtcVault.totalSupply());
 
-      wbtcDelta =
-        wbtcExpectedValue -
-        poolGetterFacet.strategyDataOf(address(wbtc)).principle;
+      wbtcDelta = wbtcExpectedValue
+        - poolGetterFacet.strategyDataOf(address(wbtc)).principle;
 
       // TODO: find a way to accurately calculate the delta
       // assertEq(delta, 275816295065400);
@@ -915,7 +829,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
 
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      ((20240.97 * 10**8) * wbtcLiquidity) / 10**8,
+      ((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8,
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) // 20240.97 * 2 rounded up
     );
 
@@ -924,7 +838,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     //  = 100906793931518405982021
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      ((20245.458 * 10**8) * wbtcLiquidity) / 10**8,
+      ((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8,
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) // 20245.458 * 2 rounded up
     );
 
@@ -932,27 +846,21 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     vm.prank(EVE);
     poolFarmFacet.farm(address(wbtc), false);
 
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // AUM should remain unchange since getting AUM before is already include the interests
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      ((20240.97 * 10**8) * wbtcLiquidity) / 10**8,
+      ((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8,
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) // 20240.97 * 2 rounded up
     );
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      ((20245.458 * 10**8) * wbtcLiquidity) / 10**8,
+      ((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8,
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) // 20245.458 * 2 rounded up
     );
 
@@ -964,16 +872,10 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     alpacaWbtcVault.deposit(100 ether);
     vm.stopPrank();
 
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // Getting AUM includes any unaccrued pnl
@@ -981,13 +883,11 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
 
     {
       wbtcShare = alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy));
-      wbtcExpectedValue =
-        (wbtcShare * (alpacaWbtcVault.totalToken())) /
-        (alpacaWbtcVault.totalSupply());
+      wbtcExpectedValue = (wbtcShare * (alpacaWbtcVault.totalToken()))
+        / (alpacaWbtcVault.totalSupply());
 
-      wbtcDelta =
-        wbtcExpectedValue -
-        poolGetterFacet.strategyDataOf(address(wbtc)).principle;
+      wbtcDelta = wbtcExpectedValue
+        - poolGetterFacet.strategyDataOf(address(wbtc)).principle;
 
       // TODO: find a way to accurately calculate the delta
       // assertEq(delta, 275816295065400);
@@ -1003,12 +903,12 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
 
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      ((20240.97 * 10**8) * wbtcLiquidity) / 10**8,
+      ((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8,
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) // 20240.97 * 2 rounded up
     );
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      ((20245.458 * 10**8) * wbtcLiquidity) / 10**8,
+      ((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8,
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) // 20245.458 * 2 rounded up
     );
 
@@ -1016,27 +916,21 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     poolFarmFacet.farm(address(wbtc), false);
 
     // only liquidity changes as the interest is accrued
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
 
     // other should still remains the same
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      ((20240.97 * 10**8) * wbtcLiquidity) / 10**8,
+      ((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8,
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) // 20240.97 * 2 rounded up
     );
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      ((20245.458 * 10**8) * wbtcLiquidity) / 10**8,
+      ((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8,
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) // 20245.458 * 2 rounded up
     );
 
@@ -1048,24 +942,14 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
 
     busd.approve(address(poolRouter), 10000 ether);
     poolRouter.addLiquidity(
-      address(busd),
-      10000 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(busd), 10000 ether, address(this), 0, zeroBytesArr()
     );
 
     // wbtc should remain the same
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // there are 0.003% deposit fee
@@ -1078,12 +962,12 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // AUMs = wbtc aum + busd aum
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      9970 ether + (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+      9970 ether + (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      9970.0758717 ether + (((20245.458 * 10**8) * wbtcLiquidity) / 10**8),
+      9970.0758717 ether + (((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) + 2 // 20245.458 * 2 rounded up
     );
 
@@ -1117,16 +1001,10 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // 0.02 / 1.00000761
     // = 0.019999847801158233
 
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     assertCloseWei(poolGetterFacet.liquidityOf(address(busd)), 9970 ether, 2);
@@ -1138,21 +1016,16 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
 
     GetterFacetInterface.GetPositionReturnVars memory position;
     {
-      position = poolGetterFacet.getPosition(
-        BOB,
-        address(busd),
-        address(wbtc),
-        false
-      );
+      position =
+        poolGetterFacet.getPosition(BOB, address(busd), address(wbtc), false);
       assertEq(position.size, 20 * PRICE_PRECISION);
     }
 
     // AUMs = wbtc aum + busd aum
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-        9970 ether +
-        0.004434570082362653 ether +
-        (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+      9970 ether + 0.004434570082362653 ether
+        + (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
 
@@ -1166,9 +1039,8 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // = (100952.373064013598578951 + 0.004434570082362653) + 9970.0758717
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      9970.0758717 ether +
-        0.004434570082362653 ether +
-        (((20245.458 * 10**8) * wbtcLiquidity) / 10**8),
+      9970.0758717 ether + 0.004434570082362653 ether
+        + (((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) + 2 // 20245.458 * 2 rounded up
     );
     vm.prank(BUSD_PHILANTROPHIST);
@@ -1193,16 +1065,10 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     vm.stopPrank();
 
     // wbtc is untouched
-    assertCloseWei(
-      poolGetterFacet.liquidityOf(address(wbtc)),
-      wbtcLiquidity,
-      2
-    );
+    assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), wbtcLiquidity, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      2.4925 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 2.4925 ether, 2
     );
 
     // short position loss count as platform profit
@@ -1247,12 +1113,8 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.strategyDataOf(address(busd)).principle, 0);
 
     {
-      position = poolGetterFacet.getPosition(
-        BOB,
-        address(busd),
-        address(wbtc),
-        false
-      );
+      position =
+        poolGetterFacet.getPosition(BOB, address(busd), address(wbtc), false);
       assertEq(position.size, 10 * PRICE_PRECISION);
     }
 
@@ -1267,9 +1129,8 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
 
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
-      9970.00221726816777057 ether +
-        0.002217285041181326 ether +
-        (((20240.97 * 10**8) * wbtcLiquidity) / 10**8),
+      9970.00221726816777057 ether + 0.002217285041181326 ether
+        + (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
 
@@ -1284,9 +1145,8 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     // = (100952.373064013598578951 + 0.002217285041181326) + 9970.078088985041181326
     assertCloseWei(
       poolGetterFacet.getAumE18(true),
-      9970.078088985041181326 ether +
-        0.002217285041181326 ether +
-        (((20245.458 * 10**8) * wbtcLiquidity) / 10**8),
+      9970.078088985041181326 ether + 0.002217285041181326 ether
+        + (((20245.458 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) + 2 // 20245.458 * 2 rounded up
     );
   }
@@ -1298,11 +1158,7 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     wbtc.approve(address(poolRouter), 100 ether);
     // 1. adding liquidity into an empty pool
     poolRouter.addLiquidity(
-      address(wbtc),
-      100 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(wbtc), 100 ether, address(this), 0, zeroBytesArr()
     );
 
     // there are 0.003% deposit fee
@@ -1336,19 +1192,14 @@ contract PoolDiamond_TestFarmAlpacaVaultStrategy is PoolDiamond_BaseTest {
     assertCloseWei(poolGetterFacet.liquidityOf(address(wbtc)), 99.7 ether, 2);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.3 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(wbtc)).principle,
-      49.85 ether,
-      2
+      poolGetterFacet.strategyDataOf(address(wbtc)).principle, 49.85 ether, 2
     );
 
     // share minted
     uint256 valueConvertFromShare;
-    uint256 ibWbtcBalance = alpacaWbtcVault.balanceOf(
-      address(wbtcFarmStrategy)
-    );
-    valueConvertFromShare =
-      (ibWbtcBalance * (alpacaWbtcVault.totalToken())) /
-      (alpacaWbtcVault.totalSupply());
+    uint256 ibWbtcBalance = alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy));
+    valueConvertFromShare = (ibWbtcBalance * (alpacaWbtcVault.totalToken()))
+      / (alpacaWbtcVault.totalSupply());
 
     assertCloseWei(
       valueConvertFromShare,

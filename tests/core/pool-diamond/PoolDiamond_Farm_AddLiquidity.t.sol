@@ -1,8 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, LibPoolConfigV1, MockDonateVault, MockStrategy, console, GetterFacetInterface, LiquidityFacetInterface, stdError } from "./PoolDiamond_BaseTest.t.sol";
-import { StrategyInterface } from "src/interfaces/StrategyInterface.sol";
+import {
+  PoolDiamond_BaseTest,
+  LibPoolConfigV1,
+  MockDonateVault,
+  MockStrategy,
+  console,
+  GetterFacetInterface,
+  LiquidityFacetInterface,
+  stdError
+} from "./PoolDiamond_BaseTest.t.sol";
+import {StrategyInterface} from "src/interfaces/StrategyInterface.sol";
 
 contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
   MockDonateVault internal mockDaiVault;
@@ -25,11 +34,11 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     poolAdminFacet.setTokenConfigs(tokens2, tokenConfigs2);
 
     // Feed prices
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(41_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(41_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
 
     // Deploy strategy related-instances
 
@@ -78,7 +87,7 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     poolFarmFacet.setStrategyTargetBps(address(dai), 5000);
 
     // Add 1000 DAI to the pool
-    dai.mint(address(poolDiamond), 1000 * 10**18);
+    dai.mint(address(poolDiamond), 1000 * 10 ** 18);
     poolLiquidityFacet.addLiquidity(address(this), address(dai), address(this));
 
     // The following conditions should be met:
@@ -91,9 +100,9 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 997 * 1
     // = 997 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
 
     // Call farm to deploy funds 997 * 50% = 498.5 DAI
     poolFarmFacet.farm(address(dai), true);
@@ -108,17 +117,16 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     // = 997 * 1 + 0 [StrategyDelta]
     // = 997 USD
     // 5. Pool's total DAI should be 1000 - 498.5 =  501.5 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
     assertEq(
-      poolGetterFacet.strategyDataOf(address(dai)).principle,
-      498.5 * 10**18
+      poolGetterFacet.strategyDataOf(address(dai)).principle, 498.5 * 10 ** 18
     );
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10 ** 18);
 
     // Add 2000 DAI to the pool
-    dai.mint(address(poolDiamond), 2000 * 10**18);
+    dai.mint(address(poolDiamond), 2000 * 10 ** 18);
     poolLiquidityFacet.addLiquidity(address(this), address(dai), address(this));
 
     // The following conditions should be met:
@@ -131,12 +139,12 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 2991 * 1
     // = 2991 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 2991 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(false), 2991 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 2991 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 2991 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(false), 2991 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 2991 * 10 ** 18);
 
     // Assuming vault profit 10 DAI
-    dai.mint(address(mockDaiVault), 10 * 10**18);
+    dai.mint(address(mockDaiVault), 10 * 10 ** 18);
 
     // The following conditions should be met:
     // 1. DAI's strategy delta should be: +10 DAI
@@ -147,16 +155,15 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 2991 * 1 + 10 [StrategyDelta]
     // = 3001 USD
-    (bool isProfit, uint256 strategyDelta) = poolGetterFacet.getStrategyDeltaOf(
-      address(dai)
-    );
-    assertEq(strategyDelta, 10 * 10**18);
+    (bool isProfit, uint256 strategyDelta) =
+      poolGetterFacet.getStrategyDeltaOf(address(dai));
+    assertEq(strategyDelta, 10 * 10 ** 18);
     assertTrue(isProfit);
-    assertEq(poolGetterFacet.getAumE18(false), 3001 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 3001 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 3001 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 3001 * 10 ** 18);
 
     // Add 500 DAI to the pool
-    dai.mint(address(poolDiamond), 500 * 10**18);
+    dai.mint(address(poolDiamond), 500 * 10 ** 18);
     poolLiquidityFacet.addLiquidity(address(this), address(dai), address(this));
 
     // The following conditions should be met:
@@ -169,9 +176,9 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 3489.5 + 10 [StrategyDelta]
     // = 3499.5 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 3499.5 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(false), 3499.5 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 3499.5 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 3499.5 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(false), 3499.5 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 3499.5 * 10 ** 18);
   }
 
   function testCorrectness_WhenAddLiquidity_WhenLoss() external {
@@ -179,7 +186,7 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     poolFarmFacet.setStrategyTargetBps(address(dai), 5000);
 
     // Add 1000 DAI to the pool
-    dai.mint(address(poolDiamond), 1000 * 10**18);
+    dai.mint(address(poolDiamond), 1000 * 10 ** 18);
     poolLiquidityFacet.addLiquidity(address(this), address(dai), address(this));
 
     // The following conditions should be met:
@@ -192,9 +199,9 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 997 * 1
     // = 997 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
 
     // Call farm to deploy funds 997 * 50% = 498.5 DAI
     poolFarmFacet.farm(address(dai), true);
@@ -209,17 +216,16 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     // = 997 * 1 + 0 [StrategyDelta]
     // = 997 USD
     // 5. Pool's total DAI should be 1000 - 498.5 =  501.5 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
     assertEq(
-      poolGetterFacet.strategyDataOf(address(dai)).principle,
-      498.5 * 10**18
+      poolGetterFacet.strategyDataOf(address(dai)).principle, 498.5 * 10 ** 18
     );
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10 ** 18);
 
     // Add 500 DAI to the pool
-    dai.mint(address(poolDiamond), 500 * 10**18);
+    dai.mint(address(poolDiamond), 500 * 10 ** 18);
     poolLiquidityFacet.addLiquidity(address(this), address(dai), address(this));
 
     // The following conditions should be met:
@@ -232,12 +238,12 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 1495.5 * 1
     // = 1495.5 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 1495.5 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(false), 1495.5 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 1495.5 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 1495.5 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(false), 1495.5 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 1495.5 * 10 ** 18);
 
     // Assuming vault loss 20 DAI
-    dai.burn(address(mockDaiVault), 20 * 10**18);
+    dai.burn(address(mockDaiVault), 20 * 10 ** 18);
 
     // The following conditions should be met:
     // 1. DAI's strategy delta should be: -20 DAI
@@ -248,16 +254,15 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 1495.5 * 1 - 20 [StrategyDelta]
     // = 1475.5 USD
-    (bool isProfit, uint256 strategyDelta) = poolGetterFacet.getStrategyDeltaOf(
-      address(dai)
-    );
-    assertEq(strategyDelta, 20 * 10**18);
+    (bool isProfit, uint256 strategyDelta) =
+      poolGetterFacet.getStrategyDeltaOf(address(dai));
+    assertEq(strategyDelta, 20 * 10 ** 18);
     assertTrue(!isProfit);
-    assertEq(poolGetterFacet.getAumE18(false), 1475.5 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 1475.5 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 1475.5 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 1475.5 * 10 ** 18);
 
     // Add 500 DAI to the pool
-    dai.mint(address(poolDiamond), 500 * 10**18);
+    dai.mint(address(poolDiamond), 500 * 10 ** 18);
     poolLiquidityFacet.addLiquidity(address(this), address(dai), address(this));
 
     // The following conditions should be met:
@@ -270,8 +275,8 @@ contract PoolDiamond_Farm_AddLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 1974 + 0 [StrategyDelta]
     // = 1974 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 1974 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(false), 1974 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 1974 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 1974 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(false), 1974 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 1974 * 10 ** 18);
   }
 }

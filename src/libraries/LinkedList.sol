@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
@@ -37,10 +37,7 @@ library LinkedList {
     return list.next[addr] != EMPTY;
   }
 
-  function add(List storage list, address addr)
-    internal
-    returns (List storage)
-  {
+  function add(List storage list, address addr) internal returns (List storage) {
     // Check
     if (has(list, addr)) revert LinkedList_Existed();
 
@@ -52,11 +49,10 @@ library LinkedList {
     return list;
   }
 
-  function remove(
-    List storage list,
-    address addr,
-    address prevAddr
-  ) internal returns (List storage) {
+  function remove(List storage list, address addr, address prevAddr)
+    internal
+    returns (List storage)
+  {
     // Check
     if (!has(list, addr)) revert LinkedList_NotExisted();
     if (list.next[prevAddr] != addr) revert LinkedList_WrongPrev();

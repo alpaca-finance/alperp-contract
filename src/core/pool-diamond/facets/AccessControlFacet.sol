@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { LibPoolV1 } from "../libraries/LibPoolV1.sol";
-import { LibAccessControl } from "../libraries/LibAccessControl.sol";
-import { AccessControlFacetInterface } from "../interfaces/AccessControlFacetInterface.sol";
+import {LibPoolV1} from "../libraries/LibPoolV1.sol";
+import {LibAccessControl} from "../libraries/LibAccessControl.sol";
+import {AccessControlFacetInterface} from
+  "../interfaces/AccessControlFacetInterface.sol";
 
 contract AccessControlFacet is AccessControlFacetInterface {
   // -------------
@@ -99,16 +100,14 @@ contract AccessControlFacet is AccessControlFacetInterface {
 
   function allowPlugin(address plugin) external {
     // Load diamond storage
-    LibPoolV1.PoolV1DiamondStorage storage ds = LibPoolV1
-      .poolV1DiamondStorage();
+    LibPoolV1.PoolV1DiamondStorage storage ds = LibPoolV1.poolV1DiamondStorage();
 
     ds.approvedPlugins[msg.sender][plugin] = true;
   }
 
   function denyPlugin(address plugin) external {
     // Load diamond storage
-    LibPoolV1.PoolV1DiamondStorage storage ds = LibPoolV1
-      .poolV1DiamondStorage();
+    LibPoolV1.PoolV1DiamondStorage storage ds = LibPoolV1.poolV1DiamondStorage();
 
     ds.approvedPlugins[msg.sender][plugin] = false;
   }
