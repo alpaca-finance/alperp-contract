@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -19,9 +19,8 @@ import {IAP} from "@alperp/interfaces/IAP.sol";
 
 contract TradeMiningManager is ITradeMiningManager, OwnableUpgradeable {
   /// Errors
-  error TradeMiningManager_InvlidMiningPoint();
   error TradeMiningManager_NotWhitelisted();
-  error TradeMiningManager_InvlidPeriod();
+  error TradeMiningManager_InvalidPeriod();
 
   /// Configs
   /// @notice The start timestamp of the period
@@ -76,7 +75,7 @@ contract TradeMiningManager is ITradeMiningManager, OwnableUpgradeable {
     onlyOwner
   {
     if (_endTimestamp < _startTimestamp) {
-      revert TradeMiningManager_InvlidPeriod();
+      revert TradeMiningManager_InvalidPeriod();
     }
 
     emit TradeMiningManager_SetPeriod(
@@ -112,7 +111,8 @@ contract TradeMiningManager is ITradeMiningManager, OwnableUpgradeable {
     }
 
     // Mint AP to the trader
-    alpacaPoint.mint(_primaryAccount, _sizeDelta / 1e30);
+    // Convert 1e30 -> 1e18 => / 1e12
+    alpacaPoint.mint(_primaryAccount, _sizeDelta / 1e12);
   }
 
   /// @notice On decrease position. NOT IMPLEMENTED. Reserved for future use.

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -64,7 +64,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
 
   function _convertPythPriceDataToTetherFormat(
     PythStructs.Price memory _price,
-    bool _maximise
+    bool /* _maximise */
   ) internal pure returns (uint256) {
     uint256 tokenDecimals = _price.expo < 0
       ? (10 ** int256(-_price.expo).toUint256())

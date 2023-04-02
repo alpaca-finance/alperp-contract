@@ -1,43 +1,30 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
 pragma solidity >=0.8.4 <0.9.0;
 
+/// Test
 import {DSTest} from "./DSTest.sol";
-
 import {VM} from "../utils/VM.sol";
 import {console} from "../utils/console.sol";
 import {stdError} from "../utils/stdError.sol";
 import {math} from "../utils/math.sol";
 
-import {MintableTokenInterface} from
-  "@alperp/interfaces/MintableTokenInterface.sol";
-
-import {MockErc20} from "../mocks/MockERC20.sol";
-import {MockWNative} from "../mocks/MockWNative.sol";
-import {MockChainlinkPriceFeed} from "../mocks/MockChainlinkPriceFeed.sol";
-import {MockDonateVault} from "../mocks/MockDonateVault.sol";
-import {MockFlashLoanBorrower} from "../mocks/MockFlashLoanBorrower.sol";
-import {MockStrategy} from "../mocks/MockStrategy.sol";
-
-import {PoolOracle} from "@alperp/core/PoolOracle.sol";
-import {ALP} from "@alperp/tokens/ALP.sol";
-import {AP} from "@alperp/tokens/AP.sol";
+/// OZ
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ProxyAdmin} from
   "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import {IPool} from "@alperp/interfaces/IPool.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-// Diamond things
+// Alperp - Diamond
 // Libs
 import {LibPoolConfigV1} from
   "@alperp/core/pool-diamond/libraries/LibPoolConfigV1.sol";
@@ -80,7 +67,6 @@ import {
   AccessControlFacet,
   AccessControlFacetInterface
 } from "@alperp/core/pool-diamond/facets/AccessControlFacet.sol";
-
 import {LibAccessControl} from
   "@alperp/core/pool-diamond/libraries/LibAccessControl.sol";
 import {DiamondInitializer} from
@@ -90,28 +76,50 @@ import {PoolConfigInitializer} from
 import {AccessControlInitializer} from
   "@alperp/core/pool-diamond/initializers/AccessControlInitializer.sol";
 import {PoolDiamond} from "@alperp/core/pool-diamond/PoolDiamond.sol";
+
+/// Alperp - Tokens
+import {ALP} from "@alperp/tokens/ALP.sol";
+import {MintableTokenInterface} from
+  "@alperp/interfaces/MintableTokenInterface.sol";
+
+/// Alperp - Farm Strategies
 import {AlpacaVaultFarmStrategy} from "@alperp/core/AlpacaVaultFarmStrategy.sol";
 
+/// Alperp - Order Mgmt
 import {PoolRouter04} from "@alperp/periphery/pool-routers/PoolRouter04.sol";
 import {Orderbook02} from "@alperp/periphery/limit-orders/Orderbook02.sol";
-
 import {MarketOrderRouter} from
   "@alperp/core/pool-diamond/market-orders/MarketOrderRouter.sol";
 
-import {MockWNative} from "../mocks/MockWNative.sol";
-
-import {MockWNativeRelayer} from "../mocks/MockWNativeRelayer.sol";
+/// Alperp - Oracles
+import {PoolOracle} from "@alperp/core/PoolOracle.sol";
 import {FastPriceFeed} from "@alperp/core/FastPriceFeed.sol";
 import {PythPriceFeed} from "@alperp/core/PythPriceFeed.sol";
 
+/// Alperp - Liquidity Mining
 import {MerkleAirdrop} from "@alperp/airdrop/MerkleAirdrop.sol";
 import {RewardDistributor} from "@alperp/staking/RewardDistributor.sol";
 
-import {MockPyth as FakePyth} from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
-
-import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
-
+/// Alperp - Trade Mining
+import {AP} from "@alperp/trade-mining/AP.sol";
 import {TradeMiningManager} from "@alperp/trade-mining/TradeMiningManager.sol";
+import {Paradeen} from "@alperp/trade-mining/Paradeen.sol";
+
+/// Alperp tests
+import {MockWNative} from "@alperp-tests/mocks/MockWNative.sol";
+import {MockWNativeRelayer} from "@alperp-tests/mocks/MockWNativeRelayer.sol";
+import {MockErc20} from "@alperp-tests/mocks/MockERC20.sol";
+import {MockWNative} from "@alperp-tests/mocks/MockWNative.sol";
+import {MockChainlinkPriceFeed} from
+  "@alperp-tests/mocks/MockChainlinkPriceFeed.sol";
+import {MockDonateVault} from "@alperp-tests/mocks/MockDonateVault.sol";
+import {MockFlashLoanBorrower} from
+  "@alperp-tests/mocks/MockFlashLoanBorrower.sol";
+import {MockStrategy} from "@alperp-tests/mocks/MockStrategy.sol";
+
+/// Pyth
+import {MockPyth as FakePyth} from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
+import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
 // solhint-disable const-name-snakecase
 // solhint-disable no-inline-assembly
@@ -818,16 +826,18 @@ contract BaseTest is DSTest {
   function deployPoolRouter(
     address _wNative,
     address _pool,
-    address _oraclePriceUpdater
+    address _oraclePriceUpdater,
+    address _tradeMiningManager
   ) internal returns (PoolRouter04) {
     bytes memory _logicBytecode =
       abi.encodePacked(vm.getCode("./out/PoolRouter04.sol/PoolRouter04.json"));
 
     bytes memory _initializer = abi.encodeWithSelector(
-      bytes4(keccak256("initialize(address,address,address)")),
+      bytes4(keccak256("initialize(address,address,address,address)")),
       _wNative,
       _pool,
-      _oraclePriceUpdater
+      _oraclePriceUpdater,
+      _tradeMiningManager
     );
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
 
@@ -1005,7 +1015,7 @@ contract BaseTest is DSTest {
     bytes memory _initializer =
       abi.encodeWithSelector(bytes4(keccak256("initialize()")));
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
-    return AP(payable(_proxy));
+    return AP(_proxy);
   }
 
   function deployTradeMiningManager(address alpacaPoint)
@@ -1019,6 +1029,25 @@ contract BaseTest is DSTest {
       bytes4(keccak256("initialize(address)")), alpacaPoint
     );
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
-    return Miner(payable(_proxy));
+    return TradeMiningManager(_proxy);
+  }
+
+  function deployParadeen(
+    address ap,
+    uint256 startWeekCursor,
+    address rewardToken,
+    address emergencyReturn
+  ) internal returns (Paradeen) {
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/Paradeen.sol/Paradeen.json"));
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize(address,uint256,address,address)")),
+      ap,
+      startWeekCursor,
+      rewardToken,
+      emergencyReturn
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+    return Paradeen(_proxy);
   }
 }

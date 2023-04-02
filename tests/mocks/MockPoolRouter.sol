@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -25,7 +25,7 @@ contract MockPoolRouter {
     address tokenIn,
     address tokenOut,
     uint256 amountIn,
-    uint256 minAmountOut,
+    uint256, /* minAmountOut */
     address receiver
   ) external returns (uint256) {
     IERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
@@ -46,11 +46,11 @@ contract MockPoolRouter {
   ) external returns (uint256) {}
 
   function addLiquidity(
-    address token,
+    address, /* token */
     uint256 amount,
-    address receiver,
-    uint256 minLiquidity
-  ) external returns (uint256) {
+    address, /* receiver */
+    uint256 /* minLiquidity */
+  ) external pure returns (uint256) {
     return amount * 2;
   }
 }

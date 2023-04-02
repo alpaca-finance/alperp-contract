@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -222,7 +222,7 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
     }
   }
 
-  function calculateShare(address rewarder, address user)
+  function calculateShare(address, /* rewarder */ address user)
     external
     view
     returns (uint256)
@@ -230,7 +230,7 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
     return userTokenAmount[stakingToken][user];
   }
 
-  function calculateTotalShare(address rewarder)
+  function calculateTotalShare(address /* rewarder */ )
     external
     view
     returns (uint256)

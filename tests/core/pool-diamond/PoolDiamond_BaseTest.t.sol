@@ -1,17 +1,24 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
 pragma solidity 0.8.17;
 
+/// OZ
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+/// Pyth
+import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
+
+/// Alperp tests
 import {
   BaseTest,
   MockWNative,
@@ -39,19 +46,15 @@ import {
   FastPriceFeed,
   PythPriceFeed,
   FakePyth,
-  Miner
-} from "../../base/BaseTest.sol";
-
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
-import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
+  TradeMiningManager
+} from "@alperp-tests/base/BaseTest.sol";
 
 abstract contract PoolDiamond_BaseTest is BaseTest {
   PoolOracle internal poolOracle;
   address internal poolDiamond;
   PoolRouter04 internal poolRouter;
   ALP internal alp;
-  Miner internal miner;
+  TradeMiningManager internal tradeMiningManager;
   AP internal ap;
 
   MockWNative internal revenueToken;
@@ -105,8 +108,16 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
     pyth = deployFakePyth(1, 0.01 ether); // no older than 1 sec for getPrice, 0.01 for fee
     pythPriceFeed = deployPythPriceFeed(address(pyth));
 
-    poolRouter =
-      deployPoolRouter(address(bnb), poolDiamond, address(pythPriceFeed));
+    // Deploy Trade Mining
+    ap = deployAP();
+    tradeMiningManager = deployTradeMiningManager(address(ap));
+
+    poolRouter = deployPoolRouter(
+      address(bnb),
+      poolDiamond,
+      address(pythPriceFeed),
+      address(tradeMiningManager)
+    );
     poolAdminFacet.setRouter(address(poolRouter));
 
     alp.setWhitelist(address(poolRouter), true);
@@ -136,17 +147,16 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
     pythPriceFeed.setUpdater(address(poolRouter), true);
     pythPriceFeed.setMaxPriceAge(15);
 
-    // trading miner
-    miner = deployMiner();
-    ap = deployAP();
-    ap.setMinter(address(miner), true);
-    ap.setRewardToken(address(usdc), true);
-    miner.setWhitelist(address(poolRouter), true);
-    miner.setWhitelist(address(orderbook), true);
-    miner.setPeriod(1, 1735689600);
-    miner.setMiningPoint(address(ap));
-    poolRouter.setMiner(address(miner));
-    orderbook.setMiner(address(miner));
+    // Config trade mining.
+    ap.setMinter(address(tradeMiningManager), true);
+    tradeMiningManager.setAuth(address(poolRouter), true);
+    tradeMiningManager.setAuth(address(orderbook), true);
+    tradeMiningManager.setPeriod(1, 1735689600);
+    tradeMiningManager.setAp(ap);
+
+    // Set tradeMiningManager on poolRouter and orderbook.
+    poolRouter.setTradeMiningManager(tradeMiningManager);
+    orderbook.setTradeMiningManager(tradeMiningManager);
   }
 
   function checkPoolBalanceWithState(address token, int256 offset) internal {

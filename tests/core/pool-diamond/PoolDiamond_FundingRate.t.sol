@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -615,8 +615,6 @@ contract PoolDiamond_FundingRateTest is PoolDiamond_BaseTest {
     );
     (isProfitShort, deltaShort, fundingFeeShort) = poolGetterFacet
       .getPositionDelta(address(this), 0, address(dai), address(wbtc), false);
-    GetterFacetInterface.GetPositionReturnVars memory position = poolGetterFacet
-      .getPosition(address(this), address(dai), address(wbtc), false);
     // Delta and Funding Fee of Short Position should remain the same
     // because there is not
     assertTrue(isProfitShort);

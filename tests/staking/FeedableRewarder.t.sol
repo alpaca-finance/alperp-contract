@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -38,7 +38,7 @@ contract FeedableRewarderTest is BaseTest {
 
   function deployFeedableRewarder(
     string memory name,
-    address rewardToken,
+    address _rewardToken,
     address staking
   ) internal returns (FeedableRewarder) {
     bytes memory _logicBytecode = abi.encodePacked(
@@ -47,7 +47,7 @@ contract FeedableRewarderTest is BaseTest {
     bytes memory _initializer = abi.encodeWithSelector(
       bytes4(keccak256("initialize(string,address,address)")),
       name,
-      rewardToken,
+      _rewardToken,
       staking
     );
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);

@@ -318,8 +318,7 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     wbtcPriceFeed.setLatestAnswer(41_000 * 10 ** 8);
 
     // Execute Alice's order
-    (bool shouldExecute, uint160[] memory orderList) =
-      orderbook.getShouldExecuteOrderList(false, 10);
+    (bool shouldExecute,) = orderbook.getShouldExecuteOrderList(false, 10);
     assertTrue(shouldExecute);
     vm.warp(1669832202); // warp ahead
 
@@ -672,8 +671,7 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     wbtcPriceFeed.setLatestAnswer(39_000 * 10 ** 8);
 
     // Execute Alice's order
-    (bool shouldExecute, uint160[] memory orderList) =
-      orderbook.getShouldExecuteOrderList(false, 10);
+    (bool shouldExecute,) = orderbook.getShouldExecuteOrderList(false, 10);
     assertTrue(shouldExecute);
     vm.warp(1669832202); // warp ahead
 
