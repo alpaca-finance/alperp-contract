@@ -9,7 +9,7 @@ import { getConfig } from "../utils/config";
 
 const config = getConfig();
 
-const MIN_EXECUTION_FEE = "0.001";
+const MIN_EXECUTION_FEE = "0.0052";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];
