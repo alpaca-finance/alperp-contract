@@ -75,7 +75,7 @@
     "deployedAtBlock": "26142438"
   },
   "TimelockController": "",
-  "ProxyAdmin": "",
+  "ProxyAdmin": "0x3dBcbbE5a361BF97D79538bCcED4dd03d04B9726",
   "Timelock": "",
   "OpMultiSig": ""
 }
