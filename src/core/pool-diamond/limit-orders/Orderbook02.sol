@@ -1,32 +1,45 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import { SafeERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import { IERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import { AddressUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { IWNative } from "../../../interfaces/IWNative.sol";
-import { IOnchainPriceUpdater } from "../../../interfaces/IOnChainPriceUpdater.sol";
+import {ReentrancyGuardUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {AddressUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IWNative} from "../../../interfaces/IWNative.sol";
+import {IOnchainPriceUpdater} from
+  "../../../interfaces/IOnChainPriceUpdater.sol";
 
-import { IWNativeRelayer } from "../../../interfaces/IWNativeRelayer.sol";
-import { GetterFacetInterface } from "../interfaces/GetterFacetInterface.sol";
-import { LiquidityFacetInterface } from "../interfaces/LiquidityFacetInterface.sol";
-import { PerpTradeFacetInterface } from "../interfaces/PerpTradeFacetInterface.sol";
-import { PoolOracle } from "../../PoolOracle.sol";
-import { IterableMapping, Orders, OrderType, itmap } from "../libraries/IterableMapping.sol";
+import {IWNativeRelayer} from "../../../interfaces/IWNativeRelayer.sol";
+import {GetterFacetInterface} from "../interfaces/GetterFacetInterface.sol";
+import {LiquidityFacetInterface} from
+  "../interfaces/LiquidityFacetInterface.sol";
+import {PerpTradeFacetInterface} from
+  "../interfaces/PerpTradeFacetInterface.sol";
+import {PoolOracle} from "../../PoolOracle.sol";
+import {
+  IterableMapping,
+  Orders,
+  OrderType,
+  itmap
+} from "../libraries/IterableMapping.sol";
 
 contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -47,6 +60,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     bool triggerAboveThreshold;
     uint256 executionFee;
   }
+
   struct DecreaseOrder {
     address account;
     uint256 subAccountId;
@@ -59,6 +73,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     bool triggerAboveThreshold;
     uint256 executionFee;
   }
+
   struct SwapOrder {
     address account;
     address[] path;
@@ -283,9 +298,9 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   }
 
   function _updatePrices(
-    bytes[] memory _priceUpdateData,
-    address[] memory _tokens,
-    uint256[] memory _prices
+    bytes[] calldata _priceUpdateData,
+    address[] calldata _tokens,
+    uint256[] calldata _prices
   ) internal {
     oraclePriceUpdater.setCachedPrices(_priceUpdateData, _tokens, _prices);
   }
@@ -344,7 +359,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   }
 
   function createSwapOrder(
-    address[] memory _path,
+    address[] calldata _path,
     uint256 _amountIn,
     uint256 _minOut,
     uint256 _triggerRatio, // tokenB / tokenA
@@ -363,14 +378,13 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     if (_shouldWrap) {
       if (_path[0] != weth) revert OnlyNativeShouldWrap();
-      if (msg.value != _executionFee + _amountIn)
+      if (msg.value != _executionFee + _amountIn) {
         revert IncorrectValueTransfer();
+      }
     } else {
       if (msg.value != _executionFee) revert IncorrectValueTransfer();
       IERC20Upgradeable(_path[0]).safeTransferFrom(
-        msg.sender,
-        address(this),
-        _amountIn
+        msg.sender, address(this), _amountIn
       );
     }
 
@@ -388,7 +402,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
   function _createSwapOrder(
     address _account,
-    address[] memory _path,
+    address[] calldata _path,
     uint256 _amountIn,
     uint256 _minOut,
     uint256 _triggerRatio,
@@ -485,9 +499,8 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       tokenBMaxPrice = poolOracle.getMaxPrice(tokenB);
       tokenCPrice = poolOracle.getMaxPrice(tokenC);
 
-      currentRatio =
-        (tokenCPrice * tokenBMaxPrice * PRICE_PRECISION) /
-        (tokenAPrice * tokenBMinPrice);
+      currentRatio = (tokenCPrice * tokenBMaxPrice * PRICE_PRECISION)
+        / (tokenAPrice * tokenBMinPrice);
     }
     bool isValid = currentRatio > _triggerRatio;
     return isValid;
@@ -523,9 +536,9 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address _account,
     uint256 _orderIndex,
     address payable _feeReceiver,
-    bytes[] memory _priceUpdateData,
-    address[] memory _tokens,
-    uint256[] memory _prices
+    bytes[] calldata _priceUpdateData,
+    address[] calldata _tokens,
+    uint256[] calldata _prices
   ) external nonReentrant whitelisted {
     _updatePrices(_priceUpdateData, _tokens, _prices);
     SwapOrder memory order = swapOrders[_account][_orderIndex];
@@ -536,10 +549,11 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       // order.minAmount should prevent wrong price execution in case of simple limit order
       if (
         !validateSwapOrderPriceWithTriggerAboveThreshold(
-          order.path,
-          order.triggerRatio
+          order.path, order.triggerRatio
         )
-      ) revert InvalidPriceForExecution();
+      ) {
+        revert InvalidPriceForExecution();
+      }
     }
 
     delete swapOrders[_account][_orderIndex];
@@ -549,20 +563,10 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     uint256 _amountOut;
     if (order.path[order.path.length - 1] == weth && order.shouldUnwrap) {
-      _amountOut = _swap(
-        order.account,
-        order.path,
-        order.minOut,
-        address(this)
-      );
+      _amountOut = _swap(order.account, order.path, order.minOut, address(this));
       _transferOutETH(_amountOut, payable(order.account));
     } else {
-      _amountOut = _swap(
-        order.account,
-        order.path,
-        order.minOut,
-        order.account
-      );
+      _amountOut = _swap(order.account, order.path, order.minOut, order.account);
     }
 
     _transferOutETH(order.executionFee, _feeReceiver);
@@ -689,14 +693,13 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     if (_executionFee < minExecutionFee) revert InsufficientExecutionFee();
     if (_shouldWrap) {
       if (_path[0] != weth) revert OnlyNativeShouldWrap();
-      if (msg.value != _executionFee + _amountIn)
+      if (msg.value != _executionFee + _amountIn) {
         revert IncorrectValueTransfer();
+      }
     } else {
       if (msg.value != _executionFee) revert IncorrectValueTransfer();
       IERC20Upgradeable(_path[0]).safeTransferFrom(
-        msg.sender,
-        address(this),
-        _amountIn
+        msg.sender, address(this), _amountIn
       );
     }
 
@@ -705,12 +708,8 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     if (_path.length > 1) {
       if (_path[0] == _path[_path.length - 1]) revert InvalidPath();
       IERC20Upgradeable(_path[0]).safeTransfer(pool, _amountIn);
-      vars._purchaseTokenAmount = _swap(
-        msg.sender,
-        _path,
-        _minOut,
-        address(this)
-      );
+      vars._purchaseTokenAmount =
+        _swap(msg.sender, _path, _minOut, address(this));
     } else {
       vars._purchaseTokenAmount = _amountIn;
     }
@@ -718,12 +717,11 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     {
       uint256 _purchaseTokenAmountUsd = GetterFacetInterface(pool)
         .convertTokensToUsde30(
-          vars._purchaseToken,
-          vars._purchaseTokenAmount,
-          false
-        );
-      if (_purchaseTokenAmountUsd < minPurchaseTokenAmountUsd)
+        vars._purchaseToken, vars._purchaseTokenAmount, false
+      );
+      if (_purchaseTokenAmountUsd < minPurchaseTokenAmountUsd) {
         revert InsufficientCollateral();
+      }
     }
 
     _createIncreaseOrder(
@@ -824,21 +822,16 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     delete increaseOrders[subAccount][_orderIndex];
     _removeFromOpenOrders(
-      msg.sender,
-      _subAccountId,
-      _orderIndex,
-      OrderType.INCREASE
+      msg.sender, _subAccountId, _orderIndex, OrderType.INCREASE
     );
 
     if (order.purchaseToken == weth) {
       _transferOutETH(
-        order.executionFee + order.purchaseTokenAmount,
-        msg.sender
+        order.executionFee + order.purchaseTokenAmount, msg.sender
       );
     } else {
       IERC20Upgradeable(order.purchaseToken).safeTransfer(
-        msg.sender,
-        order.purchaseTokenAmount
+        msg.sender, order.purchaseTokenAmount
       );
       _transferOutETH(order.executionFee, msg.sender);
     }
@@ -863,9 +856,9 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _subAccountId,
     uint256 _orderIndex,
     address payable _feeReceiver,
-    bytes[] memory _priceUpdateData,
-    address[] memory _tokens,
-    uint256[] memory _prices
+    bytes[] calldata _priceUpdateData,
+    address[] calldata _tokens,
+    uint256[] calldata _prices
   ) external nonReentrant whitelisted {
     _updatePrices(_priceUpdateData, _tokens, _prices);
     address subAccount = getSubAccount(_address, _subAccountId);
@@ -874,7 +867,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     // increase long should use max price
     // increase short should use min price
-    (uint256 currentPrice, ) = validatePositionOrderPrice(
+    (uint256 currentPrice,) = validatePositionOrderPrice(
       order.triggerAboveThreshold,
       order.triggerPrice,
       order.indexToken,
@@ -884,15 +877,11 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     delete increaseOrders[subAccount][_orderIndex];
     _removeFromOpenOrders(
-      _address,
-      _subAccountId,
-      _orderIndex,
-      OrderType.INCREASE
+      _address, _subAccountId, _orderIndex, OrderType.INCREASE
     );
 
     IERC20Upgradeable(order.purchaseToken).safeTransfer(
-      pool,
-      order.purchaseTokenAmount
+      pool, order.purchaseTokenAmount
     );
 
     if (order.purchaseToken != order.collateralToken) {
@@ -1009,9 +998,9 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _subAccountId,
     uint256 _orderIndex,
     address payable _feeReceiver,
-    bytes[] memory _priceUpdateData,
-    address[] memory _tokens,
-    uint256[] memory _prices
+    bytes[] calldata _priceUpdateData,
+    address[] calldata _tokens,
+    uint256[] calldata _prices
   ) external nonReentrant whitelisted {
     _updatePrices(_priceUpdateData, _tokens, _prices);
     address subAccount = getSubAccount(_address, _subAccountId);
@@ -1020,7 +1009,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     // decrease long should use min price
     // decrease short should use max price
-    (uint256 currentPrice, ) = validatePositionOrderPrice(
+    (uint256 currentPrice,) = validatePositionOrderPrice(
       order.triggerAboveThreshold,
       order.triggerPrice,
       order.indexToken,
@@ -1030,10 +1019,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     delete decreaseOrders[subAccount][_orderIndex];
     _removeFromOpenOrders(
-      _address,
-      _subAccountId,
-      _orderIndex,
-      OrderType.DECREASE
+      _address, _subAccountId, _orderIndex, OrderType.DECREASE
     );
 
     uint256 amountOut = PerpTradeFacetInterface(pool).decreasePosition(
@@ -1052,8 +1038,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       _transferOutETH(amountOut, payable(order.account));
     } else {
       IERC20Upgradeable(order.collateralToken).safeTransfer(
-        order.account,
-        amountOut
+        order.account, amountOut
       );
     }
 
@@ -1086,10 +1071,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     delete decreaseOrders[subAccount][_orderIndex];
     _removeFromOpenOrders(
-      msg.sender,
-      _subAccountId,
-      _orderIndex,
-      OrderType.DECREASE
+      msg.sender, _subAccountId, _orderIndex, OrderType.DECREASE
     );
     _transferOutETH(order.executionFee, msg.sender);
 
@@ -1138,7 +1120,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
   function _transferInETH() private {
     if (msg.value != 0) {
-      IWNative(weth).deposit{ value: msg.value }();
+      IWNative(weth).deposit{value: msg.value}();
     }
   }
 
@@ -1160,13 +1142,8 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       return _vaultSwap(_account, _path[0], _path[1], _minOut, _receiver);
     }
     if (_path.length == 3) {
-      uint256 midOut = _vaultSwap(
-        _account,
-        _path[0],
-        _path[1],
-        0,
-        address(this)
-      );
+      uint256 midOut =
+        _vaultSwap(_account, _path[0], _path[1], 0, address(this));
       IERC20Upgradeable(_path[1]).safeTransfer(pool, midOut);
       return _vaultSwap(_account, _path[1], _path[2], _minOut, _receiver);
     }
@@ -1184,11 +1161,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 amountOut;
 
     amountOut = LiquidityFacetInterface(pool).swap(
-      _account,
-      _tokenIn,
-      _tokenOut,
-      _minOut,
-      _receiver
+      _account, _tokenIn, _tokenOut, _minOut, _receiver
     );
 
     return amountOut;
@@ -1208,9 +1181,8 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     view
     returns (bool, uint160[] memory)
   {
-    uint256 orderListSize = orderList.size > maxOrderSize
-      ? maxOrderSize
-      : orderList.size;
+    uint256 orderListSize =
+      orderList.size > maxOrderSize ? maxOrderSize : orderList.size;
     uint160[] memory shouldExecuteOrders = new uint160[](orderListSize * 4);
     uint256 shouldExecuteIndex = 0;
     if (orderListSize > 0) {
@@ -1229,14 +1201,12 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
             shouldExecute = true;
           } else {
             shouldExecute = validateSwapOrderPriceWithTriggerAboveThreshold(
-              swapOrder.path,
-              swapOrder.triggerRatio
+              swapOrder.path, swapOrder.triggerRatio
             );
           }
         } else if (order.orderType == OrderType.INCREASE) {
-          IncreaseOrder memory increaseOrder = increaseOrders[subAccount][
-            order.orderIndex
-          ];
+          IncreaseOrder memory increaseOrder =
+            increaseOrders[subAccount][order.orderIndex];
           (, shouldExecute) = validatePositionOrderPrice(
             increaseOrder.triggerAboveThreshold,
             increaseOrder.triggerPrice,
@@ -1245,16 +1215,15 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
             false
           );
         } else if (order.orderType == OrderType.DECREASE) {
-          DecreaseOrder memory decreaseOrder = decreaseOrders[subAccount][
-            order.orderIndex
-          ];
-          GetterFacetInterface.GetPositionReturnVars
-            memory position = GetterFacetInterface(pool).getPosition(
-              subAccount,
-              decreaseOrder.collateralToken,
-              decreaseOrder.indexToken,
-              decreaseOrder.isLong
-            );
+          DecreaseOrder memory decreaseOrder =
+            decreaseOrders[subAccount][order.orderIndex];
+          GetterFacetInterface.GetPositionReturnVars memory position =
+          GetterFacetInterface(pool).getPosition(
+            subAccount,
+            decreaseOrder.collateralToken,
+            decreaseOrder.indexToken,
+            decreaseOrder.isLong
+          );
           if (position.size > 0) {
             (, shouldExecute) = validatePositionOrderPrice(
               decreaseOrder.triggerAboveThreshold,
@@ -1270,15 +1239,12 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
             return (true, new uint160[](0));
           }
           shouldExecuteOrders[shouldExecuteIndex * 4] = uint160(order.account);
-          shouldExecuteOrders[shouldExecuteIndex * 4 + 1] = uint160(
-            order.subAccountId
-          );
-          shouldExecuteOrders[shouldExecuteIndex * 4 + 2] = uint160(
-            order.orderIndex
-          );
-          shouldExecuteOrders[shouldExecuteIndex * 4 + 3] = uint160(
-            order.orderType
-          );
+          shouldExecuteOrders[shouldExecuteIndex * 4 + 1] =
+            uint160(order.subAccountId);
+          shouldExecuteOrders[shouldExecuteIndex * 4 + 2] =
+            uint160(order.orderIndex);
+          shouldExecuteOrders[shouldExecuteIndex * 4 + 3] =
+            uint160(order.orderType);
           shouldExecuteIndex++;
         }
       }
@@ -1320,16 +1286,11 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _index,
     OrderType _type
   ) public pure returns (uint256) {
-    return
-      uint256(
-        keccak256(
-          abi.encodePacked(
-            getSubAccount(_account, _subAccountId),
-            _index,
-            _type
-          )
-        )
-      );
+    return uint256(
+      keccak256(
+        abi.encodePacked(getSubAccount(_account, _subAccountId), _index, _type)
+      )
+    );
   }
 
   /// @custom:oz-upgrades-unsafe-allow constructor
