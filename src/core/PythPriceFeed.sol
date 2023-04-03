@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -134,9 +134,9 @@ contract PythPriceFeed is
   /// @param _tokens - Array of token address
   /// @param _prices - Array of price
   function setCachedPrices(
-    bytes[] memory _priceUpdateData,
-    address[] memory _tokens,
-    uint256[] memory _prices
+    bytes[] calldata _priceUpdateData,
+    address[] calldata _tokens,
+    uint256[] calldata _prices
   ) external onlyUpdater {
     if (favorRefPrice) {
       return;
@@ -167,7 +167,7 @@ contract PythPriceFeed is
 
   /// @notice A function for updating prices based on price update data
   /// @param _priceUpdateData - price update data
-  function updatePrices(bytes[] memory _priceUpdateData)
+  function updatePrices(bytes[] calldata _priceUpdateData)
     external
     payable
     onlyUpdater
@@ -181,7 +181,7 @@ contract PythPriceFeed is
 
   /// @notice A function for getting update fee based on price update data
   /// @param _priceUpdateData - price update data
-  function getUpdateFee(bytes[] memory _priceUpdateData)
+  function getUpdateFee(bytes[] calldata _priceUpdateData)
     external
     view
     returns (uint256)

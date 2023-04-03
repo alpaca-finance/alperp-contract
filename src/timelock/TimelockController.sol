@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -302,7 +302,7 @@ contract TimelockController is
     for (uint256 i = 0; i < targets.length; ++i) {
       emit CallScheduled(
         id, i, targets[i], values[i], payloads[i], predecessor, delay
-      );
+        );
     }
   }
 

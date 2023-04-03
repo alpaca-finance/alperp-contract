@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -210,7 +210,7 @@ contract PoolOracle is OwnableUpgradeable {
   {
     emit SetMaxStrictPriceDeviation(
       maxStrictPriceDeviation, _maxStrictPriceDeviation
-    );
+      );
     maxStrictPriceDeviation = _maxStrictPriceDeviation;
   }
 

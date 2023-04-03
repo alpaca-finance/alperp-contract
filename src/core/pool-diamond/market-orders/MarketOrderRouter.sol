@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -406,7 +406,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     maxTimeDelay = _maxTimeDelay;
     emit SetDelayValues(
       _minBlockDelayKeeper, _minTimeDelayPublic, _maxTimeDelay
-    );
+      );
   }
 
   function setRequestKeysStartValues(
@@ -422,7 +422,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       _increasePositionRequestKeysStart,
       _decreasePositionRequestKeysStart,
       _swapOrderRequestKeysStart
-    );
+      );
   }
 
   function executeIncreasePositions(
@@ -795,7 +795,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       request.isLong
         ? IPoolOracle(poolOracle).getMaxPrice(request.indexToken)
         : IPoolOracle(poolOracle).getMinPrice(request.indexToken)
-    );
+      );
 
     return true;
   }
@@ -846,7 +846,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       block.number - request.blockNumber,
       block.timestamp - request.blockTime,
       index
-    );
+      );
 
     return true;
   }
@@ -919,7 +919,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       request.isLong
         ? IPoolOracle(poolOracle).getMinPrice(request.indexToken)
         : IPoolOracle(poolOracle).getMaxPrice(request.indexToken)
-    );
+      );
 
     return true;
   }
@@ -959,7 +959,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       block.number - request.blockNumber,
       block.timestamp - request.blockTime,
       index
-    );
+      );
 
     return true;
   }
@@ -1014,7 +1014,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       block.number - request.blockNumber,
       block.timestamp - request.blockTime,
       index
-    );
+      );
 
     return true;
   }
@@ -1065,7 +1065,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       block.number - request.blockNumber,
       block.timestamp - request.blockTime,
       index
-    );
+      );
 
     return true;
   }
@@ -1173,7 +1173,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       _subAccountId,
       _sizeDelta,
       GetterFacetInterface(pool).positionFeeBps()
-    );
+      );
   }
 
   function _decreasePosition(
@@ -1212,7 +1212,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       _subAccountId,
       _sizeDelta,
       GetterFacetInterface(pool).positionFeeBps()
-    );
+      );
 
     return amountOut;
   }
@@ -1442,7 +1442,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       index,
       increasePositionRequestKeys.length - 1,
       tx.gasprice
-    );
+      );
 
     return requestKey;
   }
@@ -1507,7 +1507,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       request.executionFee,
       index,
       decreasePositionRequestKeys.length - 1
-    );
+      );
     return requestKey;
   }
 
@@ -1555,7 +1555,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       request.executionFee,
       index,
       swapOrderRequestKeys.length - 1
-    );
+      );
 
     return requestKey;
   }

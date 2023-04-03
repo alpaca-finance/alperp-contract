@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -298,7 +298,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
       collateralToken,
       feeUsd,
       LibPoolV1.convertUsde30ToTokens(collateralToken, feeUsd, true)
-    );
+      );
 
     uint256 borrowingFeeUsd = GetterFacetInterface(address(this))
       .getBorrowingFee(
@@ -310,7 +310,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
       collateralToken,
       borrowingFeeUsd,
       LibPoolV1.convertUsde30ToTokens(collateralToken, borrowingFeeUsd, true)
-    );
+      );
 
     feeUsd += borrowingFeeUsd;
 
@@ -484,7 +484,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
       isLong,
       vars.price,
       vars.feeUsd
-    );
+      );
     emit UpdatePosition(
       vars.posId,
       position.size,
@@ -497,7 +497,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
       position.entryFundingRate,
       position.fundingFeeDebt,
       position.openInterest
-    );
+      );
   }
 
   struct DecreasePositionLocalVars {
@@ -635,7 +635,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
         isLong,
         vars.price,
         vars.usdOut - vars.usdOutAfterFee
-      );
+        );
       emit UpdatePosition(
         vars.posId,
         position.size,
@@ -648,7 +648,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
         position.entryFundingRate,
         position.fundingFeeDebt,
         position.openInterest
-      );
+        );
     } else {
       // Close position
       if (isLong) {
@@ -671,7 +671,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
         isLong,
         vars.price,
         vars.usdOut - vars.usdOutAfterFee
-      );
+        );
       emit ClosePosition(
         vars.posId,
         position.size,
@@ -682,7 +682,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
         position.realizedPnl,
         position.entryFundingRate,
         position.openInterest
-      );
+        );
     }
 
     if (!isLong) {
@@ -812,10 +812,10 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
     ds.feeReserveOf[collateralToken] += vars.feeTokens;
     emit CollectPositionFee(
       primaryAccount, collateralToken, vars.positionFee, vars.feeTokens
-    );
+      );
     emit CollectBorrowingFee(
       primaryAccount, collateralToken, vars.borrowingFee, vars.feeTokens
-    );
+      );
 
     // Decreases reserve amount of a collateral token.
     LibPoolV1.decreaseReserved(collateralToken, position.reserveAmount);
@@ -833,7 +833,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
           : uint256(-vars.fundingFee),
         true
       )
-    );
+      );
 
     if (isLong) {
       // If it is long, then decrease guaranteed usd and pool's liquidity
@@ -862,7 +862,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
       position.reserveAmount,
       position.realizedPnl,
       vars.markPrice
-    );
+      );
 
     if (!isLong && vars.marginFee < position.collateral) {
       uint256 remainingCollateral = position.collateral - vars.marginFee;
@@ -987,7 +987,7 @@ contract PerpTradeFacet is PerpTradeFacetInterface {
           : uint256(-vars.realizedFundingFee),
         true
       )
-    );
+      );
 
     if (vars.isProfit && vars.delta > 0) {
       // Position is profitable. Handle profits here.

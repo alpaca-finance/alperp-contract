@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -80,7 +80,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     tradeMiningManager = _tradeMiningManager;
   }
 
-  function _updatePrices(bytes[] memory _priceUpdateData)
+  function _updatePrices(bytes[] calldata _priceUpdateData)
     internal
     returns (uint256)
   {
@@ -134,7 +134,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   {
     emit SetTradeMiningManager(
       address(tradeMiningManager), address(_newTradeMiningManager)
-    );
+      );
     tradeMiningManager = _newTradeMiningManager;
   }
 
@@ -143,7 +143,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 amount,
     address receiver,
     uint256 minLiquidity,
-    bytes[] memory _priceUpdateData
+    bytes[] calldata _priceUpdateData
   ) external payable nonReentrant returns (uint256) {
     _updatePrices(_priceUpdateData);
     IERC20Upgradeable(token).safeTransferFrom(msg.sender, address(pool), amount);
@@ -162,7 +162,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address token,
     address receiver,
     uint256 minLiquidity,
-    bytes[] memory _priceUpdateData
+    bytes[] calldata _priceUpdateData
   ) external payable nonReentrant returns (uint256) {
     uint256 fee = _updatePrices(_priceUpdateData);
     uint256 actualMsgValue = msg.value - fee;
@@ -186,7 +186,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 liquidity,
     address receiver,
     uint256 minAmountOut,
-    bytes[] memory _priceUpdateData
+    bytes[] calldata _priceUpdateData
   ) external payable nonReentrant returns (uint256) {
     _updatePrices(_priceUpdateData);
     IERC20Upgradeable(address(GetterFacetInterface(pool).alp()))
@@ -208,7 +208,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 liquidity,
     address receiver,
     uint256 minAmountOut,
-    bytes[] memory _priceUpdateData
+    bytes[] calldata _priceUpdateData
   ) external payable nonReentrant returns (uint256) {
     _updatePrices(_priceUpdateData);
     IERC20Upgradeable(address(GetterFacetInterface(pool).alp()))
@@ -238,7 +238,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 sizeDelta,
     bool isLong,
     uint256 acceptablePrice,
-    bytes[] memory _priceUpdateData
+    bytes[] calldata _priceUpdateData
   ) external payable nonReentrant {
     _updatePrices(_priceUpdateData);
     _validatePrice(indexToken, isLong, true, acceptablePrice);
@@ -279,7 +279,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 sizeDelta,
     bool isLong,
     uint256 acceptablePrice,
-    bytes[] memory _priceUpdateData
+    bytes[] calldata _priceUpdateData
   ) external payable nonReentrant {
     uint256 fee = _updatePrices(_priceUpdateData);
     uint256 actualMsgValue = msg.value - fee;
@@ -323,7 +323,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 acceptablePrice,
     address tokenOut,
     uint256 minAmountOut,
-    bytes[] memory _priceUpdateData
+    bytes[] calldata _priceUpdateData
   ) external payable nonReentrant {
     _updatePrices(_priceUpdateData);
     _validatePrice(indexToken, isLong, false, acceptablePrice);
@@ -369,7 +369,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 acceptablePrice,
     address tokenOut,
     uint256 minAmountOut,
-    bytes[] memory _priceUpdateData
+    bytes[] calldata _priceUpdateData
   ) external payable nonReentrant {
     _updatePrices(_priceUpdateData);
     _validatePrice(indexToken, isLong, false, acceptablePrice);
@@ -413,7 +413,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 amountIn,
     uint256 minAmountOut,
     address receiver,
-    bytes[] memory _priceUpdateData
+    bytes[] calldata _priceUpdateData
   ) external payable nonReentrant returns (uint256) {
     _updatePrices(_priceUpdateData);
     return
@@ -448,7 +448,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 amountIn,
     uint256 minAmountOut,
     address receiver,
-    bytes[] memory _priceUpdateData
+    bytes[] calldata _priceUpdateData
   ) external payable nonReentrant returns (uint256) {
     uint256 fee = _updatePrices(_priceUpdateData);
     uint256 actualMsgValue = msg.value - fee;

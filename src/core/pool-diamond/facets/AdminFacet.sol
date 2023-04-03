@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -195,7 +195,7 @@ contract AdminFacet is AdminFacetInterface {
       newStableBorrowingRateFactor,
       poolConfigDs.fundingRateFactor,
       newFundingRateFactor
-    );
+      );
     poolConfigDs.fundingInterval = newFundingInterval;
     poolConfigDs.borrowingRateFactor = newBorrowingRateFactor;
     poolConfigDs.stableBorrowingRateFactor = newStableBorrowingRateFactor;
@@ -212,7 +212,7 @@ contract AdminFacet is AdminFacetInterface {
 
     emit SetIsAllowAllLiquidators(
       poolConfigDs.isAllowAllLiquidators, _isAllowAllLiquidators
-    );
+      );
     poolConfigDs.isAllowAllLiquidators = _isAllowAllLiquidators;
   }
 
@@ -223,7 +223,7 @@ contract AdminFacet is AdminFacetInterface {
 
     emit SetIsDynamicFeeEnable(
       poolConfigDs.isDynamicFeeEnable, newIsDynamicFeeEnable
-    );
+      );
     poolConfigDs.isDynamicFeeEnable = newIsDynamicFeeEnable;
   }
 
@@ -259,7 +259,7 @@ contract AdminFacet is AdminFacetInterface {
 
     emit SetLiquidationFeeUsd(
       poolConfigDs.liquidationFeeUsd, newLiquidationFeeUsd
-    );
+      );
     poolConfigDs.liquidationFeeUsd = newLiquidationFeeUsd;
   }
 
@@ -281,7 +281,7 @@ contract AdminFacet is AdminFacetInterface {
 
     emit SetMinProfitDuration(
       poolConfigDs.minProfitDuration, newMinProfitDuration
-    );
+      );
     poolConfigDs.minProfitDuration = newMinProfitDuration;
   }
 
@@ -381,7 +381,7 @@ contract AdminFacet is AdminFacetInterface {
 
       emit SetTokenConfig(
         tokens[i], poolConfigDs.tokenMetas[tokens[i]], configs[i]
-      );
+        );
 
       poolConfigDs.totalTokenWeight = (
         poolConfigDs.totalTokenWeight

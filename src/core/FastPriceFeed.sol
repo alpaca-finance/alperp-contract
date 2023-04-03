@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -689,7 +689,7 @@ contract FastPriceFeed is OwnableUpgradeable {
       ) {
         emit MaxCumulativeDeltaDiffExceeded(
           _token, refPrice, fastPrice, cumulativeRefDelta, cumulativeFastDelta
-        );
+          );
       }
 
       _setPriceData(_token, refPrice, cumulativeRefDelta, cumulativeFastDelta);
@@ -700,7 +700,7 @@ contract FastPriceFeed is OwnableUpgradeable {
         cumulativeRefDelta,
         cumulativeFastDelta,
         _checksum
-      );
+        );
     }
 
     prices[_token] = _price;

@@ -306,9 +306,9 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   }
 
   function _updatePrices(
-    bytes[] memory _priceUpdateData,
-    address[] memory _tokens,
-    uint256[] memory _prices
+    bytes[] calldata _priceUpdateData,
+    address[] calldata _tokens,
+    uint256[] calldata _prices
   ) internal {
     oraclePriceUpdater.setCachedPrices(_priceUpdateData, _tokens, _prices);
   }
@@ -379,7 +379,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   }
 
   function createSwapOrder(
-    address[] memory _path,
+    address[] calldata _path,
     uint256 _amountIn,
     uint256 _minOut,
     uint256 _triggerRatio, // tokenB / tokenA
@@ -422,7 +422,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
   function _createSwapOrder(
     address _account,
-    address[] memory _path,
+    address[] calldata _path,
     uint256 _amountIn,
     uint256 _minOut,
     uint256 _triggerRatio,
@@ -556,9 +556,9 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address _account,
     uint256 _orderIndex,
     address payable _feeReceiver,
-    bytes[] memory _priceUpdateData,
-    address[] memory _tokens,
-    uint256[] memory _prices
+    bytes[] calldata _priceUpdateData,
+    address[] calldata _tokens,
+    uint256[] calldata _prices
   ) external nonReentrant whitelisted {
     _updatePrices(_priceUpdateData, _tokens, _prices);
     SwapOrder memory order = swapOrders[_account][_orderIndex];
@@ -874,9 +874,9 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _subAccountId,
     uint256 _orderIndex,
     address payable _feeReceiver,
-    bytes[] memory _priceUpdateData,
-    address[] memory _tokens,
-    uint256[] memory _prices
+    bytes[] calldata _priceUpdateData,
+    address[] calldata _tokens,
+    uint256[] calldata _prices
   ) external nonReentrant whitelisted {
     _updatePrices(_priceUpdateData, _tokens, _prices);
     address subAccount = getSubAccount(_address, _subAccountId);
@@ -1028,9 +1028,9 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _subAccountId,
     uint256 _orderIndex,
     address payable _feeReceiver,
-    bytes[] memory _priceUpdateData,
-    address[] memory _tokens,
-    uint256[] memory _prices
+    bytes[] calldata _priceUpdateData,
+    address[] calldata _tokens,
+    uint256[] calldata _prices
   ) external nonReentrant whitelisted {
     _updatePrices(_priceUpdateData, _tokens, _prices);
     address subAccount = getSubAccount(_address, _subAccountId);

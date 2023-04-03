@@ -80,7 +80,7 @@ contract TradeMiningManager is ITradeMiningManager, OwnableUpgradeable {
 
     emit TradeMiningManager_SetPeriod(
       startTimestamp, endTimestamp, _startTimestamp, _endTimestamp
-    );
+      );
     startTimestamp = _startTimestamp;
     endTimestamp = _endTimestamp;
   }

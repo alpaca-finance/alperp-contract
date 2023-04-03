@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -140,21 +140,21 @@ contract LiquidityFacet is LiquidityFacetInterface {
         token,
         (fee * tokenPriceUsd) / 10 ** ERC20(token).decimals(),
         fee
-      );
+        );
     } else if (action == LiquidityAction.ADD_LIQUIDITY) {
       emit CollectAddLiquidityFee(
         account,
         token,
         (fee * tokenPriceUsd) / 10 ** ERC20(token).decimals(),
         fee
-      );
+        );
     } else if (action == LiquidityAction.REMOVE_LIQUIDITY) {
       emit CollectRemoveLiquidityFee(
         account,
         token,
         (fee * tokenPriceUsd) / 10 ** ERC20(token).decimals(),
         fee
-      );
+        );
     }
 
     return amountAfterFee;
@@ -201,7 +201,7 @@ contract LiquidityFacet is LiquidityFacetInterface {
 
     emit AddLiquidity(
       account, token, amount, aum, lpSupply, usdDebt, mintAmount
-    );
+      );
 
     return mintAmount;
   }
@@ -284,7 +284,7 @@ contract LiquidityFacet is LiquidityFacetInterface {
 
     emit RemoveLiquidity(
       account, tokenOut, liquidity, aum, lpSupply, lpUsdValue, amountOut
-    );
+      );
 
     return amountOut;
   }
@@ -429,7 +429,7 @@ contract LiquidityFacet is LiquidityFacetInterface {
       vars.amountOut,
       amountOutAfterFee,
       swapFeeBps
-    );
+      );
 
     return amountOutAfterFee;
   }
@@ -483,7 +483,7 @@ contract LiquidityFacet is LiquidityFacetInterface {
 
       emit FlashLoan(
         address(borrower), tokens[i], amounts[i], vars.fees[i], receivers[i]
-      );
+        );
 
       unchecked {
         ++i;
