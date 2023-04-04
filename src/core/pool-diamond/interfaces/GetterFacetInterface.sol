@@ -1,22 +1,22 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { LibPoolConfigV1 } from "../libraries/LibPoolConfigV1.sol";
-import { PoolOracle } from "../../PoolOracle.sol";
-import { ALP } from "../../../tokens/ALP.sol";
-import { StrategyInterface } from "../../../interfaces/StrategyInterface.sol";
+import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
+import {PoolOracle} from "../../PoolOracle.sol";
+import {ALP} from "../../../tokens/ALP.sol";
+import {StrategyInterface} from "../../../interfaces/StrategyInterface.sol";
 
 interface GetterFacetInterface {
   function additionalAum() external view returns (uint256);
@@ -125,14 +125,7 @@ interface GetterFacetInterface {
     uint256 lastIncreasedTime,
     int256 entryFundingRate,
     int256 fundingFeeDebt
-  )
-    external
-    view
-    returns (
-      bool,
-      uint256,
-      int256
-    );
+  ) external view returns (bool, uint256, int256);
 
   function getEntryBorrowingRate(
     address collateralToken,
@@ -215,14 +208,7 @@ interface GetterFacetInterface {
     address collateralToken,
     address indexToken,
     bool isLong
-  )
-    external
-    view
-    returns (
-      bool,
-      uint256,
-      int256
-    );
+  ) external view returns (bool, uint256, int256);
 
   function getPositionFee(
     address account,
@@ -267,7 +253,7 @@ interface GetterFacetInterface {
 
   function getTargetValue(address token) external view returns (uint256);
 
-  function getAddLiquidityFeeBps(address token, uint256 value)
+  function getAddLiquidityFeeBps(address token, uint256 aum, uint256 value)
     external
     view
     returns (uint256);
@@ -278,20 +264,24 @@ interface GetterFacetInterface {
     bool isUseMaxPrice
   ) external view returns (uint256);
 
-  function getAum(bool isUseMaxPrice) external view returns (uint256);
-
-  function getAumE18(bool isUseMaxPrice) external view returns (uint256);
-
-  function getRemoveLiquidityFeeBps(address token, uint256 value)
+  function getCurrentValueOf(address token, bool isUseMaxPrice)
     external
     view
     returns (uint256);
 
-  function getSwapFeeBps(
-    address tokenIn,
-    address tokenOut,
-    uint256 usdDebt
-  ) external view returns (uint256);
+  function getAum(bool isUseMaxPrice) external view returns (uint256);
+
+  function getAumE18(bool isUseMaxPrice) external view returns (uint256);
+
+  function getRemoveLiquidityFeeBps(address token, uint256 aum, uint256 value)
+    external
+    view
+    returns (uint256);
+
+  function getSwapFeeBps(address tokenIn, address tokenOut, uint256 usdDebt)
+    external
+    view
+    returns (uint256);
 
   function getNextBorrowingRate(address token) external view returns (uint256);
 
