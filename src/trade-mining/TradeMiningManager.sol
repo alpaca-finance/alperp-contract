@@ -12,7 +12,8 @@
  */
 pragma solidity 0.8.17;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ITradeMiningManager} from "@alperp/interfaces/ITradeMiningManager.sol";
 import {IAP} from "@alperp/interfaces/IAP.sol";
 
@@ -20,6 +21,7 @@ contract TradeMiningManager is ITradeMiningManager, OwnableUpgradeable {
   /// Errors
   error TradeMiningManager_NotWhitelisted();
   error TradeMiningManager_InvalidPeriod();
+  error TradeMiningManager_InvalidEndTimestamp();
 
   /// Configs
   /// @notice The start timestamp of the period
@@ -76,10 +78,13 @@ contract TradeMiningManager is ITradeMiningManager, OwnableUpgradeable {
     if (_endTimestamp < _startTimestamp) {
       revert TradeMiningManager_InvalidPeriod();
     }
+    if (_endTimestamp <= block.timestamp) {
+      revert TradeMiningManager_InvalidEndTimestamp();
+    }
 
     emit TradeMiningManager_SetPeriod(
       startTimestamp, endTimestamp, _startTimestamp, _endTimestamp
-      );
+    );
     startTimestamp = _startTimestamp;
     endTimestamp = _endTimestamp;
   }

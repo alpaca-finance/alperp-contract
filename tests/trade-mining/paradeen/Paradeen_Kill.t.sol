@@ -35,8 +35,9 @@ contract Paradeen_Kill is Paradeen_BaseTest {
     vm.expectRevert("killed");
     paradeen.feed(timestamps, rewards);
 
+    vm.prank(ALICE, ALICE);
     vm.expectRevert("killed");
-    paradeen.claim(ALICE);
+    paradeen.claim();
   }
 
   function testRevert_WhenRandomAccountTryToKill() external {

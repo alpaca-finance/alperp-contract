@@ -42,4 +42,12 @@ contract TradeMiningManager_SetPeriod is TradeMiningManager_BaseTest {
     tradeMiningManager.setPeriod(1_680_000_000, 1_700_000_000);
     vm.stopPrank();
   }
+
+  function testRevert_WhenEndTimestampBeforeNow() external {
+    vm.warp(1688);
+    vm.expectRevert(
+      abi.encodeWithSignature("TradeMiningManager_InvalidEndTimestamp()")
+    );
+    tradeMiningManager.setPeriod(1600, 1687);
+  }
 }

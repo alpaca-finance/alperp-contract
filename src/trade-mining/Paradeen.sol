@@ -2,11 +2,15 @@
 pragma solidity 0.8.17;
 
 /// OZ
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Initializable} from
+  "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 /// Alperp
 import {AP} from "@alperp/trade-mining/AP.sol";
@@ -98,10 +102,9 @@ contract Paradeen is Initializable, OwnableUpgradeable {
   }
 
   /// @notice Claim reward tokens.
-  /// @param _user User to claim reward tokens.
-  function claim(address _user) external onlyLive lock returns (uint256) {
+  function claim() external onlyLive lock returns (uint256) {
     uint256 _startWeekCursor = startWeekCursor;
-    uint256 _userWeekCursor = weekCursorOf[_user];
+    uint256 _userWeekCursor = weekCursorOf[msg.sender];
     uint256 _rewards = 0;
     uint256 _maxClaimTimestamp = _floorTimestamp(block.timestamp);
 
@@ -119,7 +122,7 @@ contract Paradeen is Initializable, OwnableUpgradeable {
       }
 
       // If not reach then, calculate rewards.
-      uint256 _balance = ap.weeklyBalanceOf(_userWeekCursor, _user);
+      uint256 _balance = ap.weeklyBalanceOf(_userWeekCursor, msg.sender);
       if (_balance > 0) {
         uint256 _totalSupply = ap.weeklyTotalSupply(_userWeekCursor);
         _rewards += tokensPerWeek[_userWeekCursor] * _balance / _totalSupply;
@@ -133,11 +136,11 @@ contract Paradeen is Initializable, OwnableUpgradeable {
     }
 
     // Update user's week cursor
-    weekCursorOf[_user] = _userWeekCursor;
+    weekCursorOf[msg.sender] = _userWeekCursor;
     // Transfer reward tokens
-    rewardToken.safeTransfer(_user, _rewards);
+    rewardToken.safeTransfer(msg.sender, _rewards);
 
-    emit Claim(_user, _rewards);
+    emit Claim(msg.sender, _rewards);
 
     return _rewards;
   }

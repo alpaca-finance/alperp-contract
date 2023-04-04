@@ -14,9 +14,12 @@
 pragma solidity 0.8.17;
 
 /// OZ
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /// Alperp
 import {IAP} from "@alperp/interfaces/IAP.sol";
@@ -55,6 +58,10 @@ contract AP is OwnableUpgradeable, IAP {
   event SetMinter(address _minter, bool _newAllow);
   event Mint(uint256 _weekTimestamp, address _to, uint256 _amount);
 
+  constructor() {
+    _disableInitializers();
+  }
+
   function initialize() external initializer {
     OwnableUpgradeable.__Ownable_init();
   }
@@ -66,12 +73,12 @@ contract AP is OwnableUpgradeable, IAP {
 
   /// @notice Return the total supply of the current epoch.
   function totalSupply() external view returns (uint256) {
-    return weeklyTotalSupply[_floorWeek(block.timestamp)];
+    return weeklyTotalSupply[_floorCurrentWeek()];
   }
 
   /// @notice Return the balance of the given address in the current epoch.
   function balanceOf(address _account) external view returns (uint256) {
-    return weeklyBalanceOf[_floorWeek(block.timestamp)][_account];
+    return weeklyBalanceOf[_floorCurrentWeek()][_account];
   }
 
   /// @notice ERC20-compatible transfer function. Disabled.
@@ -117,9 +124,8 @@ contract AP is OwnableUpgradeable, IAP {
   }
 
   /// @notice Return floor week timestamp.
-  /// @param _timestamp Timestamp to be floored.
-  function _floorWeek(uint256 _timestamp) internal pure returns (uint256) {
-    return (_timestamp / WEEK) * WEEK;
+  function _floorCurrentWeek() internal view returns (uint256) {
+    return (block.timestamp / WEEK) * WEEK;
   }
 
   /// @notice Allow minter to mint AP.
@@ -135,7 +141,7 @@ contract AP is OwnableUpgradeable, IAP {
   /// @param _to The address to mint AP to.
   /// @param _amount The amount of AP to mint.
   function mint(address _to, uint256 _amount) public onlyMinter {
-    uint256 weekCursor = _floorWeek(block.timestamp);
+    uint256 weekCursor = _floorCurrentWeek();
 
     // accounting weekly amount
     weeklyTotalSupply[weekCursor] += _amount;

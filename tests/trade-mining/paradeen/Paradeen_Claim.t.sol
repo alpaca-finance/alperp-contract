@@ -34,12 +34,14 @@ contract Paradeen_Claim is Paradeen_BaseTest {
     ap.mint(BOB, 500 ether);
 
     // Claim for Alice
-    uint256 aliceClaim = paradeen.claim(ALICE);
+    vm.prank(ALICE, ALICE);
+    uint256 aliceClaim = paradeen.claim();
     assertEq(aliceClaim, 0);
     assertEq(paradeen.weekCursorOf(ALICE), 0);
 
     // Claim for Bob
-    uint256 bobClaim = paradeen.claim(BOB);
+    vm.prank(BOB, BOB);
+    uint256 bobClaim = paradeen.claim();
     assertEq(bobClaim, 0);
     assertEq(paradeen.weekCursorOf(BOB), 0);
 
@@ -47,11 +49,13 @@ contract Paradeen_Claim is Paradeen_BaseTest {
     vm.warp(WEEK);
 
     // Now Alice & Bob should be able to claim
-    aliceClaim = paradeen.claim(ALICE);
+    vm.prank(ALICE, ALICE);
+    aliceClaim = paradeen.claim();
     assertEq(aliceClaim, 66666666666666666666666);
     assertEq(paradeen.weekCursorOf(ALICE), WEEK);
 
-    bobClaim = paradeen.claim(BOB);
+    vm.prank(BOB, BOB);
+    bobClaim = paradeen.claim();
     assertEq(bobClaim, 33333333333333333333333);
     assertEq(paradeen.weekCursorOf(BOB), WEEK);
 
@@ -65,10 +69,12 @@ contract Paradeen_Claim is Paradeen_BaseTest {
     ap.mint(BOB, 200 ether);
 
     // Try to claim again, should not get anything as rewards are claimed.
-    aliceClaim = paradeen.claim(ALICE);
+    vm.prank(ALICE, ALICE);
+    aliceClaim = paradeen.claim();
     assertEq(aliceClaim, 0);
 
-    bobClaim = paradeen.claim(BOB);
+    vm.prank(BOB, BOB);
+    bobClaim = paradeen.claim();
     assertEq(bobClaim, 0);
 
     // Warp to the start of the 3rd week
@@ -91,18 +97,21 @@ contract Paradeen_Claim is Paradeen_BaseTest {
     // Alice & Bob should be able to claim:
     // Alice = (50000 * 800 / 1000) + (30000 * 100 / 1000)
     //       = 43000 USDC
-    aliceClaim = paradeen.claim(ALICE);
+    vm.prank(ALICE, ALICE);
+    aliceClaim = paradeen.claim();
     assertEq(aliceClaim, 43_000 ether);
     assertEq(paradeen.weekCursorOf(ALICE), WEEK * 3);
 
     // Bob = (50000 * 200 / 1000) + (30000 * 900 / 1000)
     //     = 37000 USDC
-    bobClaim = paradeen.claim(BOB);
+    vm.prank(BOB, BOB);
+    bobClaim = paradeen.claim();
     assertEq(bobClaim, 37_000 ether);
     assertEq(paradeen.weekCursorOf(BOB), WEEK * 3);
 
     // Cat has nothing to claim but try to claim.
-    uint256 catClaim = paradeen.claim(CAT);
+    vm.prank(CAT, CAT);
+    uint256 catClaim = paradeen.claim();
     assertEq(catClaim, 0);
     assertEq(paradeen.weekCursorOf(CAT), WEEK * 3);
   }
