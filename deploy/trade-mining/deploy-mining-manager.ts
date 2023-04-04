@@ -7,7 +7,7 @@ import { getConfig, writeConfigFile } from "../utils/config";
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = getConfig();
 
-  const MINING_POINT = config.TradeMining.miningPoint;
+  const AP = config.TradeMining.AP;
 
   const deployer = (await ethers.getSigners())[0];
 
@@ -17,7 +17,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deployer
   );
   const tradeMiningManager = await upgrades.deployProxy(TradeMiningManager, [
-    MINING_POINT,
+    AP,
   ]);
   console.log(`> ⛓ Tx submitted: ${tradeMiningManager.deployTransaction.hash}`);
   console.log(`> Waiting tx to be mined...`);
@@ -25,7 +25,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(`> Tx mined!`);
   console.log(`> Deployed at: ${tradeMiningManager.address}`);
 
-  config.TradeMining.address = tradeMiningManager.address;
+  config.TradeMining.tradeMiningManager = tradeMiningManager.address;
   writeConfigFile(config);
 
   console.log(`> Verifying contract on Tenderly...`);

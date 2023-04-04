@@ -10,7 +10,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const W_NATIVE = config.Tokens.WBNB;
   const POOL = config.Pools.ALP.poolDiamond;
   const ORACLE_PRICE_UPDATER = config.Pools.ALP.pythPriceFeed;
-  const TRADE_MINING_MANAGER = config.TradeMining.address;
+  const TRADE_MINING_MANAGER = config.TradeMining.tradeMiningManager;
 
   const deployer = (await ethers.getSigners())[0];
 
