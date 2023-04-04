@@ -940,7 +940,7 @@ contract GetterFacet is GetterFacetInterface {
     LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigV1ds =
       LibPoolConfigV1.poolConfigV1DiamondStorage();
 
-    uint256 aum = getAumE18(false);
+    uint256 aumE18 = getAumE18(false);
     bool isStableSwap = poolConfigV1ds.tokenMetas[tokenIn].isStable
       && poolConfigV1ds.tokenMetas[tokenOut].isStable;
     uint64 baseFeeBps =
@@ -948,8 +948,14 @@ contract GetterFacet is GetterFacetInterface {
     uint64 _taxBps =
       isStableSwap ? poolConfigV1ds.stableTaxBps : poolConfigV1ds.taxBps;
     uint256 feeBpsIn = getFeeBps(
-      tokenIn, aum, usdDebt, baseFeeBps, _taxBps, LiquidityDirection.ADD
+      tokenIn, aumE18, usdDebt, baseFeeBps, _taxBps, LiquidityDirection.ADD
     );
+    uint256 feeBpsOut = getFeeBps(
+      tokenOut, aumE18, usdDebt, baseFeeBps, _taxBps, LiquidityDirection.REMOVE
+    );
+
+    // Return the highest feeBps.
+    return feeBpsIn > feeBpsOut ? feeBpsIn : feeBpsOut;
   }
 
   // ------------
