@@ -4,15 +4,16 @@ pragma solidity 0.8.17;
 /// OZ
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 /// Alperp
 import {AP} from "@alperp/trade-mining/AP.sol";
 
 contract Paradeen is Initializable, OwnableUpgradeable {
   /// Dependencies
-  using SafeERC20 for IERC20;
+  using SafeERC20Upgradeable for IERC20Upgradeable;
 
   /// Constants
   uint256 public constant VERSION = 1;
@@ -26,7 +27,7 @@ contract Paradeen is Initializable, OwnableUpgradeable {
 
   /// Configs
   AP public ap;
-  IERC20 public rewardToken;
+  IERC20Upgradeable public rewardToken;
   mapping(uint256 => uint256) public tokensPerWeek;
   address public emergencyReturn;
 
@@ -46,7 +47,7 @@ contract Paradeen is Initializable, OwnableUpgradeable {
   function initialize(
     AP _ap,
     uint256 _startWeekCursor,
-    IERC20 _rewardToken,
+    IERC20Upgradeable _rewardToken,
     address _emergencyReturn
   ) external initializer {
     OwnableUpgradeable.__Ownable_init();
