@@ -16,11 +16,9 @@ import {LibReentrancyGuard} from "../libraries/LibReentrancyGuard.sol";
 import {LibPoolV1} from "../libraries/LibPoolV1.sol";
 import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
 
-import {PerpTradeFacetInterface} from
-  "../interfaces/PerpTradeFacetInterface.sol";
+import {PerpTradeFacetInterface} from "../interfaces/PerpTradeFacetInterface.sol";
 import {GetterFacetInterface} from "../interfaces/GetterFacetInterface.sol";
-import {FundingRateFacetInterface} from
-  "../interfaces/FundingRateFacetInterface.sol";
+import {FundingRateFacetInterface} from "../interfaces/FundingRateFacetInterface.sol";
 
 contract PerpTradeFacet is PerpTradeFacetInterface {
   error PerpTradeFacet_BadCollateralDelta();

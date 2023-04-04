@@ -2145,6 +2145,13 @@ hardhat-deploy@^0.11.10:
     qs "^6.9.4"
     zksync-web3 "^0.8.1"
 
+hardhat-preprocessor@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/hardhat-preprocessor/-/hardhat-preprocessor-0.1.5.tgz#75b22641fd6a680739c995d03bd5f7868eb72144"
+  integrity sha512-j8m44mmPxpxAAd0G8fPHRHOas/INZdzptSur0TNJvMEGcFdLDhbHHxBcqZVQ/bmiW42q4gC60AP4CXn9EF018g==
+  dependencies:
+    murmur-128 "^0.2.1"
+
 hardhat@^2.9.1:
   version "2.11.2"
   resolved "https://registry.yarnpkg.com/hardhat/-/hardhat-2.11.2.tgz#c81388630255823bb1717ec07c4ee651b1fbe97f"

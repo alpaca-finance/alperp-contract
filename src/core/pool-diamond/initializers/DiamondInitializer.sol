@@ -17,19 +17,14 @@ import {LibDiamond} from "../libraries/LibDiamond.sol";
 import {DiamondLoupeInterface} from "../interfaces/DiamondLoupeInterface.sol";
 import {DiamondCutInterface} from "../interfaces/DiamondCutInterface.sol";
 import {ERC165Interface} from "../interfaces/ERC165Interface.sol";
-import {OwnershipFacetInterface} from
-  "../interfaces/OwnershipFacetInterface.sol";
-import {FundingRateFacetInterface} from
-  "../interfaces/FundingRateFacetInterface.sol";
-import {LiquidityFacetInterface} from
-  "../interfaces/LiquidityFacetInterface.sol";
+import {OwnershipFacetInterface} from "../interfaces/OwnershipFacetInterface.sol";
+import {FundingRateFacetInterface} from "../interfaces/FundingRateFacetInterface.sol";
+import {LiquidityFacetInterface} from "../interfaces/LiquidityFacetInterface.sol";
 import {GetterFacetInterface} from "../interfaces/GetterFacetInterface.sol";
-import {PerpTradeFacetInterface} from
-  "../interfaces/PerpTradeFacetInterface.sol";
+import {PerpTradeFacetInterface} from "../interfaces/PerpTradeFacetInterface.sol";
 import {FarmFacetInterface} from "../interfaces/FarmFacetInterface.sol";
 
-import {AccessControlFacetInterface} from
-  "../interfaces/AccessControlFacetInterface.sol";
+import {AccessControlFacetInterface} from "../interfaces/AccessControlFacetInterface.sol";
 
 /// @title DimaondInitializer - Modified from Nick Mudge's DiamondInit
 contract DiamondInitializer {

@@ -15,8 +15,7 @@ pragma solidity 0.8.17;
 
 import {LibPoolV1} from "../libraries/LibPoolV1.sol";
 import {LibAccessControl} from "../libraries/LibAccessControl.sol";
-import {AccessControlFacetInterface} from
-  "../interfaces/AccessControlFacetInterface.sol";
+import {AccessControlFacetInterface} from "../interfaces/AccessControlFacetInterface.sol";
 
 contract AccessControlFacet is AccessControlFacetInterface {
   // -------------

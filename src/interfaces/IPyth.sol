@@ -13,8 +13,7 @@
 
 pragma solidity 0.8.17;
 
-import {IPyth as PythAbstraction} from
-  "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
+import {IPyth as PythAbstraction} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
 interface IPyth is PythAbstraction {
   function priceFeedExists(bytes32 id) external view returns (bool);

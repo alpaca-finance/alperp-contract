@@ -13,10 +13,8 @@
 
 pragma solidity 0.8.17;
 
-import {ERC20Upgradeable} from
-  "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import {OwnableUpgradeable} from
-  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract ALP is ERC20Upgradeable, OwnableUpgradeable {
   mapping(address => bool) public whitelist;

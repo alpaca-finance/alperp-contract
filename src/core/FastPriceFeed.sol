@@ -14,8 +14,7 @@
 pragma solidity 0.8.17;
 
 /// OZ
-import {OwnableUpgradeable} from
-  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /// Alperp
 import {ISecondaryPriceFeed} from "@alperp/interfaces/ISecondaryPriceFeed.sol";

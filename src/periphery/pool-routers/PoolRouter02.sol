@@ -3,17 +3,13 @@ pragma solidity 0.8.17;
 
 /// OZ
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from
-  "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// Alperp
 import {IWNative} from "@alperp/interfaces/IWNative.sol";
-import {LiquidityFacetInterface} from
-  "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
-import {GetterFacetInterface} from
-  "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
-import {PerpTradeFacetInterface} from
-  "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
+import {LiquidityFacetInterface} from "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
+import {GetterFacetInterface} from "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {PerpTradeFacetInterface} from "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
 import {PoolOracle} from "@alperp/core/PoolOracle.sol";
 
 /// @title PoolRouter02 is responsible for swapping tokens and managing liquidity

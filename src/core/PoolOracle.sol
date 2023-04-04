@@ -12,11 +12,9 @@
  */
 pragma solidity 0.8.17;
 
-import {OwnableUpgradeable} from
-  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import {ChainlinkPriceFeedInterface} from
-  "../interfaces/ChainLinkPriceFeedInterface.sol";
+import {ChainlinkPriceFeedInterface} from "../interfaces/ChainLinkPriceFeedInterface.sol";
 import {ISecondaryPriceFeed} from "../interfaces/ISecondaryPriceFeed.sol";
 
 contract PoolOracle is OwnableUpgradeable {

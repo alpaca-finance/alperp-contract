@@ -14,8 +14,7 @@
 pragma solidity 0.8.17;
 
 import {LibDiamond} from "../libraries/LibDiamond.sol";
-import {OwnershipFacetInterface} from
-  "../interfaces/OwnershipFacetInterface.sol";
+import {OwnershipFacetInterface} from "../interfaces/OwnershipFacetInterface.sol";
 
 contract OwnershipFacet is OwnershipFacetInterface {
   function transferOwnership(address _newOwner) external {

@@ -12,14 +12,10 @@
  */
 pragma solidity 0.8.17;
 
-import {OwnableUpgradeable} from
-  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {IERC20Upgradeable} from
-  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {ERC20Upgradeable} from
-  "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import {SafeERC20Upgradeable} from
-  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 import {IRewarder} from "./interfaces/IRewarder.sol";
 import {IStaking} from "./interfaces/IStaking.sol";

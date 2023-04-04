@@ -15,8 +15,7 @@ pragma solidity 0.8.17;
 import {LibPoolV1} from "../libraries/LibPoolV1.sol";
 import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
 
-import {FundingRateFacetInterface} from
-  "../interfaces/FundingRateFacetInterface.sol";
+import {FundingRateFacetInterface} from "../interfaces/FundingRateFacetInterface.sol";
 import {GetterFacetInterface} from "../interfaces/GetterFacetInterface.sol";
 
 contract FundingRateFacet is FundingRateFacetInterface {

@@ -17,11 +17,9 @@ import {LibPoolV1} from "../libraries/LibPoolV1.sol";
 import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
 import {LibAccessControl} from "../libraries/LibAccessControl.sol";
 import {LibReentrancyGuard} from "../libraries/LibReentrancyGuard.sol";
-import {AccessControlFacetInterface} from
-  "../interfaces/AccessControlFacetInterface.sol";
+import {AccessControlFacetInterface} from "../interfaces/AccessControlFacetInterface.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import {SafeERC20} from
-  "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {FarmFacetInterface} from "../interfaces/FarmFacetInterface.sol";

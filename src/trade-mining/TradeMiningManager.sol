@@ -12,8 +12,7 @@
  */
 pragma solidity 0.8.17;
 
-import {OwnableUpgradeable} from
-  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ITradeMiningManager} from "@alperp/interfaces/ITradeMiningManager.sol";
 import {IAP} from "@alperp/interfaces/IAP.sol";
 

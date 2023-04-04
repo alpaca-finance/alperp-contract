@@ -15,8 +15,7 @@ pragma solidity 0.8.17;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {MintableTokenInterface} from
-  "../../interfaces/MintableTokenInterface.sol";
+import {MintableTokenInterface} from "../../interfaces/MintableTokenInterface.sol";
 
 contract BaseMintableToken is Ownable, ERC20, MintableTokenInterface {
   error BaseMintableToken_NotMinter();

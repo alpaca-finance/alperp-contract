@@ -13,8 +13,7 @@
 
 pragma solidity 0.8.17;
 
-import {FlashLoanBorrowerInterface} from
-  "../../../interfaces/FlashLoanBorrowerInterface.sol";
+import {FlashLoanBorrowerInterface} from "../../../interfaces/FlashLoanBorrowerInterface.sol";
 
 interface LiquidityFacetInterface {
   function addLiquidity(address account, address token, address receiver)
