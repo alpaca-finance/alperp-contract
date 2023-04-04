@@ -700,6 +700,7 @@ contract GetterFacet is GetterFacetInterface {
         return delta.toInt256();
       }
     }
+    return 0;
   }
 
   /// @notice Calculate current value of an asset in the pool. Factored in trader PnL.

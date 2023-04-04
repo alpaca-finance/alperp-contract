@@ -1,83 +1,118 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity >=0.8.4 <0.9.0;
 
-import { DSTest } from "./DSTest.sol";
+import {DSTest} from "./DSTest.sol";
 
-import { VM } from "../utils/VM.sol";
-import { console } from "../utils/console.sol";
-import { stdError } from "../utils/stdError.sol";
-import { math } from "../utils/math.sol";
+import {VM} from "../utils/VM.sol";
+import {console} from "../utils/console.sol";
+import {stdError} from "../utils/stdError.sol";
+import {math} from "../utils/math.sol";
 
-import { MintableTokenInterface } from "src/interfaces/MintableTokenInterface.sol";
+import {MintableTokenInterface} from "src/interfaces/MintableTokenInterface.sol";
 
-import { MockErc20 } from "../mocks/MockERC20.sol";
-import { MockWNative } from "../mocks/MockWNative.sol";
-import { MockChainlinkPriceFeed } from "../mocks/MockChainlinkPriceFeed.sol";
-import { MockDonateVault } from "../mocks/MockDonateVault.sol";
-import { MockFlashLoanBorrower } from "../mocks/MockFlashLoanBorrower.sol";
-import { MockStrategy } from "../mocks/MockStrategy.sol";
+import {MockErc20} from "../mocks/MockERC20.sol";
+import {MockWNative} from "../mocks/MockWNative.sol";
+import {MockChainlinkPriceFeed} from "../mocks/MockChainlinkPriceFeed.sol";
+import {MockDonateVault} from "../mocks/MockDonateVault.sol";
+import {MockFlashLoanBorrower} from "../mocks/MockFlashLoanBorrower.sol";
+import {MockStrategy} from "../mocks/MockStrategy.sol";
 
-import { PoolOracle } from "src/core/PoolOracle.sol";
-import { ALP } from "src/tokens/ALP.sol";
-import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import { IPool } from "src/interfaces/IPool.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {PoolOracle} from "src/core/PoolOracle.sol";
+import {ALP} from "src/tokens/ALP.sol";
+import {ProxyAdmin} from
+  "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+import {IPool} from "src/interfaces/IPool.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // Diamond things
 // Libs
-import { LibPoolConfigV1 } from "src/core/pool-diamond/libraries/LibPoolConfigV1.sol";
+import {LibPoolConfigV1} from
+  "src/core/pool-diamond/libraries/LibPoolConfigV1.sol";
 // Facets
-import { DiamondCutFacet, DiamondCutInterface } from "src/core/pool-diamond/facets/DiamondCutFacet.sol";
-import { DiamondLoupeFacet } from "src/core/pool-diamond/facets/DiamondLoupeFacet.sol";
-import { OwnershipFacet, OwnershipFacetInterface } from "src/core/pool-diamond/facets/OwnershipFacet.sol";
-import { GetterFacet, GetterFacetInterface } from "src/core/pool-diamond/facets/GetterFacet.sol";
-import { FundingRateFacet, FundingRateFacetInterface } from "src/core/pool-diamond/facets/FundingRateFacet.sol";
-import { LiquidityFacet, LiquidityFacetInterface } from "src/core/pool-diamond/facets/LiquidityFacet.sol";
-import { PerpTradeFacet, PerpTradeFacetInterface } from "src/core/pool-diamond/facets/PerpTradeFacet.sol";
-import { AdminFacet, AdminFacetInterface } from "src/core/pool-diamond/facets/AdminFacet.sol";
-import { FarmFacet, FarmFacetInterface } from "src/core/pool-diamond/facets/FarmFacet.sol";
-import { AccessControlFacet, AccessControlFacetInterface } from "src/core/pool-diamond/facets/AccessControlFacet.sol";
+import {
+  DiamondCutFacet,
+  DiamondCutInterface
+} from "src/core/pool-diamond/facets/DiamondCutFacet.sol";
+import {DiamondLoupeFacet} from
+  "src/core/pool-diamond/facets/DiamondLoupeFacet.sol";
+import {
+  OwnershipFacet,
+  OwnershipFacetInterface
+} from "src/core/pool-diamond/facets/OwnershipFacet.sol";
+import {
+  GetterFacet,
+  GetterFacetInterface
+} from "src/core/pool-diamond/facets/GetterFacet.sol";
+import {
+  FundingRateFacet,
+  FundingRateFacetInterface
+} from "src/core/pool-diamond/facets/FundingRateFacet.sol";
+import {
+  LiquidityFacet,
+  LiquidityFacetInterface
+} from "src/core/pool-diamond/facets/LiquidityFacet.sol";
+import {
+  PerpTradeFacet,
+  PerpTradeFacetInterface
+} from "src/core/pool-diamond/facets/PerpTradeFacet.sol";
+import {
+  AdminFacet,
+  AdminFacetInterface
+} from "src/core/pool-diamond/facets/AdminFacet.sol";
+import {
+  FarmFacet,
+  FarmFacetInterface
+} from "src/core/pool-diamond/facets/FarmFacet.sol";
+import {
+  AccessControlFacet,
+  AccessControlFacetInterface
+} from "src/core/pool-diamond/facets/AccessControlFacet.sol";
 
-import { LibAccessControl } from "src/core/pool-diamond/libraries/LibAccessControl.sol";
-import { DiamondInitializer } from "src/core/pool-diamond/initializers/DiamondInitializer.sol";
-import { PoolConfigInitializer } from "src/core/pool-diamond/initializers/PoolConfigInitializer.sol";
-import { AccessControlInitializer } from "src/core/pool-diamond/initializers/AccessControlInitializer.sol";
-import { PoolDiamond } from "src/core/pool-diamond/PoolDiamond.sol";
-import { AlpacaVaultFarmStrategy } from "src/core/AlpacaVaultFarmStrategy.sol";
+import {LibAccessControl} from
+  "src/core/pool-diamond/libraries/LibAccessControl.sol";
+import {DiamondInitializer} from
+  "src/core/pool-diamond/initializers/DiamondInitializer.sol";
+import {PoolConfigInitializer} from
+  "src/core/pool-diamond/initializers/PoolConfigInitializer.sol";
+import {AccessControlInitializer} from
+  "src/core/pool-diamond/initializers/AccessControlInitializer.sol";
+import {PoolDiamond} from "src/core/pool-diamond/PoolDiamond.sol";
+import {AlpacaVaultFarmStrategy} from "src/core/AlpacaVaultFarmStrategy.sol";
 
-import { PoolRouter03 } from "src/core/pool-diamond/PoolRouter03.sol";
-import { Orderbook02 } from "src/core/pool-diamond/limit-orders/Orderbook02.sol";
+import {PoolRouter03} from "src/core/pool-diamond/PoolRouter03.sol";
+import {Orderbook02} from "src/core/pool-diamond/limit-orders/Orderbook02.sol";
 
-import { MarketOrderRouter } from "src/core/pool-diamond/market-orders/MarketOrderRouter.sol";
+import {MarketOrderRouter} from
+  "src/core/pool-diamond/market-orders/MarketOrderRouter.sol";
 
-import { MockWNative } from "../mocks/MockWNative.sol";
+import {MockWNative} from "../mocks/MockWNative.sol";
 
-import { MockWNativeRelayer } from "../mocks/MockWNativeRelayer.sol";
-import { FastPriceFeed } from "src/core/FastPriceFeed.sol";
-import { PythPriceFeed } from "src/core/PythPriceFeed.sol";
+import {MockWNativeRelayer} from "../mocks/MockWNativeRelayer.sol";
+import {FastPriceFeed} from "src/core/FastPriceFeed.sol";
+import {PythPriceFeed} from "src/core/PythPriceFeed.sol";
 
-import { MerkleAirdrop } from "src/airdrop/MerkleAirdrop.sol";
-import { RewardDistributor } from "src/staking/RewardDistributor.sol";
+import {MerkleAirdrop} from "src/airdrop/MerkleAirdrop.sol";
+import {RewardDistributor} from "src/staking/RewardDistributor.sol";
 
-import { MockPyth as FakePyth } from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
+import {MockPyth as FakePyth} from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
 
-import { IPyth } from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
+import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
 // solhint-disable const-name-snakecase
 // solhint-disable no-inline-assembly
 contract BaseTest is DSTest {
-  uint256 internal constant PRICE_PRECISION = 10**30;
+  uint256 internal constant PRICE_PRECISION = 10 ** 30;
   uint256 internal constant BPS = 10000;
 
   struct PoolConfigConstructorParams2 {
@@ -89,6 +124,7 @@ contract BaseTest is DSTest {
     uint64 fundingRateFactor;
     uint256 liquidationFeeUsd;
   }
+
   struct PoolConfigConstructorParams {
     address treasury;
     uint64 fundingInterval;
@@ -162,8 +198,8 @@ contract BaseTest is DSTest {
     tokens[3] = address(dai);
     tokens[4] = address(usdc);
 
-    PoolOracle.PriceFeedInfo[]
-      memory priceFeedInfo = new PoolOracle.PriceFeedInfo[](5);
+    PoolOracle.PriceFeedInfo[] memory priceFeedInfo =
+      new PoolOracle.PriceFeedInfo[](5);
     priceFeedInfo[0] = PoolOracle.PriceFeedInfo({
       priceFeed: bnbPriceFeed,
       decimals: 8,
@@ -208,8 +244,8 @@ contract BaseTest is DSTest {
     tokens[1] = address(wbtc);
     tokens[2] = address(bnb);
 
-    LibPoolConfigV1.TokenConfig[]
-      memory tokenConfigs = new LibPoolConfigV1.TokenConfig[](3);
+    LibPoolConfigV1.TokenConfig[] memory tokenConfigs =
+      new LibPoolConfigV1.TokenConfig[](3);
     tokenConfigs[0] = LibPoolConfigV1.TokenConfig({
       accept: true,
       isStable: true,
@@ -260,8 +296,8 @@ contract BaseTest is DSTest {
     tokens[1] = address(wbtc);
     tokens[2] = address(bnb);
 
-    LibPoolConfigV1.TokenConfig[]
-      memory tokenConfigs = new LibPoolConfigV1.TokenConfig[](3);
+    LibPoolConfigV1.TokenConfig[] memory tokenConfigs =
+      new LibPoolConfigV1.TokenConfig[](3);
     tokenConfigs[0] = LibPoolConfigV1.TokenConfig({
       accept: true,
       isStable: true,
@@ -307,8 +343,8 @@ contract BaseTest is DSTest {
     DiamondCutInterface.FacetCutAction cutAction,
     bytes4[] memory selectors
   ) internal pure returns (DiamondCutInterface.FacetCut[] memory) {
-    DiamondCutInterface.FacetCut[]
-      memory facetCuts = new DiamondCutInterface.FacetCut[](1);
+    DiamondCutInterface.FacetCut[] memory facetCuts =
+      new DiamondCutInterface.FacetCut[](1);
     facetCuts[0] = DiamondCutInterface.FacetCut({
       action: cutAction,
       facetAddress: facet,
@@ -359,9 +395,7 @@ contract BaseTest is DSTest {
     selectors[1] = OwnershipFacet.owner.selector;
 
     DiamondCutInterface.FacetCut[] memory facetCuts = buildFacetCut(
-      address(ownershipFacet),
-      DiamondCutInterface.FacetCutAction.Add,
-      selectors
+      address(ownershipFacet), DiamondCutInterface.FacetCutAction.Add, selectors
     );
 
     diamondCutFacet.diamondCut(facetCuts, address(0), "");
@@ -374,7 +408,7 @@ contract BaseTest is DSTest {
   {
     GetterFacet getterFacet = new GetterFacet();
 
-    bytes4[] memory selectors = new bytes4[](66);
+    bytes4[] memory selectors = new bytes4[](67);
     selectors[0] = GetterFacet.getAddLiquidityFeeBps.selector;
     selectors[1] = GetterFacet.getRemoveLiquidityFeeBps.selector;
     selectors[2] = GetterFacet.getSwapFeeBps.selector;
@@ -439,15 +473,12 @@ contract BaseTest is DSTest {
     selectors[61] = GetterFacet.convertTokensToUsde30.selector;
     selectors[62] = GetterFacet.getFundingFee.selector;
     selectors[63] = GetterFacet.convertUsde30ToTokens.selector;
-    selectors[64] = GetterFacet
-      .getNextShortAveragePriceWithRealizedPnl
-      .selector;
+    selectors[64] = GetterFacet.getNextShortAveragePriceWithRealizedPnl.selector;
     selectors[65] = GetterFacet.getDeltaWithoutFundingFee.selector;
+    selectors[66] = GetterFacet.getCurrentValueOf.selector;
 
     DiamondCutInterface.FacetCut[] memory facetCuts = buildFacetCut(
-      address(getterFacet),
-      DiamondCutInterface.FacetCutAction.Add,
-      selectors
+      address(getterFacet), DiamondCutInterface.FacetCutAction.Add, selectors
     );
 
     diamondCutFacet.diamondCut(facetCuts, address(0), "");
@@ -486,9 +517,7 @@ contract BaseTest is DSTest {
     selectors[3] = LiquidityFacet.flashLoan.selector;
 
     DiamondCutInterface.FacetCut[] memory facetCuts = buildFacetCut(
-      address(liquidityFacet),
-      DiamondCutInterface.FacetCutAction.Add,
-      selectors
+      address(liquidityFacet), DiamondCutInterface.FacetCutAction.Add, selectors
     );
 
     diamondCutFacet.diamondCut(facetCuts, address(0), "");
@@ -508,9 +537,7 @@ contract BaseTest is DSTest {
     selectors[3] = PerpTradeFacet.liquidate.selector;
 
     DiamondCutInterface.FacetCut[] memory facetCuts = buildFacetCut(
-      address(perpTradeFacet),
-      DiamondCutInterface.FacetCutAction.Add,
-      selectors
+      address(perpTradeFacet), DiamondCutInterface.FacetCutAction.Add, selectors
     );
 
     diamondCutFacet.diamondCut(facetCuts, address(0), "");
@@ -560,9 +587,7 @@ contract BaseTest is DSTest {
     selectors[19] = AdminFacet.setPlugin.selector;
 
     DiamondCutInterface.FacetCut[] memory facetCuts = buildFacetCut(
-      address(adminFacet),
-      DiamondCutInterface.FacetCutAction.Add,
-      selectors
+      address(adminFacet), DiamondCutInterface.FacetCutAction.Add, selectors
     );
 
     diamondCutFacet.diamondCut(facetCuts, address(0), "");
@@ -581,9 +606,7 @@ contract BaseTest is DSTest {
     selectors[2] = FarmFacet.farm.selector;
 
     DiamondCutInterface.FacetCut[] memory facetCuts = buildFacetCut(
-      address(farmFacet),
-      DiamondCutInterface.FacetCutAction.Add,
-      selectors
+      address(farmFacet), DiamondCutInterface.FacetCutAction.Add, selectors
     );
 
     diamondCutFacet.diamondCut(facetCuts, address(0), "");
@@ -595,7 +618,8 @@ contract BaseTest is DSTest {
     returns (AccessControlFacet, bytes4[] memory)
   {
     AccessControlFacet accessControlFacet = new AccessControlFacet();
-    AccessControlInitializer accessControlInitializer = deployAccessControlInitializer();
+    AccessControlInitializer accessControlInitializer =
+      deployAccessControlInitializer();
 
     bytes4[] memory selectors = new bytes4[](7);
     selectors[0] = AccessControlFacet.hasRole.selector;
@@ -616,8 +640,7 @@ contract BaseTest is DSTest {
       facetCuts,
       address(accessControlInitializer),
       abi.encodeWithSelector(
-        bytes4(keccak256("initialize(address)")),
-        address(this)
+        bytes4(keccak256("initialize(address)")), address(this)
       )
     );
     return (accessControlFacet, selectors);
@@ -639,16 +662,13 @@ contract BaseTest is DSTest {
     }
 
     _proxyBytecode = abi.encodePacked(
-      _proxyBytecode,
-      abi.encode(_logic, address(proxyAdmin), _initializer)
+      _proxyBytecode, abi.encode(_logic, address(proxyAdmin), _initializer)
     );
 
     address _proxy;
     assembly {
       _proxy := create(0, add(_proxyBytecode, 0x20), mload(_proxyBytecode))
-      if iszero(extcodesize(_proxy)) {
-        revert(0, 0)
-      }
+      if iszero(extcodesize(_proxy)) { revert(0, 0) }
     }
 
     return _proxy;
@@ -696,24 +716,19 @@ contract BaseTest is DSTest {
   }
 
   function deployALP() internal returns (ALP) {
-    bytes memory _logicBytecode = abi.encodePacked(
-      vm.getCode("./out/ALP.sol/ALP.json")
-    );
-    bytes memory _initializer = abi.encodeWithSelector(
-      bytes4(keccak256("initialize(uint256)")),
-      [1 days]
-    );
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/ALP.sol/ALP.json"));
+    bytes memory _initializer =
+      abi.encodeWithSelector(bytes4(keccak256("initialize(uint256)")), [1 days]);
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
     return ALP(payable(_proxy));
   }
 
   function deployPoolOracle(uint80 roundDepth) internal returns (PoolOracle) {
-    bytes memory _logicBytecode = abi.encodePacked(
-      vm.getCode("./out/PoolOracle.sol/PoolOracle.json")
-    );
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/PoolOracle.sol/PoolOracle.json"));
     bytes memory _initializer = abi.encodeWithSelector(
-      bytes4(keccak256("initialize(uint80)")),
-      roundDepth
+      bytes4(keccak256("initialize(uint80)")), roundDepth
     );
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
     return PoolOracle(payable(_proxy));
@@ -750,8 +765,7 @@ contract BaseTest is DSTest {
 
     initializeDiamond(DiamondCutFacet(address(poolDiamond)));
     initializePoolConfig(
-      DiamondCutFacet(address(poolDiamond)),
-      poolConfigConstructorParams
+      DiamondCutFacet(address(poolDiamond)), poolConfigConstructorParams
     );
 
     return (poolOracle, address(poolDiamond));
@@ -760,8 +774,8 @@ contract BaseTest is DSTest {
   function initializeDiamond(DiamondCutFacet diamondCutFacet) internal {
     // Deploy DiamondInitializer
     DiamondInitializer diamondInitializer = deployDiamondInitializer();
-    DiamondCutInterface.FacetCut[]
-      memory facetCuts = new DiamondCutInterface.FacetCut[](0);
+    DiamondCutInterface.FacetCut[] memory facetCuts =
+      new DiamondCutInterface.FacetCut[](0);
     diamondCutFacet.diamondCut(
       facetCuts,
       address(diamondInitializer),
@@ -775,8 +789,8 @@ contract BaseTest is DSTest {
   ) internal {
     // Deploy PoolConfigInitializer
     PoolConfigInitializer poolConfigInitializer = deployPoolConfigInitializer();
-    DiamondCutInterface.FacetCut[]
-      memory facetCuts = new DiamondCutInterface.FacetCut[](0);
+    DiamondCutInterface.FacetCut[] memory facetCuts =
+      new DiamondCutInterface.FacetCut[](0);
     diamondCutFacet.diamondCut(
       facetCuts,
       address(poolConfigInitializer),
@@ -821,9 +835,8 @@ contract BaseTest is DSTest {
     uint256 _minPurchaseTokenAmountUsd,
     address _oraclePriceUpdater
   ) internal returns (Orderbook02) {
-    bytes memory _logicBytecode = abi.encodePacked(
-      vm.getCode("./out/Orderbook02.sol/Orderbook02.json")
-    );
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/Orderbook02.sol/Orderbook02.json"));
     MockWNativeRelayer _mockWNativeRelayer = deployWNativeRelayer(_weth);
     bytes memory _initializer = abi.encodeWithSelector(
       bytes4(
@@ -888,9 +901,8 @@ contract BaseTest is DSTest {
     address _positionRouter,
     address _orderbook
   ) internal returns (FastPriceFeed) {
-    bytes memory _logicBytecode = abi.encodePacked(
-      vm.getCode("./out/FastPriceFeed.sol/FastPriceFeed.json")
-    );
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/FastPriceFeed.sol/FastPriceFeed.json"));
     bytes memory _initializer = abi.encodeWithSelector(
       bytes4(
         keccak256(
@@ -913,18 +925,14 @@ contract BaseTest is DSTest {
     uint256 _validTimePeriod,
     uint256 _singleUpdateFeeInWei
   ) internal returns (IPyth) {
-    return
-      IPyth(address(new FakePyth(_validTimePeriod, _singleUpdateFeeInWei)));
+    return IPyth(address(new FakePyth(_validTimePeriod, _singleUpdateFeeInWei)));
   }
 
   function deployPythPriceFeed(address _pyth) internal returns (PythPriceFeed) {
-    bytes memory _logicBytecode = abi.encodePacked(
-      vm.getCode("./out/PythPriceFeed.sol/PythPriceFeed.json")
-    );
-    bytes memory _initializer = abi.encodeWithSelector(
-      bytes4(keccak256("initialize(address)")),
-      _pyth
-    );
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/PythPriceFeed.sol/PythPriceFeed.json"));
+    bytes memory _initializer =
+      abi.encodeWithSelector(bytes4(keccak256("initialize(address)")), _pyth);
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
     return PythPriceFeed(payable(_proxy));
   }
