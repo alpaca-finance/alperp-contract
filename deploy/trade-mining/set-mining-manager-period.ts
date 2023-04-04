@@ -1,20 +1,24 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers } from "hardhat";
-import { Miner__factory } from "../../typechain";
+import { TradeMiningManager__factory } from "../../typechain";
 import { getConfig } from "../utils/config";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = getConfig();
 
-  const MINER_ADDRESS = config.Pools.ALP.miner;
-  const MINING_POINT_ADDRESS = config.Tokens.AP;
+  const MINER_ADDRESS = config.TradeMining.address;
+  const START_TIMESTAMP = 1679875200;
+  const END_TIMESTAMP = 1682899200;
 
   const deployer = (await ethers.getSigners())[0];
-  const miner = Miner__factory.connect(MINER_ADDRESS, deployer);
+  const tradeMiningManager = TradeMiningManager__factory.connect(
+    MINER_ADDRESS,
+    deployer
+  );
 
-  console.log(`> Setting mining point for miner`);
-  const tx = await tradeMiningManager.setMiningPoint(MINING_POINT_ADDRESS);
+  console.log(`> Setting campaign period for miner`);
+  const tx = await tradeMiningManager.setPeriod(START_TIMESTAMP, END_TIMESTAMP);
   console.log(`> ⛓ Tx submitted: ${tx.hash}`);
   console.log(`> Waiting for tx to be mined...`);
   await tx.wait();
@@ -24,4 +28,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["SetMinerMiningPoint"];
+func.tags = ["SetMiningManagerPeriod"];

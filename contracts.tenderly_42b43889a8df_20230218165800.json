@@ -32,7 +32,6 @@
       "pythPriceFeed": "0x67972120E4A3c377C40E524010a67D41Fc1ca1ab",
       "oracle": "0x746a651bE7f3326625201E3703103B5786496F48",
       "orderbook": "0x238B44242c6C2aEF83ed5BFAdF35802Ae3e07F6D",
-      "miner": "",
       "facets": {
         "admin": "0x8c14A7ECEB9e0a4523B2cD10036d9d7a1BB0d601",
         "accessControl": "0x5890F76dd9444b2fc06e2F660BD85af85D335012",
@@ -78,5 +77,11 @@
   "TimelockController": "",
   "ProxyAdmin": "",
   "Timelock": "",
-  "OpMultiSig": ""
+  "OpMultiSig": "",
+  "TradeMining": {
+    "address": "",
+    "rewarder": "",
+    "miningPoint": "",
+    "rewardToken" : ""
+  }
 }

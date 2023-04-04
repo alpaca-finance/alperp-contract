@@ -2,7 +2,7 @@
   "Tokens": {
     "ALPACA": "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F",
     "ALP": "0x395d07a1312b4A01C6Acd69AfBD40C25DF91cF0C",
-    "AP": "0xD40F12BdC9659e967343a209eb239fDf7c9bA6e4",
+    "AP": "0xF12Ef0f68521761192e04343a013980947223Ca3",
     "ETH": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
     "WBNB": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
     "BTCB": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
@@ -26,7 +26,7 @@
       }
     }
   },
-  "PoolRouter": "0x41AFceb019bbdD751e5E88966D448B65a9940e14",
+  "PoolRouter": "0x43074C43BdbEc9e09602d23C69f04543f70251B8",
   "WNativeRelayer": "0xa815338cab1c7b7AB805144F9c267e372782e2D9",
   "Pools": {
     "ALP": {
@@ -34,7 +34,6 @@
       "pythPriceFeed": "0x6C831Dc94BE4B61fc3Be6F2b6c3CFCD444707DEC",
       "oracle": "0x1db2910EF4860440Fc09B7E6baE7AdF4C9cfAa0C",
       "orderbook": "0xaBB3cb336704EA7d9FaFd22bEEb16cEA90c1f7e8",
-      "miner": "0xdb91D1C1E29B42d326CF2e9087cF35D296802676",
       "facets": {
         "admin": "0x52E01884650b0c83bF809F85992764b497E91a21",
         "accessControl": "0x079129A0FbE9261F7a11Ca405162268D020df24d",
@@ -80,5 +79,11 @@
   "TimelockController": "",
   "ProxyAdmin": "0x4c7674E008991c257209Cd48Bc6233dCB4812419",
   "Timelock": "",
-  "OpMultiSig": ""
+  "OpMultiSig": "",
+  "TradeMining": {
+    "address": "0x480DC16F44401235E20f849384f764f50B3Adb46",
+    "rewarder": "0x06ed8e9DD7e3CAee9461145Cc8D7747d0Da23b21",
+    "miningPoint": "0xF12Ef0f68521761192e04343a013980947223Ca3",
+    "rewardToken": "0x55d398326f99059fF775485246999027B3197955"
+  }
 }

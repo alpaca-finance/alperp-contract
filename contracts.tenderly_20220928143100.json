@@ -27,7 +27,6 @@
       "pythPriceFeed": "",
       "oracle": "0xD4A043B42c60674f288a25CBCeFc21CCcD087880",
       "orderbook": "",
-      "miner": "",
       "facets": {
         "admin": "0x3C9aF60A79EB4DF4516b0f432cAA420532300059",
         "accessControl": "",
@@ -73,5 +72,11 @@
   "TimelockController": "",
   "ProxyAdmin": "",
   "Timelock": "",
-  "OpMultiSig": ""
+  "OpMultiSig": "",
+  "TradeMining": {
+    "address": "",
+    "rewarder": "",
+    "miningPoint": "",
+    "rewardToken" : ""
+  }
 }
