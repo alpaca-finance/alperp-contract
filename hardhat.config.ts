@@ -79,7 +79,6 @@ const config: HardhatUserConfig = {
               line = line.replace(find, replace);
             }
           });
-          console.log("line", line);
         }
         return line;
       },
