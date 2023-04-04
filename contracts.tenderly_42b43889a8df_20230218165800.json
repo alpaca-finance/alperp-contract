@@ -2,7 +2,6 @@
   "Tokens": {
     "ALPACA": "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F",
     "ALP": "0xE14B9f9C6aA1a941E74C1D56b0d399934eE35CA1",
-    "AP": "",
     "ETH": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
     "WBNB": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
     "BTCB": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
@@ -82,6 +81,6 @@
     "address": "",
     "rewarder": "",
     "miningPoint": "",
-    "rewardToken" : ""
+    "rewardToken": ""
   }
 }
