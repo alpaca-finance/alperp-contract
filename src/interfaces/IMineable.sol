@@ -14,5 +14,5 @@
 pragma solidity 0.8.17;
 
 interface IMineable {
-  function setMiner(address _miner) external;
+  function setTradeMiningManager(address _miningManager) external;
 }
