@@ -1,3 +1,4 @@
+import fs from "fs";
 import { config as dotEnvConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
 import "./scripts/simulation/interactable";
@@ -12,6 +13,15 @@ import "@openzeppelin/hardhat-upgrades";
 import "@nomiclabs/hardhat-ethers";
 import "@typechain/hardhat";
 import "hardhat-deploy";
+import "hardhat-preprocessor";
+
+function getRemappings() {
+  return fs
+    .readFileSync("remappings.txt", "utf8")
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => line.trim().split("="));
+}
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -58,6 +68,21 @@ const config: HardhatUserConfig = {
     project: process.env.TENDERLY_PROJECT_NAME!,
     username: process.env.TENDERLY_USERNAME!,
     privateVerification: true,
+  },
+  // This fully resolves paths for imports in the ./lib directory for Hardhat
+  preprocess: {
+    eachLine: (hre) => ({
+      transform: (line: string) => {
+        if (line.match(/^\s*import /i)) {
+          getRemappings().forEach(([find, replace]) => {
+            if (line.match(find)) {
+              line = line.replace(find, replace);
+            }
+          });
+        }
+        return line;
+      },
+    }),
   },
 };
 

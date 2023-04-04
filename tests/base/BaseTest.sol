@@ -12,101 +12,113 @@
  */
 pragma solidity >=0.8.4 <0.9.0;
 
+/// Test
 import {DSTest} from "./DSTest.sol";
-
 import {VM} from "../utils/VM.sol";
 import {console} from "../utils/console.sol";
 import {stdError} from "../utils/stdError.sol";
 import {math} from "../utils/math.sol";
 
-import {MintableTokenInterface} from "src/interfaces/MintableTokenInterface.sol";
-
-import {MockErc20} from "../mocks/MockERC20.sol";
-import {MockWNative} from "../mocks/MockWNative.sol";
-import {MockChainlinkPriceFeed} from "../mocks/MockChainlinkPriceFeed.sol";
-import {MockDonateVault} from "../mocks/MockDonateVault.sol";
-import {MockFlashLoanBorrower} from "../mocks/MockFlashLoanBorrower.sol";
-import {MockStrategy} from "../mocks/MockStrategy.sol";
-
-import {PoolOracle} from "src/core/PoolOracle.sol";
-import {ALP} from "src/tokens/ALP.sol";
+/// OZ
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ProxyAdmin} from
   "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import {IPool} from "src/interfaces/IPool.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-// Diamond things
+// Alperp - Diamond
 // Libs
 import {LibPoolConfigV1} from
-  "src/core/pool-diamond/libraries/LibPoolConfigV1.sol";
+  "@alperp/core/pool-diamond/libraries/LibPoolConfigV1.sol";
 // Facets
 import {
   DiamondCutFacet,
   DiamondCutInterface
-} from "src/core/pool-diamond/facets/DiamondCutFacet.sol";
+} from "@alperp/core/pool-diamond/facets/DiamondCutFacet.sol";
 import {DiamondLoupeFacet} from
-  "src/core/pool-diamond/facets/DiamondLoupeFacet.sol";
+  "@alperp/core/pool-diamond/facets/DiamondLoupeFacet.sol";
 import {
   OwnershipFacet,
   OwnershipFacetInterface
-} from "src/core/pool-diamond/facets/OwnershipFacet.sol";
+} from "@alperp/core/pool-diamond/facets/OwnershipFacet.sol";
 import {
   GetterFacet,
   GetterFacetInterface
-} from "src/core/pool-diamond/facets/GetterFacet.sol";
+} from "@alperp/core/pool-diamond/facets/GetterFacet.sol";
 import {
   FundingRateFacet,
   FundingRateFacetInterface
-} from "src/core/pool-diamond/facets/FundingRateFacet.sol";
+} from "@alperp/core/pool-diamond/facets/FundingRateFacet.sol";
 import {
   LiquidityFacet,
   LiquidityFacetInterface
-} from "src/core/pool-diamond/facets/LiquidityFacet.sol";
+} from "@alperp/core/pool-diamond/facets/LiquidityFacet.sol";
 import {
   PerpTradeFacet,
   PerpTradeFacetInterface
-} from "src/core/pool-diamond/facets/PerpTradeFacet.sol";
+} from "@alperp/core/pool-diamond/facets/PerpTradeFacet.sol";
 import {
   AdminFacet,
   AdminFacetInterface
-} from "src/core/pool-diamond/facets/AdminFacet.sol";
+} from "@alperp/core/pool-diamond/facets/AdminFacet.sol";
 import {
   FarmFacet,
   FarmFacetInterface
-} from "src/core/pool-diamond/facets/FarmFacet.sol";
+} from "@alperp/core/pool-diamond/facets/FarmFacet.sol";
 import {
   AccessControlFacet,
   AccessControlFacetInterface
-} from "src/core/pool-diamond/facets/AccessControlFacet.sol";
-
+} from "@alperp/core/pool-diamond/facets/AccessControlFacet.sol";
 import {LibAccessControl} from
-  "src/core/pool-diamond/libraries/LibAccessControl.sol";
+  "@alperp/core/pool-diamond/libraries/LibAccessControl.sol";
 import {DiamondInitializer} from
-  "src/core/pool-diamond/initializers/DiamondInitializer.sol";
+  "@alperp/core/pool-diamond/initializers/DiamondInitializer.sol";
 import {PoolConfigInitializer} from
-  "src/core/pool-diamond/initializers/PoolConfigInitializer.sol";
+  "@alperp/core/pool-diamond/initializers/PoolConfigInitializer.sol";
 import {AccessControlInitializer} from
-  "src/core/pool-diamond/initializers/AccessControlInitializer.sol";
-import {PoolDiamond} from "src/core/pool-diamond/PoolDiamond.sol";
-import {AlpacaVaultFarmStrategy} from "src/core/AlpacaVaultFarmStrategy.sol";
+  "@alperp/core/pool-diamond/initializers/AccessControlInitializer.sol";
+import {PoolDiamond} from "@alperp/core/pool-diamond/PoolDiamond.sol";
 
-import {PoolRouter03} from "src/core/pool-diamond/PoolRouter03.sol";
-import {Orderbook02} from "src/core/pool-diamond/limit-orders/Orderbook02.sol";
+/// Alperp - Tokens
+import {ALP} from "@alperp/tokens/ALP.sol";
+import {MintableTokenInterface} from
+  "@alperp/interfaces/MintableTokenInterface.sol";
 
+/// Alperp - Farm Strategies
+import {AlpacaVaultFarmStrategy} from "@alperp/core/AlpacaVaultFarmStrategy.sol";
+
+/// Alperp - Order Mgmt
+import {PoolRouter04} from "@alperp/periphery/pool-routers/PoolRouter04.sol";
+import {Orderbook02} from "@alperp/periphery/limit-orders/Orderbook02.sol";
 import {MarketOrderRouter} from
-  "src/core/pool-diamond/market-orders/MarketOrderRouter.sol";
+  "@alperp/core/pool-diamond/market-orders/MarketOrderRouter.sol";
 
-import {MockWNative} from "../mocks/MockWNative.sol";
+/// Alperp - Oracles
+import {PoolOracle} from "@alperp/core/PoolOracle.sol";
+import {FastPriceFeed} from "@alperp/core/FastPriceFeed.sol";
+import {PythPriceFeed} from "@alperp/core/PythPriceFeed.sol";
 
-import {MockWNativeRelayer} from "../mocks/MockWNativeRelayer.sol";
-import {FastPriceFeed} from "src/core/FastPriceFeed.sol";
-import {PythPriceFeed} from "src/core/PythPriceFeed.sol";
+/// Alperp - Liquidity Mining
+import {MerkleAirdrop} from "@alperp/airdrop/MerkleAirdrop.sol";
+import {RewardDistributor} from "@alperp/staking/RewardDistributor.sol";
 
-import {MerkleAirdrop} from "src/airdrop/MerkleAirdrop.sol";
-import {RewardDistributor} from "src/staking/RewardDistributor.sol";
+/// Alperp - Trade Mining
+import {AP} from "@alperp/trade-mining/AP.sol";
+import {TradeMiningManager} from "@alperp/trade-mining/TradeMiningManager.sol";
+import {Paradeen} from "@alperp/trade-mining/Paradeen.sol";
 
+/// Alperp tests
+import {MockWNative} from "@alperp-tests/mocks/MockWNative.sol";
+import {MockWNativeRelayer} from "@alperp-tests/mocks/MockWNativeRelayer.sol";
+import {MockErc20} from "@alperp-tests/mocks/MockERC20.sol";
+import {MockWNative} from "@alperp-tests/mocks/MockWNative.sol";
+import {MockChainlinkPriceFeed} from
+  "@alperp-tests/mocks/MockChainlinkPriceFeed.sol";
+import {MockDonateVault} from "@alperp-tests/mocks/MockDonateVault.sol";
+import {MockFlashLoanBorrower} from
+  "@alperp-tests/mocks/MockFlashLoanBorrower.sol";
+import {MockStrategy} from "@alperp-tests/mocks/MockStrategy.sol";
+
+/// Pyth
 import {MockPyth as FakePyth} from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
-
 import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
 // solhint-disable const-name-snakecase
@@ -815,9 +827,22 @@ contract BaseTest is DSTest {
   function deployPoolRouter(
     address _wNative,
     address _pool,
-    address _oraclePriceUpdater
-  ) internal returns (PoolRouter03) {
-    return new PoolRouter03(_wNative, _pool, _oraclePriceUpdater);
+    address _oraclePriceUpdater,
+    address _tradeMiningManager
+  ) internal returns (PoolRouter04) {
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/PoolRouter04.sol/PoolRouter04.json"));
+
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize(address,address,address,address)")),
+      _wNative,
+      _pool,
+      _oraclePriceUpdater,
+      _tradeMiningManager
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+
+    return PoolRouter04(payable(_proxy));
   }
 
   function deployWNativeRelayer(address _weth)
@@ -983,5 +1008,47 @@ contract BaseTest is DSTest {
 
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
     return RewardDistributor(payable(_proxy));
+  }
+
+  function deployAP() internal returns (AP) {
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/AP.sol/AP.json"));
+    bytes memory _initializer =
+      abi.encodeWithSelector(bytes4(keccak256("initialize()")));
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+    return AP(_proxy);
+  }
+
+  function deployTradeMiningManager(address alpacaPoint)
+    internal
+    returns (TradeMiningManager)
+  {
+    bytes memory _logicBytecode = abi.encodePacked(
+      vm.getCode("./out/TradeMiningManager.sol/TradeMiningManager.json")
+    );
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize(address)")), alpacaPoint
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+    return TradeMiningManager(_proxy);
+  }
+
+  function deployParadeen(
+    address ap,
+    uint256 startWeekCursor,
+    address rewardToken,
+    address emergencyReturn
+  ) internal returns (Paradeen) {
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/Paradeen.sol/Paradeen.json"));
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize(address,uint256,address,address)")),
+      ap,
+      startWeekCursor,
+      rewardToken,
+      emergencyReturn
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+    return Paradeen(_proxy);
   }
 }

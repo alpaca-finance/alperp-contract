@@ -492,7 +492,6 @@ contract LiquidityFacet is LiquidityFacetInterface {
       emit FlashLoan(
         address(borrower), tokens[i], amounts[i], vars.fees[i], receivers[i]
       );
-
       unchecked {
         ++i;
       }

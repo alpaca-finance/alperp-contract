@@ -1,8 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, LibPoolConfigV1, MockDonateVault, MockStrategy, console, GetterFacetInterface, LiquidityFacetInterface, stdError } from "./PoolDiamond_BaseTest.t.sol";
-import { StrategyInterface } from "src/interfaces/StrategyInterface.sol";
+import {
+  PoolDiamond_BaseTest,
+  LibPoolConfigV1,
+  MockDonateVault,
+  MockStrategy,
+  console,
+  GetterFacetInterface,
+  LiquidityFacetInterface,
+  stdError
+} from "./PoolDiamond_BaseTest.t.sol";
+import {StrategyInterface} from "src/interfaces/StrategyInterface.sol";
 
 contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
   MockDonateVault internal mockDaiVault;
@@ -25,11 +34,11 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     poolAdminFacet.setTokenConfigs(tokens2, tokenConfigs2);
 
     // Feed prices
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(41_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(41_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
 
     // Deploy strategy related-instances
 
@@ -73,14 +82,13 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     poolFarmFacet.setStrategyOf(address(bnb), mockBnbVaultStrategy);
   }
 
-  function testCorrectness_WhenRemoveLiquidity_WhenProfit_WhenEnoughBalanceInPool()
-    external
-  {
+  function testCorrectness_WhenRemoveLiquidity_WhenProfit_WhenEnoughBalanceInPool(
+  ) external {
     // Set strategy target bps to be 50%
     poolFarmFacet.setStrategyTargetBps(address(dai), 5000);
 
     // Add 1000 DAI to the pool
-    dai.mint(address(poolDiamond), 1000 * 10**18);
+    dai.mint(address(poolDiamond), 1000 * 10 ** 18);
     poolLiquidityFacet.addLiquidity(address(this), address(dai), address(this));
 
     // The following conditions should be met:
@@ -93,9 +101,9 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 997 * 1
     // = 997 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
 
     // Call farm to deploy funds 997 * 50% = 498.5 DAI
     poolFarmFacet.farm(address(dai), true);
@@ -110,17 +118,16 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // = 997 * 1 + 0 [StrategyDelta]
     // = 997 USD
     // 5. Pool's total DAI should be 1000 - 498.5 =  501.5 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
     assertEq(
-      poolGetterFacet.strategyDataOf(address(dai)).principle,
-      498.5 * 10**18
+      poolGetterFacet.strategyDataOf(address(dai)).principle, 498.5 * 10 ** 18
     );
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10 ** 18);
 
     // Assuming profit 20 DAI
-    dai.mint(address(mockDaiVault), 20 * 10**18);
+    dai.mint(address(mockDaiVault), 20 * 10 ** 18);
 
     // The following conditions should be met:
     // 1. DAI's strategy delta should be: 20 DAI
@@ -131,13 +138,12 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // 4. Pool's aum by max price should be:
     // = 997 * 1 + 20 [StrategyDelta]
     // = 1017 USD
-    (bool isProfit, uint256 strategyDelta) = poolGetterFacet.getStrategyDeltaOf(
-      address(dai)
-    );
-    assertEq(strategyDelta, 20 * 10**18);
+    (bool isProfit, uint256 strategyDelta) =
+      poolGetterFacet.getStrategyDeltaOf(address(dai));
+    assertEq(strategyDelta, 20 * 10 ** 18);
     assertTrue(isProfit);
-    assertEq(poolGetterFacet.getAumE18(false), 1017 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 1017 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 1017 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 1017 * 10 ** 18);
 
     // Warp to pass liquidity cool down
     vm.warp(block.timestamp + 1 days);
@@ -148,9 +154,7 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
       (400 ether * alp.totalSupply()) / poolGetterFacet.getAumE18(false)
     );
     poolLiquidityFacet.removeLiquidity(
-      address(this),
-      address(dai),
-      address(this)
+      address(this), address(dai), address(this)
     );
 
     // The following conditions should be met:
@@ -173,26 +177,24 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // 7. Pool's total DAI should be:
     // = 1000 - 498.5 + 20 - 398.8
     // = 122.7 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 617 * 10**18 + 1);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 617 * 10 ** 18 + 1);
     assertEq(
-      poolGetterFacet.strategyDataOf(address(dai)).principle,
-      498.5 * 10**18
+      poolGetterFacet.strategyDataOf(address(dai)).principle, 498.5 * 10 ** 18
     );
-    assertEq(poolGetterFacet.getAumE18(false), 617 * 10**18 + 1);
-    assertEq(poolGetterFacet.getAumE18(true), 617 * 10**18 + 1);
-    assertEq(dai.balanceOf(address(this)), 398.8 * 10**18 - 1);
-    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 4.2 * 10**18);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 122.7 * 10**18 + 1);
+    assertEq(poolGetterFacet.getAumE18(false), 617 * 10 ** 18 + 1);
+    assertEq(poolGetterFacet.getAumE18(true), 617 * 10 ** 18 + 1);
+    assertEq(dai.balanceOf(address(this)), 398.8 * 10 ** 18 - 1);
+    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 4.2 * 10 ** 18);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 122.7 * 10 ** 18 + 1);
   }
 
-  function testCorrectness_WhenRemoveLiquidity_WhenProfit_WhenNotEnoughBalanceInPool()
-    external
-  {
+  function testCorrectness_WhenRemoveLiquidity_WhenProfit_WhenNotEnoughBalanceInPool(
+  ) external {
     // Set strategy target bps to be 50%
     poolFarmFacet.setStrategyTargetBps(address(dai), 5000);
 
     // Add 1000 DAI to the pool
-    dai.mint(address(poolDiamond), 1000 * 10**18);
+    dai.mint(address(poolDiamond), 1000 * 10 ** 18);
     poolLiquidityFacet.addLiquidity(address(this), address(dai), address(this));
 
     // The following conditions should be met:
@@ -205,9 +207,9 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 997 * 1
     // = 997 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
 
     // Call farm to deploy funds 997 * 50% = 498.5 DAI
     poolFarmFacet.farm(address(dai), true);
@@ -222,17 +224,16 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // = 997 * 1 + 0 [StrategyDelta]
     // = 997 USD
     // 5. Pool's total DAI should be 1000 - 498.5 =  501.5 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
     assertEq(
-      poolGetterFacet.strategyDataOf(address(dai)).principle,
-      498.5 * 10**18
+      poolGetterFacet.strategyDataOf(address(dai)).principle, 498.5 * 10 ** 18
     );
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10 ** 18);
 
     // Assuming profit 20 DAI
-    dai.mint(address(mockDaiVault), 20 * 10**18);
+    dai.mint(address(mockDaiVault), 20 * 10 ** 18);
 
     // The following conditions should be met:
     // 1. DAI's strategy delta should be: 20 DAI
@@ -243,13 +244,12 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // 4. Pool's aum by max price should be:
     // = 997 * 1 + 20 [StrategyDelta]
     // = 1017 USD
-    (bool isProfit, uint256 strategyDelta) = poolGetterFacet.getStrategyDeltaOf(
-      address(dai)
-    );
-    assertEq(strategyDelta, 20 * 10**18);
+    (bool isProfit, uint256 strategyDelta) =
+      poolGetterFacet.getStrategyDeltaOf(address(dai));
+    assertEq(strategyDelta, 20 * 10 ** 18);
     assertTrue(isProfit);
-    assertEq(poolGetterFacet.getAumE18(false), 1017 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 1017 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 1017 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 1017 * 10 ** 18);
 
     // Warp to pass liquidity cool down
     vm.warp(block.timestamp + 1 days);
@@ -260,14 +260,10 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
       (600 ether * alp.totalSupply()) / poolGetterFacet.getAumE18(false)
     );
     poolLiquidityFacet.removeLiquidity(
-      address(this),
-      address(dai),
-      address(this)
+      address(this), address(dai), address(this)
     );
 
-    (isProfit, strategyDelta) = poolGetterFacet.getStrategyDeltaOf(
-      address(dai)
-    );
+    (isProfit, strategyDelta) = poolGetterFacet.getStrategyDeltaOf(address(dai));
 
     // The following conditions should be met:
     // 1. DAI's liquidity should be:
@@ -290,26 +286,24 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // = 3 + (600 * 0.003)
     // = 4.8 DAI
     // 7. Pool's total DAI should be: 4.8 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 417 * 10**18 + 1);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 417 * 10 ** 18 + 1);
     assertEq(
-      poolGetterFacet.strategyDataOf(address(dai)).principle,
-      417 * 10**18 + 1
+      poolGetterFacet.strategyDataOf(address(dai)).principle, 417 * 10 ** 18 + 1
     );
-    assertEq(poolGetterFacet.getAumE18(false), 417 * 10**18 + 1);
-    assertEq(poolGetterFacet.getAumE18(true), 417 * 10**18 + 1);
-    assertEq(dai.balanceOf(address(this)), 598.2 * 10**18 - 1);
-    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 4.8 * 10**18);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 4.8 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 417 * 10 ** 18 + 1);
+    assertEq(poolGetterFacet.getAumE18(true), 417 * 10 ** 18 + 1);
+    assertEq(dai.balanceOf(address(this)), 598.2 * 10 ** 18 - 1);
+    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 4.8 * 10 ** 18);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 4.8 * 10 ** 18);
   }
 
-  function testCorrectness_WhenRemoveLiquidity_WhenLoss_WhenEnoughBalanceInPool()
-    external
-  {
+  function testCorrectness_WhenRemoveLiquidity_WhenLoss_WhenEnoughBalanceInPool(
+  ) external {
     // Set strategy target bps to be 50%
     poolFarmFacet.setStrategyTargetBps(address(dai), 5000);
 
     // Add 1000 DAI to the pool
-    dai.mint(address(poolDiamond), 1000 * 10**18);
+    dai.mint(address(poolDiamond), 1000 * 10 ** 18);
     poolLiquidityFacet.addLiquidity(address(this), address(dai), address(this));
 
     // The following conditions should be met:
@@ -322,9 +316,9 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 997 * 1
     // = 997 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
 
     // Call farm to deploy funds 997 * 50% = 498.5 DAI
     poolFarmFacet.farm(address(dai), true);
@@ -339,17 +333,16 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // = 997 * 1 + 0 [StrategyDelta]
     // = 997 USD
     // 5. Pool's total DAI should be 1000 - 498.5 =  501.5 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
     assertEq(
-      poolGetterFacet.strategyDataOf(address(dai)).principle,
-      498.5 * 10**18
+      poolGetterFacet.strategyDataOf(address(dai)).principle, 498.5 * 10 ** 18
     );
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10 ** 18);
 
     // Assuming loss 20 DAI
-    dai.burn(address(mockDaiVault), 20 * 10**18);
+    dai.burn(address(mockDaiVault), 20 * 10 ** 18);
 
     // The following conditions should be met:
     // 1. DAI's strategy delta should be: -20 DAI
@@ -360,13 +353,12 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // 4. Pool's aum by max price should be:
     // = 997 * 1 - 20 [StrategyDelta]
     // = 977 USD
-    (bool isProfit, uint256 strategyDelta) = poolGetterFacet.getStrategyDeltaOf(
-      address(dai)
-    );
-    assertEq(strategyDelta, 20 * 10**18);
+    (bool isProfit, uint256 strategyDelta) =
+      poolGetterFacet.getStrategyDeltaOf(address(dai));
+    assertEq(strategyDelta, 20 * 10 ** 18);
     assertTrue(!isProfit);
-    assertEq(poolGetterFacet.getAumE18(false), 977 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 977 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 977 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 977 * 10 ** 18);
 
     // Warp to pass liquidity cool down
     vm.warp(block.timestamp + 1 days);
@@ -377,9 +369,7 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
       (400 ether * alp.totalSupply()) / poolGetterFacet.getAumE18(false)
     );
     poolLiquidityFacet.removeLiquidity(
-      address(this),
-      address(dai),
-      address(this)
+      address(this), address(dai), address(this)
     );
 
     // The following conditions should be met:
@@ -404,24 +394,21 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // 7. Pool's total DAI should be:
     // = 1000 - 498.5 - 398.8
     // = 102.7 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 577 * 10**18 + 1);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 577 * 10 ** 18 + 1);
     assertEq(
-      poolGetterFacet.strategyDataOf(address(dai)).principle,
-      478.5 * 10**18
+      poolGetterFacet.strategyDataOf(address(dai)).principle, 478.5 * 10 ** 18
     );
-    assertEq(poolGetterFacet.getAumE18(false), 577 * 10**18 + 1);
-    assertEq(poolGetterFacet.getAumE18(true), 577 * 10**18 + 1);
-    assertEq(dai.balanceOf(address(this)), 398.8 * 10**18 - 1);
-    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 4.2 * 10**18);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 102.7 * 10**18 + 1);
+    assertEq(poolGetterFacet.getAumE18(false), 577 * 10 ** 18 + 1);
+    assertEq(poolGetterFacet.getAumE18(true), 577 * 10 ** 18 + 1);
+    assertEq(dai.balanceOf(address(this)), 398.8 * 10 ** 18 - 1);
+    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 4.2 * 10 ** 18);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 102.7 * 10 ** 18 + 1);
 
     // Exit position
     uint256 daiBefore = dai.balanceOf(address(this));
     alp.transfer(address(poolDiamond), alp.balanceOf(address(this)));
     poolLiquidityFacet.removeLiquidity(
-      address(this),
-      address(dai),
-      address(this)
+      address(this), address(dai), address(this)
     );
     uint256 daiAfter = dai.balanceOf(address(this));
 
@@ -442,19 +429,18 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.strategyDataOf(address(dai)).principle, 0);
     assertEq(poolGetterFacet.getAumE18(false), 0);
     assertEq(poolGetterFacet.getAumE18(true), 0);
-    assertEq(daiAfter - daiBefore, 575.269 * 10**18);
-    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 5.931 * 10**18 + 1);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 5.931 * 10**18 + 1);
+    assertEq(daiAfter - daiBefore, 575.269 * 10 ** 18);
+    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 5.931 * 10 ** 18 + 1);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 5.931 * 10 ** 18 + 1);
   }
 
-  function testCorrectness_WhenRemoveLiquidity_WhenLoss_WhenNotEnoughBalanceInPool()
-    external
-  {
+  function testCorrectness_WhenRemoveLiquidity_WhenLoss_WhenNotEnoughBalanceInPool(
+  ) external {
     // Set strategy target bps to be 50%
     poolFarmFacet.setStrategyTargetBps(address(dai), 5000);
 
     // Add 1000 DAI to the pool
-    dai.mint(address(poolDiamond), 1000 * 10**18);
+    dai.mint(address(poolDiamond), 1000 * 10 ** 18);
     poolLiquidityFacet.addLiquidity(address(this), address(dai), address(this));
 
     // The following conditions should be met:
@@ -467,9 +453,9 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // 3. Pool's aum by max price should be:
     // = 997 * 1
     // = 997 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
 
     // Call farm to deploy funds 997 * 50% = 498.5 DAI
     poolFarmFacet.farm(address(dai), true);
@@ -484,17 +470,16 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // = 997 * 1 + 0 [StrategyDelta]
     // = 997 USD
     // 5. Pool's total DAI should be 1000 - 498.5 =  501.5 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 997 * 10 ** 18);
     assertEq(
-      poolGetterFacet.strategyDataOf(address(dai)).principle,
-      498.5 * 10**18
+      poolGetterFacet.strategyDataOf(address(dai)).principle, 498.5 * 10 ** 18
     );
-    assertEq(poolGetterFacet.getAumE18(false), 997 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 997 * 10**18);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 997 * 10 ** 18);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 501.5 * 10 ** 18);
 
     // Assuming loss 20 DAI
-    dai.burn(address(mockDaiVault), 20 * 10**18);
+    dai.burn(address(mockDaiVault), 20 * 10 ** 18);
 
     // The following conditions should be met:
     // 1. DAI's strategy delta should be: -20 DAI
@@ -505,13 +490,12 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // 4. Pool's aum by max price should be:
     // = 997 * 1 - 20 [StrategyDelta]
     // = 977 USD
-    (bool isProfit, uint256 strategyDelta) = poolGetterFacet.getStrategyDeltaOf(
-      address(dai)
-    );
-    assertEq(strategyDelta, 20 * 10**18);
+    (bool isProfit, uint256 strategyDelta) =
+      poolGetterFacet.getStrategyDeltaOf(address(dai));
+    assertEq(strategyDelta, 20 * 10 ** 18);
     assertTrue(!isProfit);
-    assertEq(poolGetterFacet.getAumE18(false), 977 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 977 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 977 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 977 * 10 ** 18);
 
     // Warp to pass liquidity cool down
     vm.warp(block.timestamp + 1 days);
@@ -522,9 +506,7 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
       (600 ether * alp.totalSupply()) / poolGetterFacet.getAumE18(false)
     );
     poolLiquidityFacet.removeLiquidity(
-      address(this),
-      address(dai),
-      address(this)
+      address(this), address(dai), address(this)
     );
 
     // The following conditions should be met:
@@ -548,24 +530,21 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     // = 4.8 DAI
     // 7. Pool's total DAI should be:
     // = 4.8 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 377 * 10**18 + 1);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 377 * 10 ** 18 + 1);
     assertEq(
-      poolGetterFacet.strategyDataOf(address(dai)).principle,
-      377 * 10**18 + 1
+      poolGetterFacet.strategyDataOf(address(dai)).principle, 377 * 10 ** 18 + 1
     );
-    assertEq(poolGetterFacet.getAumE18(false), 377 * 10**18 + 1);
-    assertEq(poolGetterFacet.getAumE18(true), 377 * 10**18 + 1);
-    assertEq(dai.balanceOf(address(this)), 598.2 * 10**18 - 1);
-    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 4.8 * 10**18);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 4.8 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 377 * 10 ** 18 + 1);
+    assertEq(poolGetterFacet.getAumE18(true), 377 * 10 ** 18 + 1);
+    assertEq(dai.balanceOf(address(this)), 598.2 * 10 ** 18 - 1);
+    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 4.8 * 10 ** 18);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 4.8 * 10 ** 18);
 
     // Exit position
     uint256 daiBefore = dai.balanceOf(address(this));
     alp.transfer(address(poolDiamond), alp.balanceOf(address(this)));
     poolLiquidityFacet.removeLiquidity(
-      address(this),
-      address(dai),
-      address(this)
+      address(this), address(dai), address(this)
     );
     uint256 daiAfter = dai.balanceOf(address(this));
 
@@ -586,8 +565,8 @@ contract PoolDiamond_Farm_RemoveLiquidityTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.strategyDataOf(address(dai)).principle, 0);
     assertEq(poolGetterFacet.getAumE18(false), 0);
     assertEq(poolGetterFacet.getAumE18(true), 0);
-    assertEq(daiAfter - daiBefore, 375.869 * 10**18);
-    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 5.931 * 10**18 + 1);
-    assertEq(poolGetterFacet.totalOf(address(dai)), 5.931 * 10**18 + 1);
+    assertEq(daiAfter - daiBefore, 375.869 * 10 ** 18);
+    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 5.931 * 10 ** 18 + 1);
+    assertEq(poolGetterFacet.totalOf(address(dai)), 5.931 * 10 ** 18 + 1);
   }
 }

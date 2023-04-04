@@ -1,33 +1,29 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { PoolOracle } from "../PoolOracle.sol";
-import { ALP } from "../../tokens/ALP.sol";
+import {PoolOracle} from "../PoolOracle.sol";
+import {ALP} from "../../tokens/ALP.sol";
 
-import { LibReentrancyGuard } from "./libraries/LibReentrancyGuard.sol";
-import { LibDiamond } from "./libraries/LibDiamond.sol";
-import { LibPoolV1 } from "./libraries/LibPoolV1.sol";
-import { DiamondCutInterface } from "./interfaces/DiamondCutInterface.sol";
+import {LibReentrancyGuard} from "./libraries/LibReentrancyGuard.sol";
+import {LibDiamond} from "./libraries/LibDiamond.sol";
+import {LibPoolV1} from "./libraries/LibPoolV1.sol";
+import {DiamondCutInterface} from "./interfaces/DiamondCutInterface.sol";
 
 /// @title Pool with ERC-2535 Diamond Standard.
 /// Core logic of Diamond Standard is taken from https://github.com/mudgen/diamond-3-hardhat
 contract PoolDiamond {
-  constructor(
-    address diamondCutFacet,
-    ALP alp,
-    PoolOracle poolOracle
-  ) payable {
+  constructor(address diamondCutFacet, ALP alp, PoolOracle poolOracle) payable {
     // Set contract owner
     LibDiamond.setContractOwner(msg.sender);
 
@@ -39,8 +35,8 @@ contract PoolDiamond {
     LibReentrancyGuard.unlock();
 
     // Add the diamondCut external function from the diamondCutFacet
-    DiamondCutInterface.FacetCut[]
-      memory cut = new DiamondCutInterface.FacetCut[](1);
+    DiamondCutInterface.FacetCut[] memory cut =
+      new DiamondCutInterface.FacetCut[](1);
     bytes4[] memory functionSelectors = new bytes4[](1);
     functionSelectors[0] = DiamondCutInterface.diamondCut.selector;
     cut[0] = DiamondCutInterface.FacetCut({
@@ -73,12 +69,8 @@ contract PoolDiamond {
       returndatacopy(0, 0, returndatasize())
       // return any return value or error back to the caller
       switch result
-      case 0 {
-        revert(0, returndatasize())
-      }
-      default {
-        return(0, returndatasize())
-      }
+      case 0 { revert(0, returndatasize()) }
+      default { return(0, returndatasize()) }
     }
   }
 

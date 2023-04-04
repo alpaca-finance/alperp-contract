@@ -12,25 +12,28 @@
  */
 pragma solidity 0.8.17;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from
-  "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IWNative} from "../../interfaces/IWNative.sol";
-import {LiquidityFacetInterface} from "./interfaces/LiquidityFacetInterface.sol";
-import {GetterFacetInterface} from "./interfaces/GetterFacetInterface.sol";
-import {PerpTradeFacetInterface} from "./interfaces/PerpTradeFacetInterface.sol";
-import {IOnchainPriceUpdater} from "../../interfaces/IOnChainPriceUpdater.sol";
-import {PoolOracle} from "../PoolOracle.sol";
+/// OZ
+import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-/// @title PoolRouter03 is responsible for swapping tokens and managing liquidity
+/// Alperp
+import {IWNative} from "@alperp/interfaces/IWNative.sol";
+import {LiquidityFacetInterface} from "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
+import {GetterFacetInterface} from "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {PerpTradeFacetInterface} from "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
+import {IOnchainPriceUpdater} from "@alperp/interfaces/IOnChainPriceUpdater.sol";
+import {PoolOracle} from "@alperp/core/PoolOracle.sol";
+import {ITradeMiningManager} from "@alperp/interfaces/ITradeMiningManager.sol";
+
+/// @title PoolRouter04 is responsible for swapping tokens and managing liquidity
 /// @notice  This Router will apply pyth oracle mechanism
-contract PoolRouter03 {
-  using SafeERC20 for IERC20;
+contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
+  /// Dependencies
+  using SafeERC20Upgradeable for IERC20Upgradeable;
 
-  IWNative public immutable WNATIVE;
-  address public immutable pool;
-  IOnchainPriceUpdater public oraclePriceUpdater;
-
+  /// Errors
   error PoolRouter_InsufficientOutputAmount(
     uint256 expectedAmount, uint256 actualAmount
   );
@@ -40,10 +43,34 @@ contract PoolRouter03 {
   error PoolRouter_MarkPriceTooLow(uint256 acceptablePrice, uint256 actualPrice);
   error PoolRouter_InsufficientUpdatedFee(uint256 expectedFee, uint256 msgValue);
 
-  constructor(address wNative_, address pool_, address oraclePriceUpdater_) {
-    WNATIVE = IWNative(wNative_);
-    pool = pool_;
-    oraclePriceUpdater = IOnchainPriceUpdater(oraclePriceUpdater_);
+  /// Configs
+  IWNative public WNATIVE;
+  address public pool;
+  IOnchainPriceUpdater public oraclePriceUpdater;
+  ITradeMiningManager public tradeMiningManager;
+
+  event SetTradeMiningManager(
+    address _prevTradeMiningManager, address _newTradeMiningManager
+  );
+
+  /// @custom:oz-upgrades-unsafe-allow constructor
+  constructor() {
+    _disableInitializers();
+  }
+
+  function initialize(
+    IWNative _wNative,
+    address _pool,
+    IOnchainPriceUpdater _oraclePriceUpdater,
+    ITradeMiningManager _tradeMiningManager
+  ) external initializer {
+    OwnableUpgradeable.__Ownable_init();
+    ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
+
+    WNATIVE = _wNative;
+    pool = _pool;
+    oraclePriceUpdater = _oraclePriceUpdater;
+    tradeMiningManager = _tradeMiningManager;
   }
 
   function _updatePrices(bytes[] calldata _priceUpdateData)
@@ -94,15 +121,25 @@ contract PoolRouter03 {
     }
   }
 
+  function setTradeMiningManager(ITradeMiningManager _newTradeMiningManager)
+    external
+    onlyOwner
+  {
+    emit SetTradeMiningManager(
+      address(tradeMiningManager), address(_newTradeMiningManager)
+      );
+    tradeMiningManager = _newTradeMiningManager;
+  }
+
   function addLiquidity(
     address token,
     uint256 amount,
     address receiver,
     uint256 minLiquidity,
     bytes[] calldata _priceUpdateData
-  ) external payable returns (uint256) {
+  ) external payable nonReentrant returns (uint256) {
     _updatePrices(_priceUpdateData);
-    IERC20(token).safeTransferFrom(msg.sender, address(pool), amount);
+    IERC20Upgradeable(token).safeTransferFrom(msg.sender, address(pool), amount);
 
     uint256 receivedAmount =
       LiquidityFacetInterface(pool).addLiquidity(msg.sender, token, receiver);
@@ -119,11 +156,13 @@ contract PoolRouter03 {
     address receiver,
     uint256 minLiquidity,
     bytes[] calldata _priceUpdateData
-  ) external payable returns (uint256) {
+  ) external payable nonReentrant returns (uint256) {
     uint256 fee = _updatePrices(_priceUpdateData);
     uint256 actualMsgValue = msg.value - fee;
     WNATIVE.deposit{value: actualMsgValue}();
-    IERC20(address(WNATIVE)).safeTransfer(address(pool), actualMsgValue);
+    IERC20Upgradeable(address(WNATIVE)).safeTransfer(
+      address(pool), actualMsgValue
+    );
 
     uint256 receivedAmount =
       LiquidityFacetInterface(pool).addLiquidity(msg.sender, token, receiver);
@@ -141,11 +180,10 @@ contract PoolRouter03 {
     address receiver,
     uint256 minAmountOut,
     bytes[] calldata _priceUpdateData
-  ) external payable returns (uint256) {
+  ) external payable nonReentrant returns (uint256) {
     _updatePrices(_priceUpdateData);
-    IERC20(address(GetterFacetInterface(pool).alp())).safeTransferFrom(
-      msg.sender, address(pool), liquidity
-    );
+    IERC20Upgradeable(address(GetterFacetInterface(pool).alp()))
+      .safeTransferFrom(msg.sender, address(pool), liquidity);
 
     uint256 receivedAmount = LiquidityFacetInterface(pool).removeLiquidity(
       msg.sender, tokenOut, receiver
@@ -154,6 +192,7 @@ contract PoolRouter03 {
     if (receivedAmount < minAmountOut) {
       revert PoolRouter_InsufficientOutputAmount(minAmountOut, receivedAmount);
     }
+
     return receivedAmount;
   }
 
@@ -163,11 +202,10 @@ contract PoolRouter03 {
     address receiver,
     uint256 minAmountOut,
     bytes[] calldata _priceUpdateData
-  ) external payable returns (uint256) {
+  ) external payable nonReentrant returns (uint256) {
     _updatePrices(_priceUpdateData);
-    IERC20(address(GetterFacetInterface(pool).alp())).safeTransferFrom(
-      msg.sender, address(pool), liquidity
-    );
+    IERC20Upgradeable(address(GetterFacetInterface(pool).alp()))
+      .safeTransferFrom(msg.sender, address(pool), liquidity);
 
     uint256 receivedAmount = LiquidityFacetInterface(pool).removeLiquidity(
       msg.sender, tokenOut, address(this)
@@ -179,6 +217,7 @@ contract PoolRouter03 {
 
     WNATIVE.withdraw(receivedAmount);
     payable(receiver).transfer(receivedAmount);
+
     return receivedAmount;
   }
 
@@ -193,7 +232,7 @@ contract PoolRouter03 {
     bool isLong,
     uint256 acceptablePrice,
     bytes[] calldata _priceUpdateData
-  ) external payable {
+  ) external payable nonReentrant {
     _updatePrices(_priceUpdateData);
     _validatePrice(indexToken, isLong, true, acceptablePrice);
 
@@ -206,13 +245,22 @@ contract PoolRouter03 {
         minAmountOut,
         address(this)
       );
-      IERC20(collateralToken).safeTransfer(pool, amountOutFromSwap);
+      IERC20Upgradeable(collateralToken).safeTransfer(pool, amountOutFromSwap);
     } else {
-      IERC20(collateralToken).safeTransferFrom(msg.sender, pool, amountIn);
+      IERC20Upgradeable(collateralToken).safeTransferFrom(
+        msg.sender, pool, amountIn
+      );
     }
     PerpTradeFacetInterface(pool).increasePosition(
       msg.sender, subAccountId, collateralToken, indexToken, sizeDelta, isLong
     );
+
+    if (address(tradeMiningManager) != address(0)) {
+      // If trade mining is enabled, call the trade mining manager to its state
+      tradeMiningManager.onIncreasePosition(
+        msg.sender, subAccountId, collateralToken, indexToken, sizeDelta, isLong
+      );
+    }
   }
 
   function increasePositionNative(
@@ -225,7 +273,7 @@ contract PoolRouter03 {
     bool isLong,
     uint256 acceptablePrice,
     bytes[] calldata _priceUpdateData
-  ) external payable {
+  ) external payable nonReentrant {
     uint256 fee = _updatePrices(_priceUpdateData);
     uint256 actualMsgValue = msg.value - fee;
     _validatePrice(indexToken, isLong, true, acceptablePrice);
@@ -240,14 +288,21 @@ contract PoolRouter03 {
         minAmountOut,
         address(this)
       );
-      IERC20(collateralToken).safeTransfer(pool, amountOut);
+      IERC20Upgradeable(collateralToken).safeTransfer(pool, amountOut);
     } else {
       WNATIVE.deposit{value: actualMsgValue}();
-      IERC20(address(WNATIVE)).safeTransfer(pool, actualMsgValue);
+      IERC20Upgradeable(address(WNATIVE)).safeTransfer(pool, actualMsgValue);
     }
     PerpTradeFacetInterface(pool).increasePosition(
       msg.sender, subAccountId, collateralToken, indexToken, sizeDelta, isLong
     );
+
+    if (address(tradeMiningManager) != address(0)) {
+      // If trade mining is enabled, call the trade mining manager to its state
+      tradeMiningManager.onIncreasePosition(
+        msg.sender, subAccountId, collateralToken, indexToken, sizeDelta, isLong
+      );
+    }
   }
 
   function decreasePosition(
@@ -262,7 +317,7 @@ contract PoolRouter03 {
     address tokenOut,
     uint256 minAmountOut,
     bytes[] calldata _priceUpdateData
-  ) external payable {
+  ) external payable nonReentrant {
     _updatePrices(_priceUpdateData);
     _validatePrice(indexToken, isLong, false, acceptablePrice);
 
@@ -283,7 +338,7 @@ contract PoolRouter03 {
           minAmountOut, amountOutFromPosition
         );
       }
-      IERC20(tokenOut).safeTransfer(receiver, amountOutFromPosition);
+      IERC20Upgradeable(tokenOut).safeTransfer(receiver, amountOutFromPosition);
     } else {
       _swap(
         address(this),
@@ -308,7 +363,7 @@ contract PoolRouter03 {
     address tokenOut,
     uint256 minAmountOut,
     bytes[] calldata _priceUpdateData
-  ) external payable {
+  ) external payable nonReentrant {
     _updatePrices(_priceUpdateData);
     _validatePrice(indexToken, isLong, false, acceptablePrice);
 
@@ -352,7 +407,7 @@ contract PoolRouter03 {
     uint256 minAmountOut,
     address receiver,
     bytes[] calldata _priceUpdateData
-  ) external payable returns (uint256) {
+  ) external payable nonReentrant returns (uint256) {
     _updatePrices(_priceUpdateData);
     return
       _swap(msg.sender, tokenIn, tokenOut, amountIn, minAmountOut, receiver);
@@ -368,9 +423,11 @@ contract PoolRouter03 {
   ) internal returns (uint256) {
     if (amountIn == 0) return 0;
     if (sender == address(this)) {
-      IERC20(tokenIn).safeTransfer(address(pool), amountIn);
+      IERC20Upgradeable(tokenIn).safeTransfer(address(pool), amountIn);
     } else {
-      IERC20(tokenIn).safeTransferFrom(sender, address(pool), amountIn);
+      IERC20Upgradeable(tokenIn).safeTransferFrom(
+        sender, address(pool), amountIn
+      );
     }
 
     return LiquidityFacetInterface(pool).swap(
@@ -385,15 +442,17 @@ contract PoolRouter03 {
     uint256 minAmountOut,
     address receiver,
     bytes[] calldata _priceUpdateData
-  ) external payable returns (uint256) {
+  ) external payable nonReentrant returns (uint256) {
     uint256 fee = _updatePrices(_priceUpdateData);
     uint256 actualMsgValue = msg.value - fee;
     if (tokenIn == address(WNATIVE)) {
       WNATIVE.deposit{value: actualMsgValue}();
-      IERC20(address(WNATIVE)).safeTransfer(pool, actualMsgValue);
+      IERC20Upgradeable(address(WNATIVE)).safeTransfer(pool, actualMsgValue);
       amountIn = actualMsgValue;
     } else {
-      IERC20(tokenIn).safeTransferFrom(msg.sender, address(pool), amountIn);
+      IERC20Upgradeable(tokenIn).safeTransferFrom(
+        msg.sender, address(pool), amountIn
+      );
     }
 
     if (tokenOut == address(WNATIVE)) {

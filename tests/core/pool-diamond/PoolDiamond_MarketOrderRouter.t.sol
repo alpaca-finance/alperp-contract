@@ -1,7 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, console, LibPoolConfigV1, LiquidityFacetInterface, GetterFacetInterface, PerpTradeFacetInterface, FastPriceFeed } from "./PoolDiamond_BaseTest.t.sol";
+import {
+  PoolDiamond_BaseTest,
+  console,
+  LibPoolConfigV1,
+  LiquidityFacetInterface,
+  GetterFacetInterface,
+  PerpTradeFacetInterface,
+  FastPriceFeed
+} from "./PoolDiamond_BaseTest.t.sol";
 
 contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
   FastPriceFeed internal fastPriceFeed;
@@ -60,14 +68,7 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     _maxCumulativeDeltaDiffs[1] = 1000000;
     _maxCumulativeDeltaDiffs[2] = 1000000;
     fastPriceFeed.setConfigs(
-      _tokens,
-      _tokenPrecisions,
-      1,
-      60,
-      _maxCumulativeDeltaDiffs,
-      3600,
-      500,
-      20
+      _tokens, _tokenPrecisions, 1, 60, _maxCumulativeDeltaDiffs, 3600, 500, 20
     );
 
     poolOracle.setSecondaryPriceFeed(address(fastPriceFeed));
@@ -81,15 +82,15 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     address[] memory path = new address[](1);
     path[0] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InsufficientExecutionFee()"));
-    marketOrderRouter.createIncreasePosition{ value: 0.01 ether }({
+    marketOrderRouter.createIncreasePosition{value: 0.01 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _amountIn: 22500,
       _minOut: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _executionFee: 0 ether
     });
   }
@@ -100,15 +101,15 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     address[] memory path = new address[](1);
     path[0] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("IncorrectValueTransferred()"));
-    marketOrderRouter.createIncreasePosition{ value: 0.001 ether }({
+    marketOrderRouter.createIncreasePosition{value: 0.001 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _amountIn: 22500,
       _minOut: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _executionFee: 0.01 ether
     });
   }
@@ -119,51 +120,49 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     path[1] = address(wbtc);
     path[2] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InvalidPathLength()"));
-    marketOrderRouter.createIncreasePosition{ value: 0.01 ether }({
+    marketOrderRouter.createIncreasePosition{value: 0.01 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _amountIn: 22500,
       _minOut: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _executionFee: 0.01 ether
     });
   }
 
-  function testRevert_CreateIncreasePositionNative_WithInsufficientExecutionFee()
-    external
-  {
+  function testRevert_CreateIncreasePositionNative_WithInsufficientExecutionFee(
+  ) external {
     address[] memory path = new address[](1);
     path[0] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InsufficientExecutionFee()"));
-    marketOrderRouter.createIncreasePositionNative{ value: 0.01 ether }({
+    marketOrderRouter.createIncreasePositionNative{value: 0.01 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _minOut: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _executionFee: 0 ether
     });
   }
 
-  function testRevert_CreateIncreasePositionNative_WithIncorrectValueTransferred()
-    external
-  {
+  function testRevert_CreateIncreasePositionNative_WithIncorrectValueTransferred(
+  ) external {
     address[] memory path = new address[](1);
     path[0] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("IncorrectValueTransferred()"));
-    marketOrderRouter.createIncreasePositionNative{ value: 0.001 ether }({
+    marketOrderRouter.createIncreasePositionNative{value: 0.001 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _minOut: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _executionFee: 0.01 ether
     });
   }
@@ -174,14 +173,14 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     path[1] = address(wbtc);
     path[2] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InvalidPathLength()"));
-    marketOrderRouter.createIncreasePositionNative{ value: 0.01 ether }({
+    marketOrderRouter.createIncreasePositionNative{value: 0.01 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _minOut: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _executionFee: 0.01 ether
     });
   }
@@ -193,14 +192,14 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     path[0] = address(wbtc);
     path[1] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InvalidPath()"));
-    marketOrderRouter.createIncreasePositionNative{ value: 0.01 ether }({
+    marketOrderRouter.createIncreasePositionNative{value: 0.01 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _minOut: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _executionFee: 0.01 ether
     });
   }
@@ -211,15 +210,15 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     address[] memory path = new address[](1);
     path[0] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InsufficientExecutionFee()"));
-    marketOrderRouter.createDecreasePosition{ value: 0.01 ether }({
+    marketOrderRouter.createDecreasePosition{value: 0.01 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _collateralDelta: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
       _receiver: address(this),
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _minOut: 0,
       _executionFee: 0 ether,
       _withdrawETH: false
@@ -232,15 +231,15 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     address[] memory path = new address[](1);
     path[0] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("IncorrectValueTransferred()"));
-    marketOrderRouter.createDecreasePosition{ value: 0.001 ether }({
+    marketOrderRouter.createDecreasePosition{value: 0.001 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _collateralDelta: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
       _receiver: address(this),
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _minOut: 0,
       _executionFee: 0.01 ether,
       _withdrawETH: false
@@ -253,37 +252,36 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     path[1] = address(wbtc);
     path[2] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InvalidPathLength()"));
-    marketOrderRouter.createDecreasePosition{ value: 0.01 ether }({
+    marketOrderRouter.createDecreasePosition{value: 0.01 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _collateralDelta: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
       _receiver: address(this),
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _minOut: 0,
       _executionFee: 0.01 ether,
       _withdrawETH: false
     });
   }
 
-  function testRevert_CreateDecreasePosition_WhenWithdrawETHIsTrue_WhenLastPathIsNotWNative()
-    external
-  {
+  function testRevert_CreateDecreasePosition_WhenWithdrawETHIsTrue_WhenLastPathIsNotWNative(
+  ) external {
     address[] memory path = new address[](2);
     path[0] = address(wbtc);
     path[1] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InvalidPath()"));
-    marketOrderRouter.createDecreasePosition{ value: 0.01 ether }({
+    marketOrderRouter.createDecreasePosition{value: 0.01 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _collateralDelta: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
       _receiver: address(this),
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _minOut: 0,
       _executionFee: 0.01 ether,
       _withdrawETH: true
@@ -296,7 +294,7 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     path[1] = address(weth);
     path[2] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InvalidPathLength()"));
-    marketOrderRouter.createSwapOrder{ value: 0.01 ether }({
+    marketOrderRouter.createSwapOrder{value: 0.01 ether}({
       _path: path,
       _amountIn: 1 ether,
       _minOut: 0,
@@ -311,7 +309,7 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     path[0] = address(wbtc);
     path[1] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InvalidPath()"));
-    marketOrderRouter.createSwapOrder{ value: 0.01 ether }({
+    marketOrderRouter.createSwapOrder{value: 0.01 ether}({
       _path: path,
       _amountIn: 1 ether,
       _minOut: 0,
@@ -326,7 +324,7 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     path[0] = address(wbtc);
     path[1] = address(weth);
     vm.expectRevert(abi.encodeWithSignature("InvalidAmountIn()"));
-    marketOrderRouter.createSwapOrder{ value: 0.01 ether }({
+    marketOrderRouter.createSwapOrder{value: 0.01 ether}({
       _path: path,
       _amountIn: 0 ether,
       _minOut: 0,
@@ -341,7 +339,7 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     path[0] = address(wbtc);
     path[1] = address(weth);
     vm.expectRevert(abi.encodeWithSignature("InsufficientExecutionFee()"));
-    marketOrderRouter.createSwapOrder{ value: 0.01 ether }({
+    marketOrderRouter.createSwapOrder{value: 0.01 ether}({
       _path: path,
       _amountIn: 1 ether,
       _minOut: 0,
@@ -358,7 +356,7 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     path[0] = address(wbtc);
     path[1] = address(weth);
     vm.expectRevert(abi.encodeWithSignature("OnlyNativeShouldWrap()"));
-    marketOrderRouter.createSwapOrder{ value: 1.01 ether }({
+    marketOrderRouter.createSwapOrder{value: 1.01 ether}({
       _path: path,
       _amountIn: 1 ether,
       _minOut: 0,
@@ -368,14 +366,13 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     });
   }
 
-  function testRevert_CreateSwapOrder_WithIncorrectValueTransferred_WithShouldWrap()
-    external
-  {
+  function testRevert_CreateSwapOrder_WithIncorrectValueTransferred_WithShouldWrap(
+  ) external {
     address[] memory path = new address[](2);
     path[0] = address(bnb);
     path[1] = address(weth);
     vm.expectRevert(abi.encodeWithSignature("IncorrectValueTransferred()"));
-    marketOrderRouter.createSwapOrder{ value: 1.02 ether }({
+    marketOrderRouter.createSwapOrder{value: 1.02 ether}({
       _path: path,
       _amountIn: 1 ether,
       _minOut: 0,
@@ -385,16 +382,15 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     });
   }
 
-  function testRevert_CreateSwapOrder_WithIncorrectValueTransferred_WithShouldNotWrap()
-    external
-  {
+  function testRevert_CreateSwapOrder_WithIncorrectValueTransferred_WithShouldNotWrap(
+  ) external {
     address[] memory path = new address[](2);
     path[0] = address(wbtc);
     path[1] = address(weth);
     // approve 1 ether of wbtc
     wbtc.approve(address(marketOrderRouter), 1 ether);
     vm.expectRevert(abi.encodeWithSignature("IncorrectValueTransferred()"));
-    marketOrderRouter.createSwapOrder{ value: 0.001 ether }({
+    marketOrderRouter.createSwapOrder{value: 0.001 ether}({
       _path: path,
       _amountIn: 1 ether,
       _minOut: 0,
@@ -405,14 +401,14 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
   }
 
   function testCorrectness_WhenLong_WithNoSwap_WithoutDepositFee() external {
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
 
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(41_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(41_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
 
-    wbtc.mint(ALICE, 1 * 10**8);
+    wbtc.mint(ALICE, 1 * 10 ** 8);
 
     // ----- Start Alice session -----
     vm.deal(ALICE, 100 ether);
@@ -434,15 +430,17 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     // 5. WBTC's USD debt should be 48.8584 USD
     // 6. WBTC's liquidity should be 117499 - 353 = 117146 satoshi
     // 7. Redeemable WBTC in USD should be 48.8584 USD
-    assertEq(poolGetterFacet.alp().balanceOf(address(ALICE)), 46.8584 * 10**18);
+    assertEq(
+      poolGetterFacet.alp().balanceOf(address(ALICE)), 46.8584 * 10 ** 18
+    );
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 353);
-    assertEq(poolGetterFacet.getAumE18(false), 46.8584 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 48.02986 * 10**18);
-    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 46.8584 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 46.8584 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 48.02986 * 10 ** 18);
+    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 46.8584 * 10 ** 18);
     assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 117146);
     assertEq(
       poolGetterFacet.getRedemptionCollateralUsd(address(wbtc)),
-      46.8584 * 10**30
+      46.8584 * 10 ** 30
     );
 
     // Alice add liquidity again with 117499 satoshi
@@ -461,24 +459,23 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     // 6. WBTC's liquidity should be 117146 + 117499 - 353 = 234292 satoshi
     // 7. Redeemable WBTC in USD should be 93.7168 USD
     assertEq(
-      poolGetterFacet.alp().balanceOf(address(ALICE)),
-      92573912195121951219
+      poolGetterFacet.alp().balanceOf(address(ALICE)), 92573912195121951219
     );
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 706);
-    assertEq(poolGetterFacet.getAumE18(false), 93.7168 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 96.05972 * 10**18);
-    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 93.7168 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 93.7168 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 96.05972 * 10 ** 18);
+    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 93.7168 * 10 ** 18);
     assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 234292);
     assertEq(
       poolGetterFacet.getRedemptionCollateralUsd(address(wbtc)),
-      93.7168 * 10**30
+      93.7168 * 10 ** 30
     );
 
     vm.stopPrank();
 
-    wbtcPriceFeed.setLatestAnswer(45_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(41_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(45_000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(45_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(41_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(45_000 * 10 ** 8);
 
     uint256 startTime = 1669832202;
     vm.warp(startTime);
@@ -496,9 +493,9 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
       _indexToken: address(wbtc),
       _amountIn: 22500,
       _minOut: 0,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
-      _acceptablePrice: 41_001 * 10**30,
+      _acceptablePrice: 41_001 * 10 ** 30,
       _executionFee: 0.01 ether
     });
     vm.stopPrank();
@@ -525,9 +522,9 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
       assertEq(actualIndexToken, address(wbtc));
       assertEq(actualAmountIn, 22500);
       assertEq(actualMinOut, 0);
-      assertEq(actualSizeDelta, 47 * 10**30);
+      assertEq(actualSizeDelta, 47 * 10 ** 30);
       assertTrue(actualIsLong);
-      assertEq(actualAcceptablePrice, 41_001 * 10**30);
+      assertEq(actualAcceptablePrice, 41_001 * 10 ** 30);
       assertEq(actualExecutionFee, 0.01 ether);
       assertEq(actualBlockNumber, block.number);
       assertEq(actualBlockTime, block.timestamp);
@@ -536,14 +533,14 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
 
     {
       // Avoid Stack-Too-Deep
-      address[] memory actualPath = marketOrderRouter
-        .getIncreasePositionRequestPath(requestKey);
+      address[] memory actualPath =
+        marketOrderRouter.getIncreasePositionRequestPath(requestKey);
       assertEq(actualPath[0], path[0]);
     }
 
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(41_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(41_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
 
     // Set delay values for execution validation
     marketOrderRouter.setDelayValues({
@@ -599,15 +596,15 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     // = 256678 + 820 = 257498 sathoshi
     assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 256678);
     assertEq(poolGetterFacet.reservedOf(address(wbtc)), 114634);
-    assertEq(poolGetterFacet.guaranteedUsdOf(address(wbtc)), 37.822 * 10**30);
+    assertEq(poolGetterFacet.guaranteedUsdOf(address(wbtc)), 37.822 * 10 ** 30);
     assertEq(
       poolGetterFacet.getRedemptionCollateralUsd(address(wbtc)),
-      96.05972 * 10**30
+      96.05972 * 10 ** 30
     );
-    assertEq(poolGetterFacet.getAumE18(false), 96.06004 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 96.06004 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 96.06004 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 96.06004 * 10 ** 18);
     assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 820);
-    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 93.7168 * 10**18);
+    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 93.7168 * 10 ** 18);
     assertEq(wbtc.balanceOf(address(poolDiamond)), 257498);
 
     // Assert a postion
@@ -616,16 +613,10 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     // = ((22500 / 1e8) * 41000) - 0.047 = 9.178 USD
     // 3. Position's average price should be 41000 USD
     GetterFacetInterface.GetPositionReturnVars memory position = poolGetterFacet
-      .getPositionWithSubAccountId(
-        ALICE,
-        0,
-        address(wbtc),
-        address(wbtc),
-        true
-      );
-    assertEq(position.size, 47 * 10**30);
-    assertEq(position.collateral, 9.178 * 10**30);
-    assertEq(position.averagePrice, 41000 * 10**30);
+      .getPositionWithSubAccountId(ALICE, 0, address(wbtc), address(wbtc), true);
+    assertEq(position.size, 47 * 10 ** 30);
+    assertEq(position.collateral, 9.178 * 10 ** 30);
+    assertEq(position.averagePrice, 41000 * 10 ** 30);
     assertEq(position.entryFundingRate, 0);
     assertEq(position.reserveAmount, 114634);
     assertEq(position.realizedPnl, 0);
@@ -633,15 +624,15 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     assertEq(position.lastIncreasedTime, block.timestamp);
 
     vm.startPrank(ALICE);
-    marketOrderRouter.createDecreasePosition{ value: 0.01 ether }({
+    marketOrderRouter.createDecreasePosition{value: 0.01 ether}({
       _subAccountId: 0,
       _path: path,
       _indexToken: address(wbtc),
       _collateralDelta: position.collateral,
-      _sizeDelta: 47 * 10**30,
+      _sizeDelta: 47 * 10 ** 30,
       _isLong: true,
       _receiver: address(ALICE),
-      _acceptablePrice: 44_000 * 10**30,
+      _acceptablePrice: 44_000 * 10 ** 30,
       _minOut: 0,
       _executionFee: 0.01 ether,
       _withdrawETH: false
@@ -649,21 +640,15 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     vm.stopPrank();
     // ----- Stop Alice session ------
 
-    wbtcPriceFeed.setLatestAnswer(45_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(46_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(45_000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(45_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(46_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(45_000 * 10 ** 8);
 
     uint256 aliceWBTCBalanceBefore = wbtc.balanceOf(ALICE);
 
     // Execute Alice's order
-    (
-      ,
-      increaseQueueEndIndex,
-      ,
-      decreaseQueueEndIndex,
-      ,
-      swapOrderQueueEndIndex
-    ) = marketOrderRouter.getRequestQueueLengths();
+    (, increaseQueueEndIndex,, decreaseQueueEndIndex,, swapOrderQueueEndIndex) =
+      marketOrderRouter.getRequestQueueLengths();
 
     vm.warp(block.timestamp + 1000);
     fastPriceFeed.setPricesWithBitsAndExecute(
@@ -683,11 +668,7 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     assertEq(BOB.balance, 0.02 ether);
 
     position = poolGetterFacet.getPositionWithSubAccountId(
-      ALICE,
-      0,
-      address(wbtc),
-      address(wbtc),
-      true
+      ALICE, 0, address(wbtc), address(wbtc), true
     );
     // Position should be closed
     assertEq(position.collateral, 0, "Alice position should be closed");
@@ -700,34 +681,30 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
 
   function testCorrectness_WhenShort_WithNoSwap_WithoutDepositFee() external {
     // Initialized price feeds
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60_000 * 10**8);
-    bnbPriceFeed.setLatestAnswer(1000 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60_000 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(1000 * 10 ** 8);
 
     // Set mintBurnFeeBps to 4 BPS
     poolAdminFacet.setMintBurnFeeBps(4);
 
     // Feed WBTC price to be 40,000 USD
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
 
     // Mint 1,000 DAI to Alice
-    dai.mint(ALICE, 1000 * 10**18);
+    dai.mint(ALICE, 1000 * 10 ** 18);
 
     // --- Start Alice session --- //
     vm.deal(ALICE, 100 ether);
     vm.startPrank(ALICE);
 
     // Alice performs add liquidity by a 500 DAI
-    dai.approve(address(poolRouter), 500 * 10**18);
+    dai.approve(address(poolRouter), 500 * 10 ** 18);
     alp.approve(address(poolRouter), type(uint256).max);
     poolRouter.addLiquidity(
-      address(dai),
-      500 * 10**18,
-      ALICE,
-      0,
-      zeroBytesArr()
+      address(dai), 500 * 10 ** 18, ALICE, 0, zeroBytesArr()
     );
 
     // The following conditions need to be met:
@@ -737,27 +714,26 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     // 4. Redemptable DAI collateral should be 499.8 USD
     // 5. Pool's AUM by min price should be 499.8 USD
     // 6. Pool's AUM by max price should be 499.8 USD
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 499.8 * 10**18);
-    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 0.2 * 10**18);
-    assertEq(poolGetterFacet.usdDebtOf(address(dai)), 499.8 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 499.8 * 10 ** 18);
+    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 0.2 * 10 ** 18);
+    assertEq(poolGetterFacet.usdDebtOf(address(dai)), 499.8 * 10 ** 18);
     assertEq(
-      poolGetterFacet.getRedemptionCollateralUsd(address(dai)),
-      499.8 * 10**30
+      poolGetterFacet.getRedemptionCollateralUsd(address(dai)), 499.8 * 10 ** 30
     );
-    assertEq(poolGetterFacet.getAumE18(false), 499.8 * 10**18);
-    assertEq(poolGetterFacet.getAumE18(true), 499.8 * 10**18);
+    assertEq(poolGetterFacet.getAumE18(false), 499.8 * 10 ** 18);
+    assertEq(poolGetterFacet.getAumE18(true), 499.8 * 10 ** 18);
 
     vm.stopPrank();
     // ---- Stop Alice session ---- //
 
-    wbtcPriceFeed.setLatestAnswer(39_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(39_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(39_000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(39_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(39_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(39_000 * 10 ** 8);
 
     // ---- Start Alice session ---- //
     vm.startPrank(ALICE);
     // Alice opens a 90 USD WBTC short position with 20 DAI as a collateral
-    dai.approve(address(marketOrderRouter), 20 * 10**18);
+    dai.approve(address(marketOrderRouter), 20 * 10 ** 18);
     poolAccessControlFacet.allowPlugin(address(marketOrderRouter));
     address[] memory path = new address[](1);
     path[0] = address(dai);
@@ -767,11 +743,11 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
       _subAccountId: 1,
       _path: path,
       _indexToken: address(wbtc),
-      _amountIn: 20 * 10**18,
+      _amountIn: 20 * 10 ** 18,
       _minOut: 0,
-      _sizeDelta: 90 * 10**30,
+      _sizeDelta: 90 * 10 ** 30,
       _isLong: false,
-      _acceptablePrice: 39_999 * 10**30,
+      _acceptablePrice: 39_999 * 10 ** 30,
       _executionFee: 0.01 ether
     });
     vm.stopPrank();
@@ -796,11 +772,11 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
       assertEq(actualAccount, address(ALICE));
       assertEq(actualSubAccountId, 1);
       assertEq(actualIndexToken, address(wbtc));
-      assertEq(actualAmountIn, 20 * 10**18);
+      assertEq(actualAmountIn, 20 * 10 ** 18);
       assertEq(actualMinOut, 0);
-      assertEq(actualSizeDelta, 90 * 10**30);
+      assertEq(actualSizeDelta, 90 * 10 ** 30);
       assertFalse(actualIsLong);
-      assertEq(actualAcceptablePrice, 39_999 * 10**30);
+      assertEq(actualAcceptablePrice, 39_999 * 10 ** 30);
       assertEq(actualExecutionFee, 0.01 ether);
       assertEq(actualBlockNumber, block.number);
       assertEq(actualBlockTime, block.timestamp);
@@ -809,14 +785,14 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
 
     {
       // Avoid Stack-Too-Deep
-      address[] memory actualPath = marketOrderRouter
-        .getIncreasePositionRequestPath(requestKey);
+      address[] memory actualPath =
+        marketOrderRouter.getIncreasePositionRequestPath(requestKey);
       assertEq(actualPath[0], path[0]);
     }
 
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(41_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(40_000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(41_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(40_000 * 10 ** 8);
 
     // Set delay values for execution validation
     marketOrderRouter.setDelayValues({
@@ -826,11 +802,10 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     });
 
     // Execute Alice's order
-    (, uint256 increaseQueueEndIndex, , , , ) = marketOrderRouter
-      .getRequestQueueLengths();
+    (, uint256 increaseQueueEndIndex,,,,) =
+      marketOrderRouter.getRequestQueueLengths();
     marketOrderRouter.executeIncreasePositions(
-      increaseQueueEndIndex,
-      payable(address(BOB))
+      increaseQueueEndIndex, payable(address(BOB))
     );
     // Bob should receive 0.01 ether as execution fee
     assertEq(BOB.balance, 0.01 ether);
@@ -842,19 +817,17 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     // // 3. Pool's guaranteed USD should be 0
     // // 4. Redemptable DAI collateral should be 499.8 USD (same as liquidity)
     // // 5. Pool should makes 0.2 + ((90 * 0.001)) = 0.29 DAI
-    assertEq(poolGetterFacet.liquidityOf(address(dai)), 499.8 * 10**18);
-    assertEq(poolGetterFacet.usdDebtOf(address(dai)), 499.8 * 10**18);
-    assertEq(poolGetterFacet.reservedOf(address(dai)), 90 * 10**18);
-    assertEq(poolGetterFacet.guaranteedUsdOf(address(dai)), 0 * 10**18);
+    assertEq(poolGetterFacet.liquidityOf(address(dai)), 499.8 * 10 ** 18);
+    assertEq(poolGetterFacet.usdDebtOf(address(dai)), 499.8 * 10 ** 18);
+    assertEq(poolGetterFacet.reservedOf(address(dai)), 90 * 10 ** 18);
+    assertEq(poolGetterFacet.guaranteedUsdOf(address(dai)), 0 * 10 ** 18);
     assertEq(
-      poolGetterFacet.getRedemptionCollateralUsd(address(dai)),
-      499.8 * 10**30
+      poolGetterFacet.getRedemptionCollateralUsd(address(dai)), 499.8 * 10 ** 30
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 0.29 * 10**18);
-    assertEq(poolGetterFacet.shortSizeOf(address(wbtc)), 90 * 10**30);
+    assertEq(poolGetterFacet.feeReserveOf(address(dai)), 0.29 * 10 ** 18);
+    assertEq(poolGetterFacet.shortSizeOf(address(wbtc)), 90 * 10 ** 30);
     assertEq(
-      poolGetterFacet.shortAveragePriceOf(address(wbtc)),
-      40_000 * 10**30
+      poolGetterFacet.shortAveragePriceOf(address(wbtc)), 40_000 * 10 ** 30
     );
 
     // // Assert a position:
@@ -866,49 +839,38 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     // // 6. Position should be in profit
     // // 7. Position's lastIncreasedTime should be block.timestamp
     GetterFacetInterface.GetPositionReturnVars memory position = poolGetterFacet
-      .getPositionWithSubAccountId(
-        ALICE,
-        1,
-        address(dai),
-        address(wbtc),
-        false
-      );
-    assertEq(position.size, 90 * 10**30);
-    assertEq(position.collateral, 19.91 * 10**30);
-    assertEq(position.averagePrice, 40_000 * 10**30);
+      .getPositionWithSubAccountId(ALICE, 1, address(dai), address(wbtc), false);
+    assertEq(position.size, 90 * 10 ** 30);
+    assertEq(position.collateral, 19.91 * 10 ** 30);
+    assertEq(position.averagePrice, 40_000 * 10 ** 30);
     assertEq(position.entryFundingRate, 0);
-    assertEq(position.reserveAmount, 90 * 10**18);
+    assertEq(position.reserveAmount, 90 * 10 ** 18);
     assertTrue(position.hasProfit);
     assertEq(position.lastIncreasedTime, block.timestamp);
 
     // Assert pool's short delta
     // 1. Pool's delta should be (90 * (40000 - 41000)) / 40000 = -2.25 USD
     // 2. Pool's short should be not profitable
-    (bool isProfit, uint256 delta) = poolGetterFacet.getPoolShortDelta(
-      address(wbtc)
-    );
+    (bool isProfit, uint256 delta) =
+      poolGetterFacet.getPoolShortDelta(address(wbtc));
     assertFalse(isProfit);
-    assertEq(delta, 2.25 * 10**30);
+    assertEq(delta, 2.25 * 10 ** 30);
 
     // Assert position's delta
     // 1. Position's delta should be (90 * (40000 - 41000)) / 40000 = -2.25 USD
     // 2. Position's short should be not profitable
-    (isProfit, delta, ) = poolGetterFacet.getPositionDelta(
-      ALICE,
-      1,
-      address(dai),
-      address(wbtc),
-      false
+    (isProfit, delta,) = poolGetterFacet.getPositionDelta(
+      ALICE, 1, address(dai), address(wbtc), false
     );
     assertFalse(isProfit);
-    assertEq(delta, 2.25 * 10**30);
+    assertEq(delta, 2.25 * 10 ** 30);
 
     vm.stopPrank();
 
     // Make WBTC price pump to 42,000 USD
-    wbtcPriceFeed.setLatestAnswer(42_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(42_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(42_000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(42_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(42_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(42_000 * 10 ** 8);
 
     vm.startPrank(ALICE);
 
@@ -917,77 +879,68 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     // 2. Pool's short should be not profitable
     (isProfit, delta) = poolGetterFacet.getPoolShortDelta(address(wbtc));
     assertFalse(isProfit);
-    assertEq(delta, 4.5 * 10**30);
+    assertEq(delta, 4.5 * 10 ** 30);
 
     // Assert position's delta
     // 1. Position's delta should be (90 * (40000 - 42000)) / 40000 = -4.5 USD
     // 2. Position's short should be not profitable
-    (isProfit, delta, ) = poolGetterFacet.getPositionDelta(
-      ALICE,
-      1,
-      address(dai),
-      address(wbtc),
-      false
+    (isProfit, delta,) = poolGetterFacet.getPositionDelta(
+      ALICE, 1, address(dai), address(wbtc), false
     );
     assertFalse(isProfit);
-    assertEq(delta, 4.5 * 10**30);
+    assertEq(delta, 4.5 * 10 ** 30);
 
-    marketOrderRouter.createDecreasePosition{ value: 0.01 ether }({
+    marketOrderRouter.createDecreasePosition{value: 0.01 ether}({
       _subAccountId: 1,
       _path: path,
       _indexToken: address(wbtc),
       _collateralDelta: position.collateral,
-      _sizeDelta: 90 * 10**30,
+      _sizeDelta: 90 * 10 ** 30,
       _isLong: false,
       _receiver: address(ALICE),
-      _acceptablePrice: 40_000 * 10**30,
+      _acceptablePrice: 40_000 * 10 ** 30,
       _minOut: 0,
       _executionFee: 0.01 ether,
       _withdrawETH: false
     });
     vm.stopPrank();
 
-    wbtcPriceFeed.setLatestAnswer(39_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(39_000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(38_000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(39_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(39_000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(38_000 * 10 ** 8);
 
     uint256 aliceDAIBalanceBefore = dai.balanceOf(ALICE);
 
     // Execute Alice's order
-    (, , , uint256 decreaseQueueEndIndex, , ) = marketOrderRouter
-      .getRequestQueueLengths();
+    (,,, uint256 decreaseQueueEndIndex,,) =
+      marketOrderRouter.getRequestQueueLengths();
     marketOrderRouter.executeDecreasePositions(
-      decreaseQueueEndIndex,
-      payable(address(BOB))
+      decreaseQueueEndIndex, payable(address(BOB))
     );
 
     // Bob should receive another 0.01 ether as execution fee
     assertEq(BOB.balance, 0.02 ether);
 
     position = poolGetterFacet.getPositionWithSubAccountId(
-      ALICE,
-      1,
-      address(wbtc),
-      address(wbtc),
-      true
+      ALICE, 1, address(wbtc), address(wbtc), true
     );
     // Position should be closed
     assertEq(position.collateral, 0, "Alice position should be closed");
     assertGt(
       dai.balanceOf(ALICE) - aliceDAIBalanceBefore,
-      20 * 10**18,
+      20 * 10 ** 18,
       "Alice should receive collateral and profit."
     );
   }
 
   function testCorrectness_WhenSwap() external {
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
 
     bnb.mint(ALICE, 200 ether);
     vm.deal(address(bnb), 200 ether);
-    wbtc.mint(ALICE, 1 * 10**8);
+    wbtc.mint(ALICE, 1 * 10 ** 8);
 
     // ------- Alice session START -------
     vm.startPrank(ALICE);
@@ -1002,8 +955,10 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.getAumE18(false), 59820 ether);
 
     // Alice add liquidity 1 WBTC (~$60,000)
-    wbtc.approve(address(poolRouter), 1 * 10**8);
-    poolRouter.addLiquidity(address(wbtc), 1 * 10**8, ALICE, 0, zeroBytesArr());
+    wbtc.approve(address(poolRouter), 1 * 10 ** 8);
+    poolRouter.addLiquidity(
+      address(wbtc), 1 * 10 ** 8, ALICE, 0, zeroBytesArr()
+    );
 
     // Alice add another 1 WBTC as liquidity to the pool, the following condition is expected:
     // 1. Pool should have 59,820 + (1 * (1-0.003) * 60000) = 119,640 USD in AUM
@@ -1021,18 +976,18 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 59820 ether);
     assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 59820 ether);
     assertEq(poolGetterFacet.liquidityOf(address(bnb)), 199.4 ether);
-    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10**8);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10 ** 8);
 
     vm.stopPrank();
     // ------- Alice session END -------
 
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
-    bnbPriceFeed.setLatestAnswer(600 * 10**8);
-    bnbPriceFeed.setLatestAnswer(500 * 10**8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(600 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(500 * 10 ** 8);
 
-    wbtcPriceFeed.setLatestAnswer(90000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(100000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(80000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(90000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(100000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(80000 * 10 ** 8);
 
     bnb.mint(BOB, 100 ether);
     vm.deal(address(bnb), 100 ether);
@@ -1046,9 +1001,7 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     address[] memory path = new address[](2);
     path[0] = address(bnb);
     path[1] = address(wbtc);
-    bytes32 requestKey = marketOrderRouter.createSwapOrder{
-      value: 0.01 ether
-    }({
+    bytes32 requestKey = marketOrderRouter.createSwapOrder{value: 0.01 ether}({
       _path: path,
       _amountIn: 100 ether,
       _minOut: 0,
@@ -1080,9 +1033,8 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
 
     {
       // Avoid Stack-Too-Deep
-      address[] memory actualPath = marketOrderRouter.getSwapOrderRequestPath(
-        requestKey
-      );
+      address[] memory actualPath =
+        marketOrderRouter.getSwapOrderRequestPath(requestKey);
       assertEq(actualPath[0], path[0]);
       assertEq(actualPath[1], path[1]);
     }
@@ -1116,7 +1068,7 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     uint256 startTime = 1669832202;
     vm.warp(startTime);
     bnb.approve(address(marketOrderRouter), 100 ether);
-    requestKey = marketOrderRouter.createSwapOrder{ value: 100.01 ether }({
+    requestKey = marketOrderRouter.createSwapOrder{value: 100.01 ether}({
       _path: path,
       _amountIn: 100 ether,
       _minOut: 0,
@@ -1151,7 +1103,6 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
 
     // Timeout since max time delay is 30 mins
     BobBNBBalanceBefore = BOB.balance;
-
 
     vm.expectEmit(false, false, false, true);
     emit CancelSwapOrder(
@@ -1209,7 +1160,7 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     vm.startPrank(BOB);
 
     bnb.approve(address(marketOrderRouter), 100 ether);
-    requestKey = marketOrderRouter.createSwapOrder{ value: 100.01 ether }({
+    requestKey = marketOrderRouter.createSwapOrder{value: 100.01 ether}({
       _path: path,
       _amountIn: 100 ether,
       _minOut: 0,
@@ -1230,14 +1181,8 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     vm.warp(block.timestamp + 1 minutes);
 
     // Execute Bob's order
-    (
-      ,
-      increaseQueueEndIndex,
-      ,
-      decreaseQueueEndIndex,
-      ,
-      swapOrderQueueEndIndex
-    ) = marketOrderRouter.getRequestQueueLengths();
+    (, increaseQueueEndIndex,, decreaseQueueEndIndex,, swapOrderQueueEndIndex) =
+      marketOrderRouter.getRequestQueueLengths();
 
     fastPriceFeed.setPricesWithBitsAndExecute(
       getPriceBits(100000000, 1200000, 400000),
@@ -1264,12 +1209,12 @@ contract PoolDiamond_MarketOrderRouter is PoolDiamond_BaseTest {
     // 7. Pool's BNB liquidity should be 199.4 + 100 = 299.4 BNB
     // 8. Pool's WBTC liquidity should be 0.997 - ((100 * 400 / 100000)) = 0.597 WBTC
     assertEq(poolGetterFacet.getAumE18(false), 167520 ether);
-    assertEq(wbtc.balanceOf(BOB), 0.3988 * 10**8);
+    assertEq(wbtc.balanceOf(BOB), 0.3988 * 10 ** 8);
     assertEq(poolGetterFacet.feeReserveOf(address(bnb)), 0.6 ether);
-    assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.0042 * 10**8);
+    assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.0042 * 10 ** 8);
     assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 99820 ether);
     assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 19820 ether);
     assertEq(poolGetterFacet.liquidityOf(address(bnb)), 299.4 ether);
-    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.597 * 10**8);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.597 * 10 ** 8);
   }
 }

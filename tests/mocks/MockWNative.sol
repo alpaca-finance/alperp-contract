@@ -1,6 +1,6 @@
 pragma solidity 0.8.17;
 
-import { IWNative } from "src/interfaces/IWNative.sol";
+import {IWNative} from "src/interfaces/IWNative.sol";
 
 // Copyright (C) 2015, 2016, 2017 Dapphub
 
@@ -67,11 +67,10 @@ contract MockWNative is IWNative {
     return transferFrom(msg.sender, dst, wad);
   }
 
-  function transferFrom(
-    address src,
-    address dst,
-    uint256 wad
-  ) public returns (bool) {
+  function transferFrom(address src, address dst, uint256 wad)
+    public
+    returns (bool)
+  {
     require(balanceOf[src] >= wad);
 
     if (src != msg.sender && allowance[src][msg.sender] != type(uint256).max) {

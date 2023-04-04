@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ *   ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
@@ -44,17 +44,18 @@ library LibReentrancyGuard {
   }
 
   function lock() internal {
-    ReentrancyGuardDiamondStorage
-      storage reentrancyGuardDs = reentrancyGuardDiamondStorage();
-    if (reentrancyGuardDs.status == _ENTERED)
+    ReentrancyGuardDiamondStorage storage reentrancyGuardDs =
+      reentrancyGuardDiamondStorage();
+    if (reentrancyGuardDs.status == _ENTERED) {
       revert LibReentrancyGuard_ReentrantCall();
+    }
 
     reentrancyGuardDs.status = _ENTERED;
   }
 
   function unlock() internal {
-    ReentrancyGuardDiamondStorage
-      storage reentrancyGuardDs = reentrancyGuardDiamondStorage();
+    ReentrancyGuardDiamondStorage storage reentrancyGuardDs =
+      reentrancyGuardDiamondStorage();
     reentrancyGuardDs.status = _NOT_ENTERED;
   }
 }

@@ -1,26 +1,26 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ *   ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { IERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import { SafeERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import { MerkleAirdrop } from "../airdrop/MerkleAirdrop.sol";
-import { AdminFacetInterface } from "../core/pool-diamond/interfaces/AdminFacetInterface.sol";
-import { GetterFacetInterface } from "../core/pool-diamond/interfaces/GetterFacetInterface.sol";
-import { IPoolRouter } from "../interfaces/IPoolRouter.sol";
-import { IFeedableRewarder } from "./interfaces/IFeedableRewarder.sol";
+import {MerkleAirdrop} from "../airdrop/MerkleAirdrop.sol";
+import {AdminFacetInterface} from "../core/pool-diamond/interfaces/AdminFacetInterface.sol";
+import {GetterFacetInterface} from "../core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {IPoolRouter} from "../interfaces/IPoolRouter.sol";
+import {IFeedableRewarder} from "./interfaces/IFeedableRewarder.sol";
 
 contract RewardDistributor is OwnableUpgradeable {
   using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -57,9 +57,7 @@ contract RewardDistributor is OwnableUpgradeable {
   error RewardDistributor_BadParams();
   error RewardDistributor_BadReferralRevenueMaxThreshold();
   error RewardDistributor_BadMerkleAirdrop(
-    bytes32 merkleRoote,
-    bytes32 salt,
-    address merkleAirdropAddress
+    bytes32 merkleRoote, bytes32 salt, address merkleAirdropAddress
   );
   error RewardDistributor_ReferralRevenueExceedMaxThreshold();
   error RewardDistributor_NotFeeder();
@@ -81,8 +79,7 @@ contract RewardDistributor is OwnableUpgradeable {
     address merkleAirdrop
   );
   event LogSetReferralRevenueMaxThreshold(
-    uint256 oldThreshold,
-    uint256 newThreshold
+    uint256 oldThreshold, uint256 newThreshold
   );
   event LogSetFeeder(address oldFeeder, address newFeeder);
   event LogProtocolFee(
@@ -189,8 +186,7 @@ contract RewardDistributor is OwnableUpgradeable {
       revert RewardDistributor_BadReferralRevenueMaxThreshold();
     }
     emit LogSetReferralRevenueMaxThreshold(
-      referralRevenueMaxThreshold,
-      newReferralRevenueMaxThreshold
+      referralRevenueMaxThreshold, newReferralRevenueMaxThreshold
     );
     referralRevenueMaxThreshold = newReferralRevenueMaxThreshold;
   }
@@ -213,7 +209,7 @@ contract RewardDistributor is OwnableUpgradeable {
     bytes[] memory priceUpdateData
   ) internal {
     uint256 length = tokens.length;
-    for (uint256 i = 0; i < length; ) {
+    for (uint256 i = 0; i < length;) {
       // 1. Withdraw protocol revenue
       _withdrawProtocolRevenue(tokens[i]);
       // 2. Swap those revenue (along with surplus) to RewardToken Token
@@ -240,10 +236,7 @@ contract RewardDistributor is OwnableUpgradeable {
   ) external payable onlyFeeder {
     _claimAndSwap(tokens, priceUpdateData);
     _feedProtocolRevenue(
-      feedingExpiredAt,
-      weekTimestamp,
-      referralRevenueAmount,
-      merkleRoot
+      feedingExpiredAt, weekTimestamp, referralRevenueAmount, merkleRoot
     );
   }
 
@@ -254,18 +247,16 @@ contract RewardDistributor is OwnableUpgradeable {
     bytes32 merkleRoot
   ) internal {
     // Transfer referral revenue to merkle airdrop address for distribution
-    uint256 totalProtocolRevenue = IERC20Upgradeable(rewardToken).balanceOf(
-      address(this)
-    );
+    uint256 totalProtocolRevenue =
+      IERC20Upgradeable(rewardToken).balanceOf(address(this));
     // totalProtocolRevenue * referralRevenueMaxThreshold / 10000 < referralRevenueAmount
     if (
-      totalProtocolRevenue * referralRevenueMaxThreshold <
-      referralRevenueAmount * MAX_BPS
+      totalProtocolRevenue * referralRevenueMaxThreshold
+        < referralRevenueAmount * MAX_BPS
     ) revert RewardDistributor_ReferralRevenueExceedMaxThreshold();
     merkleAirdrop.init(weekTimestamp, merkleRoot);
     IERC20Upgradeable(rewardToken).safeTransfer(
-      address(merkleAirdrop),
-      referralRevenueAmount
+      address(merkleAirdrop), referralRevenueAmount
     );
 
     // Calculate reward sharing
@@ -305,38 +296,27 @@ contract RewardDistributor is OwnableUpgradeable {
     bytes32 merkleRoot
   ) external onlyFeeder {
     _feedProtocolRevenue(
-      feedingExpiredAt,
-      weekTimestamp,
-      referralRevenueAmount,
-      merkleRoot
+      feedingExpiredAt, weekTimestamp, referralRevenueAmount, merkleRoot
     );
   }
 
   function _withdrawProtocolRevenue(address token) internal {
     // Withdraw the all max amount revenue from the pool
     AdminFacetInterface(pool).withdrawFeeReserve(
-      token,
-      address(this),
-      GetterFacetInterface(pool).feeReserveOf(token)
+      token, address(this), GetterFacetInterface(pool).feeReserveOf(token)
     );
   }
 
   function _calculateRewardSharing()
     internal
     view
-    returns (
-      uint256,
-      uint256,
-      uint256,
-      uint256
-    )
+    returns (uint256, uint256, uint256, uint256)
   {
-    uint256 totalRewardAmount = IERC20Upgradeable(rewardToken).balanceOf(
-      address(this)
-    );
+    uint256 totalRewardAmount =
+      IERC20Upgradeable(rewardToken).balanceOf(address(this));
 
-    uint256 alpStakingRewardAmount = (totalRewardAmount * alpStakingBps) /
-      MAX_BPS;
+    uint256 alpStakingRewardAmount =
+      (totalRewardAmount * alpStakingBps) / MAX_BPS;
     uint256 devFundAmount = (totalRewardAmount * devFundBps) / MAX_BPS;
     uint256 govRewardAmount = (totalRewardAmount * govBps) / MAX_BPS;
     uint256 burnAMount = (totalRewardAmount * burnBps) / MAX_BPS;
@@ -381,13 +361,8 @@ contract RewardDistributor is OwnableUpgradeable {
     IERC20Upgradeable(token).approve(poolRouter, amount);
 
     // Swap
-    IPoolRouter(poolRouter).swap{ value: fee }(
-      token,
-      rewardToken,
-      amount,
-      0,
-      address(this),
-      priceUpdateData
+    IPoolRouter(poolRouter).swap{value: fee}(
+      token, rewardToken, amount, 0, address(this), priceUpdateData
     );
   }
 
@@ -397,12 +372,10 @@ contract RewardDistributor is OwnableUpgradeable {
   ) internal {
     // Approve and feed to ALPStaking
     IERC20Upgradeable(rewardToken).approve(
-      alpStakingProtocolRevenueRewarder,
-      alpStakingRewardAmount
+      alpStakingProtocolRevenueRewarder, alpStakingRewardAmount
     );
     IFeedableRewarder(alpStakingProtocolRevenueRewarder).feedWithExpiredAt(
-      alpStakingRewardAmount,
-      feedingExpiredAt
+      alpStakingRewardAmount, feedingExpiredAt
     );
   }
 

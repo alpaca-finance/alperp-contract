@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { MockErc20 } from "../mocks/MockERC20.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {MockErc20} from "../mocks/MockERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from
+  "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract MockPoolRouter {
   using SafeERC20 for IERC20;
@@ -24,7 +25,7 @@ contract MockPoolRouter {
     address tokenIn,
     address tokenOut,
     uint256 amountIn,
-    uint256 minAmountOut,
+    uint256, /* minAmountOut */
     address receiver
   ) external returns (uint256) {
     IERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
@@ -45,11 +46,11 @@ contract MockPoolRouter {
   ) external returns (uint256) {}
 
   function addLiquidity(
-    address token,
+    address, /* token */
     uint256 amount,
-    address receiver,
-    uint256 minLiquidity
-  ) external returns (uint256) {
+    address, /* receiver */
+    uint256 /* minLiquidity */
+  ) external pure returns (uint256) {
     return amount * 2;
   }
 }

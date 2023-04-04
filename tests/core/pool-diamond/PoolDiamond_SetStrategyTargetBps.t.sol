@@ -1,7 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, LibPoolConfigV1, MockDonateVault, MockStrategy, console, GetterFacetInterface, LiquidityFacetInterface } from "./PoolDiamond_BaseTest.t.sol";
+import {
+  PoolDiamond_BaseTest,
+  LibPoolConfigV1,
+  MockDonateVault,
+  MockStrategy,
+  console,
+  GetterFacetInterface,
+  LiquidityFacetInterface
+} from "./PoolDiamond_BaseTest.t.sol";
 
 contract PoolDiamond_SetStrategyTargetBpsTest is PoolDiamond_BaseTest {
   MockDonateVault internal mockDaiVault;
@@ -18,9 +26,9 @@ contract PoolDiamond_SetStrategyTargetBpsTest is PoolDiamond_BaseTest {
     poolAdminFacet.setTokenConfigs(tokens2, tokenConfigs2);
 
     // Feed prices
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
   }
 
   function testRevert_WhenNotOwner() external {
@@ -40,8 +48,8 @@ contract PoolDiamond_SetStrategyTargetBpsTest is PoolDiamond_BaseTest {
   function testCorrectness_WhenSetStrategyTargetBpsSuccessfully() external {
     poolFarmFacet.setStrategyTargetBps(address(dai), 5000);
 
-    LibPoolConfigV1.StrategyData memory strategyData = poolGetterFacet
-      .strategyDataOf(address(dai));
+    LibPoolConfigV1.StrategyData memory strategyData =
+      poolGetterFacet.strategyDataOf(address(dai));
     assertEq(strategyData.targetBps, 5000);
   }
 }

@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { BaseTest, console, PoolOracle } from "../../base/BaseTest.sol";
-import { ChainlinkPriceFeedInterface } from "src/interfaces/ChainLinkPriceFeedInterface.sol";
+import {BaseTest, console, PoolOracle} from "../../base/BaseTest.sol";
+import {ChainlinkPriceFeedInterface} from
+  "src/interfaces/ChainLinkPriceFeedInterface.sol";
 
 abstract contract PoolOracle_BaseTest is BaseTest {
   PoolOracle internal poolOracle;
@@ -24,10 +25,8 @@ abstract contract PoolOracle_BaseTest is BaseTest {
   }
 
   function initValidPriceFeeds() internal {
-    (
-      address[] memory tokens,
-      PoolOracle.PriceFeedInfo[] memory priceFeedInfo
-    ) = buildDefaultSetPriceFeedInput();
+    (address[] memory tokens, PoolOracle.PriceFeedInfo[] memory priceFeedInfo) =
+      buildDefaultSetPriceFeedInput();
 
     poolOracle.setPriceFeed(tokens, priceFeedInfo);
   }
@@ -39,8 +38,8 @@ abstract contract PoolOracle_BaseTest is BaseTest {
     address[] memory tokenArr = new address[](1);
     tokenArr[0] = token;
 
-    PoolOracle.PriceFeedInfo[]
-      memory priceFeedInfoArr = new PoolOracle.PriceFeedInfo[](1);
+    PoolOracle.PriceFeedInfo[] memory priceFeedInfoArr =
+      new PoolOracle.PriceFeedInfo[](1);
     priceFeedInfoArr[0] = priceFeedInfo;
 
     poolOracle.setPriceFeed(tokenArr, priceFeedInfoArr);

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import { LibPoolConfigV1 } from "../libraries/LibPoolConfigV1.sol";
-import { LinkedList } from "../../../libraries/LinkedList.sol";
+import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
+import {LinkedList} from "../../../libraries/LinkedList.sol";
 
 contract PoolConfigInitializer02 {
   using LinkedList for LinkedList.List;
@@ -17,8 +17,8 @@ contract PoolConfigInitializer02 {
     uint64 fundingRateFactor,
     uint256 liquidationFeeUsd
   ) external {
-    LibPoolConfigV1.PoolConfigV1DiamondStorage
-      storage poolConfigDs = LibPoolConfigV1.poolConfigV1DiamondStorage();
+    LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigDs =
+      LibPoolConfigV1.poolConfigV1DiamondStorage();
 
     poolConfigDs.allowTokens.init();
 

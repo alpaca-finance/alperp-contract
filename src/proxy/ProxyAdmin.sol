@@ -3,8 +3,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 interface ProxyAdmin {
   event OwnershipTransferred(
-    address indexed previousOwner,
-    address indexed newOwner
+    address indexed previousOwner, address indexed newOwner
   );
 
   function changeProxyAdmin(address proxy, address newAdmin) external;

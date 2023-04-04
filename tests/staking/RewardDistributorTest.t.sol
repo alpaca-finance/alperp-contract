@@ -1,27 +1,30 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from
+  "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import { BaseTest, MerkleAirdrop } from "../base/BaseTest.sol";
-import { MockErc20 } from "../mocks/MockERC20.sol";
-import { RewardDistributor } from "src/staking/RewardDistributor.sol";
-import { MockFeedableRewarder } from "../mocks/MockFeedableRewarder.sol";
-import { MockPoolForRewardDistributor } from "../mocks/MockPoolForRewardDistributor.sol";
-import { MockPoolRouterForRewardDistributor } from "../mocks/MockPoolRouterForRewardDistributor.sol";
-import { console } from "../utils/console.sol";
+import {BaseTest, MerkleAirdrop} from "../base/BaseTest.sol";
+import {MockErc20} from "../mocks/MockERC20.sol";
+import {RewardDistributor} from "src/staking/RewardDistributor.sol";
+import {MockFeedableRewarder} from "../mocks/MockFeedableRewarder.sol";
+import {MockPoolForRewardDistributor} from
+  "../mocks/MockPoolForRewardDistributor.sol";
+import {MockPoolRouterForRewardDistributor} from
+  "../mocks/MockPoolRouterForRewardDistributor.sol";
+import {console} from "../utils/console.sol";
 
 contract RewardDistributorTest is BaseTest {
   using SafeERC20 for IERC20;
@@ -113,17 +116,13 @@ contract RewardDistributorTest is BaseTest {
     // 8.4 ether for burner                           = 140 ether * ((10000 - 7000 - 1400 - 1000) / 1000) = 8.4 ether
 
     assertEq(
-      busd.balanceOf(address(alpStakingProtocolRevenueRewarder)),
-      98 ether
+      busd.balanceOf(address(alpStakingProtocolRevenueRewarder)), 98 ether
     );
     assertEq(busd.balanceOf(devFundAddress), 19.6 ether);
     assertEq(busd.balanceOf(govFeeder), 14 ether);
     assertEq(busd.balanceOf(burner), 8.4 ether);
 
-    assertEq(
-      busd.balanceOf(address(merkleAirdrop)),
-      referralRevenueTokenAmount
-    );
+    assertEq(busd.balanceOf(address(merkleAirdrop)), referralRevenueTokenAmount);
   }
 
   function testRevert_WhenBadMerkleAirdrop() external {

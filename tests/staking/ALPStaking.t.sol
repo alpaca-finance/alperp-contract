@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { ALPStaking } from "src/staking/ALPStaking.sol";
-import { BaseTest } from "../base/BaseTest.sol";
-import { MockErc20 } from "../mocks/MockERC20.sol";
-import { MockRewarder } from "../mocks/MockRewarder.sol";
+import {ALPStaking} from "src/staking/ALPStaking.sol";
+import {BaseTest} from "../base/BaseTest.sol";
+import {MockErc20} from "../mocks/MockERC20.sol";
+import {MockRewarder} from "../mocks/MockRewarder.sol";
 
 contract ALPStakingTest is BaseTest {
   ALPStaking internal staking;
@@ -49,20 +49,16 @@ contract ALPStakingTest is BaseTest {
   }
 
   function deployALPStaking() internal returns (ALPStaking) {
-    bytes memory _logicBytecode = abi.encodePacked(
-      vm.getCode("./out/ALPStaking.sol/ALPStaking.json")
-    );
-    bytes memory _initializer = abi.encodeWithSelector(
-      bytes4(keccak256("initialize()"))
-    );
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/ALPStaking.sol/ALPStaking.json"));
+    bytes memory _initializer =
+      abi.encodeWithSelector(bytes4(keccak256("initialize()")));
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
     return ALPStaking(payable(_proxy));
   }
 
   function testRevert_NotStakingToken_WhenAliceDeposit() external {
-    vm.expectRevert(
-      abi.encodeWithSignature("ALPStaking_UnknownStakingToken()")
-    );
+    vm.expectRevert(abi.encodeWithSignature("ALPStaking_UnknownStakingToken()"));
     vm.prank(ALICE);
     staking.deposit(ALICE, address(alpaca), 100 ether);
   }
@@ -92,15 +88,13 @@ contract ALPStakingTest is BaseTest {
     assertEq(staking.userTokenAmount(address(alp), BOB), 100 ether);
 
     assertEq(
-      staking.calculateShare(address(protocolRevenueRewarder), BOB),
-      100 ether
+      staking.calculateShare(address(protocolRevenueRewarder), BOB), 100 ether
     );
     assertEq(staking.calculateShare(address(mockRewarder), BOB), 100 ether);
     assertEq(staking.calculateShare(address(partnerRewarder), BOB), 100 ether);
 
     assertEq(
-      staking.calculateTotalShare(address(protocolRevenueRewarder)),
-      100 ether
+      staking.calculateTotalShare(address(protocolRevenueRewarder)), 100 ether
     );
     assertEq(staking.calculateTotalShare(address(mockRewarder)), 100 ether);
     assertEq(staking.calculateTotalShare(address(partnerRewarder)), 100 ether);
@@ -114,18 +108,13 @@ contract ALPStakingTest is BaseTest {
     assertEq(staking.userTokenAmount(address(alp), ALICE), 100 ether);
 
     assertEq(
-      staking.calculateShare(address(protocolRevenueRewarder), ALICE),
-      100 ether
+      staking.calculateShare(address(protocolRevenueRewarder), ALICE), 100 ether
     );
     assertEq(staking.calculateShare(address(mockRewarder), ALICE), 100 ether);
-    assertEq(
-      staking.calculateShare(address(partnerRewarder), ALICE),
-      100 ether
-    );
+    assertEq(staking.calculateShare(address(partnerRewarder), ALICE), 100 ether);
 
     assertEq(
-      staking.calculateTotalShare(address(protocolRevenueRewarder)),
-      200 ether
+      staking.calculateTotalShare(address(protocolRevenueRewarder)), 200 ether
     );
     assertEq(staking.calculateTotalShare(address(mockRewarder)), 200 ether);
     assertEq(staking.calculateTotalShare(address(partnerRewarder)), 200 ether);
@@ -133,9 +122,7 @@ contract ALPStakingTest is BaseTest {
 
   function testRevert_NotStakingToken_WhenAliceWithdraw() external {
     vm.startPrank(ALICE);
-    vm.expectRevert(
-      abi.encodeWithSignature("ALPStaking_UnknownStakingToken()")
-    );
+    vm.expectRevert(abi.encodeWithSignature("ALPStaking_UnknownStakingToken()"));
     staking.withdraw(address(alpaca), 100 ether);
     vm.stopPrank();
   }
@@ -167,15 +154,13 @@ contract ALPStakingTest is BaseTest {
     assertEq(staking.userTokenAmount(address(alp), BOB), 50 ether);
 
     assertEq(
-      staking.calculateShare(address(protocolRevenueRewarder), BOB),
-      50 ether
+      staking.calculateShare(address(protocolRevenueRewarder), BOB), 50 ether
     );
     assertEq(staking.calculateShare(address(mockRewarder), BOB), 50 ether);
     assertEq(staking.calculateShare(address(partnerRewarder), BOB), 50 ether);
 
     assertEq(
-      staking.calculateTotalShare(address(protocolRevenueRewarder)),
-      150 ether
+      staking.calculateTotalShare(address(protocolRevenueRewarder)), 150 ether
     );
     assertEq(staking.calculateTotalShare(address(mockRewarder)), 150 ether);
     assertEq(staking.calculateTotalShare(address(partnerRewarder)), 150 ether);
@@ -187,15 +172,13 @@ contract ALPStakingTest is BaseTest {
     assertEq(staking.userTokenAmount(address(alp), ALICE), 0 ether);
 
     assertEq(
-      staking.calculateShare(address(protocolRevenueRewarder), ALICE),
-      0 ether
+      staking.calculateShare(address(protocolRevenueRewarder), ALICE), 0 ether
     );
     assertEq(staking.calculateShare(address(mockRewarder), ALICE), 0 ether);
     assertEq(staking.calculateShare(address(partnerRewarder), ALICE), 0 ether);
 
     assertEq(
-      staking.calculateTotalShare(address(protocolRevenueRewarder)),
-      50 ether
+      staking.calculateTotalShare(address(protocolRevenueRewarder)), 50 ether
     );
     assertEq(staking.calculateTotalShare(address(mockRewarder)), 50 ether);
     assertEq(staking.calculateTotalShare(address(partnerRewarder)), 50 ether);

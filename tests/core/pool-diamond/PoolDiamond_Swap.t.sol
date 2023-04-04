@@ -1,18 +1,25 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, LibPoolConfigV1, stdError, console, GetterFacetInterface, LiquidityFacetInterface } from "./PoolDiamond_BaseTest.t.sol";
+import {
+  PoolDiamond_BaseTest,
+  LibPoolConfigV1,
+  stdError,
+  console,
+  GetterFacetInterface,
+  LiquidityFacetInterface
+} from "./PoolDiamond_BaseTest.t.sol";
 
 contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
   function setUp() public override {
@@ -29,22 +36,14 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
   function testRevert_WhenTokenInIsRandomErc20() external {
     vm.expectRevert(abi.encodeWithSignature("LiquidityFacet_BadTokenIn()"));
     poolLiquidityFacet.swap(
-      address(this),
-      address(randomErc20),
-      address(dai),
-      0,
-      address(this)
+      address(this), address(randomErc20), address(dai), 0, address(this)
     );
   }
 
   function testRevert_WhenTokenOutIsRandomErc20() external {
     vm.expectRevert(abi.encodeWithSignature("LiquidityFacet_BadTokenOut()"));
     poolLiquidityFacet.swap(
-      address(this),
-      address(dai),
-      address(randomErc20),
-      0,
-      address(this)
+      address(this), address(dai), address(randomErc20), 0, address(this)
     );
   }
 
@@ -54,11 +53,7 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
 
     vm.expectRevert(abi.encodeWithSignature("LiquidityFacet_SwapDisabled()"));
     poolLiquidityFacet.swap(
-      address(this),
-      address(dai),
-      address(wbtc),
-      0,
-      address(this)
+      address(this), address(dai), address(wbtc), 0, address(this)
     );
   }
 
@@ -67,29 +62,21 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
       abi.encodeWithSignature("LiquidityFacet_SameTokenInTokenOut()")
     );
     poolLiquidityFacet.swap(
-      address(this),
-      address(dai),
-      address(dai),
-      0,
-      address(this)
+      address(this), address(dai), address(dai), 0, address(this)
     );
   }
 
   function testRevert_WhenAmountInZero() external {
     vm.expectRevert(abi.encodeWithSignature("LiquidityFacet_BadAmount()"));
     poolLiquidityFacet.swap(
-      address(this),
-      address(dai),
-      address(wbtc),
-      0,
-      address(this)
+      address(this), address(dai), address(wbtc), 0, address(this)
     );
   }
 
   function testRevert_WhenOverUsdDebtCeiling() external {
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
 
     dai.mint(address(this), 200000 ether);
     wbtc.mint(address(this), 10 ether);
@@ -98,27 +85,19 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     dai.approve(address(poolRouter), 200000 ether);
     alp.approve(address(poolRouter), type(uint256).max);
     poolRouter.addLiquidity(
-      address(dai),
-      200000 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(dai), 200000 ether, address(this), 0, zeroBytesArr()
     );
 
     wbtc.approve(address(poolRouter), 10 ether);
     poolRouter.addLiquidity(
-      address(wbtc),
-      10 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(wbtc), 10 ether, address(this), 0, zeroBytesArr()
     );
 
     // Set DAI's debt ceiling to be 200100 USD
     address[] memory tokens = new address[](1);
     tokens[0] = address(dai);
-    LibPoolConfigV1.TokenConfig[]
-      memory tokenConfigs = new LibPoolConfigV1.TokenConfig[](1);
+    LibPoolConfigV1.TokenConfig[] memory tokenConfigs =
+      new LibPoolConfigV1.TokenConfig[](1);
     tokenConfigs[0] = LibPoolConfigV1.TokenConfig({
       accept: true,
       isStable: true,
@@ -140,19 +119,14 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     // Try to swap that will exceed the debt ceiling
     vm.expectRevert(abi.encodeWithSignature("LibPoolV1_OverUsdDebtCeiling()"));
     poolRouter.swap(
-      address(dai),
-      address(wbtc),
-      701 ether,
-      0,
-      address(this),
-      zeroBytesArr()
+      address(dai), address(wbtc), 701 ether, 0, address(this), zeroBytesArr()
     );
   }
 
   function testRevert_WhenLiquidityLessThanBuffer() external {
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
 
     dai.mint(address(this), 200000 ether);
     wbtc.mint(address(this), 10 ether);
@@ -164,26 +138,18 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     dai.approve(address(poolRouter), 200000 ether);
     alp.approve(address(poolRouter), type(uint256).max);
     poolRouter.addLiquidity(
-      address(dai),
-      200000 ether,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(dai), 200000 ether, address(this), 0, zeroBytesArr()
     );
-    wbtc.approve(address(poolRouter), 10 * 10**8);
+    wbtc.approve(address(poolRouter), 10 * 10 ** 8);
     poolRouter.addLiquidity(
-      address(wbtc),
-      10 * 10**8,
-      address(this),
-      0,
-      zeroBytesArr()
+      address(wbtc), 10 * 10 ** 8, address(this), 0, zeroBytesArr()
     );
 
     // Set WBTC's liquidity buffer to be 9.97 WBTC
     address[] memory tokens = new address[](1);
     tokens[0] = address(wbtc);
-    LibPoolConfigV1.TokenConfig[]
-      memory tokenConfigs = new LibPoolConfigV1.TokenConfig[](1);
+    LibPoolConfigV1.TokenConfig[] memory tokenConfigs =
+      new LibPoolConfigV1.TokenConfig[](1);
     tokenConfigs[0] = LibPoolConfigV1.TokenConfig({
       accept: true,
       isStable: false,
@@ -193,7 +159,7 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
       minProfitBps: 75,
       usdDebtCeiling: 0,
       shortCeiling: 0,
-      bufferLiquidity: 9.97 * 10**8,
+      bufferLiquidity: 9.97 * 10 ** 8,
       openInterestLongCeiling: 0
     });
     poolAdminFacet.setTokenConfigs(tokens, tokenConfigs);
@@ -201,26 +167,19 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     dai.mint(address(this), 1 ether);
     dai.approve(address(poolRouter), 1 ether);
 
-    vm.expectRevert(
-      abi.encodeWithSignature("LiquidityFacet_LiquidityBuffer()")
-    );
+    vm.expectRevert(abi.encodeWithSignature("LiquidityFacet_LiquidityBuffer()"));
     poolRouter.swap(
-      address(dai),
-      address(wbtc),
-      1 ether,
-      0,
-      address(this),
-      zeroBytesArr()
+      address(dai), address(wbtc), 1 ether, 0, address(this), zeroBytesArr()
     );
   }
 
   function testCorrectness_WhenSwapSuccess() external {
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
 
     bnb.mint(ALICE, 200 ether);
-    wbtc.mint(ALICE, 1 * 10**8);
+    wbtc.mint(ALICE, 1 * 10 ** 8);
 
     // ------- Alice session START -------
     vm.startPrank(ALICE);
@@ -235,9 +194,11 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.getAumE18(false), 59820 ether);
 
     // Alice add liquidity 1 WBTC (~$60,000)
-    wbtc.approve(address(poolRouter), 1 * 10**8);
+    wbtc.approve(address(poolRouter), 1 * 10 ** 8);
     alp.approve(address(poolRouter), type(uint256).max);
-    poolRouter.addLiquidity(address(wbtc), 1 * 10**8, ALICE, 0, zeroBytesArr());
+    poolRouter.addLiquidity(
+      address(wbtc), 1 * 10 ** 8, ALICE, 0, zeroBytesArr()
+    );
 
     // Alice add another 1 WBTC as liquidity to the pool, the following condition is expected:
     // 1. Pool should have 59,820 + (1 * (1-0.003) * 60000) = 119,640 USD in AUM
@@ -255,22 +216,22 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 59820 ether);
     assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 59820 ether);
     assertEq(poolGetterFacet.liquidityOf(address(bnb)), 199.4 ether);
-    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10**8);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10 ** 8);
 
     vm.stopPrank();
     // ------- Alice session END -------
 
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
-    bnbPriceFeed.setLatestAnswer(600 * 10**8);
-    bnbPriceFeed.setLatestAnswer(500 * 10**8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(600 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(500 * 10 ** 8);
 
     // Oracle price updates, the following condition is expected:
     // 1. Pool should have (199.4 * 400) + (0.997 * 60000) = 139,580 USD
     assertEq(poolGetterFacet.getAumE18(false), 139580 ether);
 
-    wbtcPriceFeed.setLatestAnswer(90000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(100000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(80000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(90000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(100000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(80000 * 10 ** 8);
 
     // Oracle price updates, the following condition is expected:
     // 1. Pool should have (199.4 * 400) + (0.997 * 80000) = 159,520 USD
@@ -284,12 +245,7 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     // Bob swap 100 BNB for WBTC
     bnb.approve(address(poolRouter), 100 ether);
     poolRouter.swap(
-      address(bnb),
-      address(wbtc),
-      100 ether,
-      0,
-      BOB,
-      zeroBytesArr()
+      address(bnb), address(wbtc), 100 ether, 0, BOB, zeroBytesArr()
     );
 
     // After Bob swap, the following condition is expected:
@@ -302,20 +258,20 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     // 7. Pool's BNB liquidity should be 199.4 + 100 = 299.4 BNB
     // 8. Pool's WBTC liquidity should be 0.997 - ((100 * 400 / 100000)) = 0.597 WBTC
     assertEq(poolGetterFacet.getAumE18(false), 167520 ether);
-    assertEq(wbtc.balanceOf(BOB), 0.3988 * 10**8);
+    assertEq(wbtc.balanceOf(BOB), 0.3988 * 10 ** 8);
     assertEq(poolGetterFacet.feeReserveOf(address(bnb)), 0.6 ether);
-    assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.0042 * 10**8);
+    assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.0042 * 10 ** 8);
     assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 99820 ether);
     assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 19820 ether);
     assertEq(poolGetterFacet.liquidityOf(address(bnb)), 299.4 ether);
-    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.597 * 10**8);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.597 * 10 ** 8);
 
     vm.stopPrank();
     // ------- Bob session END -------
 
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
-    bnbPriceFeed.setLatestAnswer(500 * 10**8);
-    bnbPriceFeed.setLatestAnswer(450 * 10**8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(500 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(450 * 10 ** 8);
 
     // ------- Alice session START -------
     vm.startPrank(ALICE);
@@ -327,13 +283,13 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
 
     poolGetterFacet.alp().approve(
       address(poolRouter),
-      (50_000 ether * poolGetterFacet.alp().totalSupply()) /
-        poolGetterFacet.getAumE18(false)
+      (50_000 ether * poolGetterFacet.alp().totalSupply())
+        / poolGetterFacet.getAumE18(false)
     );
     poolRouter.removeLiquidity(
       address(bnb),
-      (50_000 ether * poolGetterFacet.alp().totalSupply()) /
-        poolGetterFacet.getAumE18(false),
+      (50_000 ether * poolGetterFacet.alp().totalSupply())
+        / poolGetterFacet.getAumE18(false),
       ALICE,
       0,
       zeroBytesArr()
@@ -348,13 +304,13 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
 
     poolGetterFacet.alp().approve(
       address(poolRouter),
-      (50_000 ether * poolGetterFacet.alp().totalSupply()) /
-        poolGetterFacet.getAumE18(false)
+      (50_000 ether * poolGetterFacet.alp().totalSupply())
+        / poolGetterFacet.getAumE18(false)
     );
     poolRouter.removeLiquidity(
       address(wbtc),
-      (50_000 ether * poolGetterFacet.alp().totalSupply()) /
-        poolGetterFacet.getAumE18(false),
+      (50_000 ether * poolGetterFacet.alp().totalSupply())
+        / poolGetterFacet.getAumE18(false),
       ALICE,
       0,
       zeroBytesArr()
@@ -365,27 +321,23 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
 
     // Alice try remove 10000 USD worth of ALP from the pool with WBTC as tokenOut
     // Pool doesn't has any liquidity left, so this should revert
-    uint256 alpNeeded = (10_000 ether * poolGetterFacet.alp().totalSupply()) /
-      poolGetterFacet.getAumE18(false);
+    uint256 alpNeeded = (10_000 ether * poolGetterFacet.alp().totalSupply())
+      / poolGetterFacet.getAumE18(false);
 
     poolGetterFacet.alp().approve(address(poolRouter), alpNeeded);
     vm.expectRevert(stdError.arithmeticError);
     poolRouter.removeLiquidity(
-      address(wbtc),
-      alpNeeded,
-      ALICE,
-      0,
-      zeroBytesArr()
+      address(wbtc), alpNeeded, ALICE, 0, zeroBytesArr()
     );
   }
 
   function testRevert_Slippage() external {
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
 
     bnb.mint(ALICE, 200 ether);
-    wbtc.mint(ALICE, 1 * 10**8);
+    wbtc.mint(ALICE, 1 * 10 ** 8);
 
     // ------- Alice session START -------
     vm.startPrank(ALICE);
@@ -400,9 +352,11 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.getAumE18(false), 59820 ether);
 
     // Alice add liquidity 1 WBTC (~$60,000)
-    wbtc.approve(address(poolRouter), 1 * 10**8);
+    wbtc.approve(address(poolRouter), 1 * 10 ** 8);
     alp.approve(address(poolRouter), type(uint256).max);
-    poolRouter.addLiquidity(address(wbtc), 1 * 10**8, ALICE, 0, zeroBytesArr());
+    poolRouter.addLiquidity(
+      address(wbtc), 1 * 10 ** 8, ALICE, 0, zeroBytesArr()
+    );
 
     // Alice add another 1 WBTC as liquidity to the pool, the following condition is expected:
     // 1. Pool should have 59,820 + (1 * (1-0.003) * 60000) = 119,640 USD in AUM
@@ -420,22 +374,22 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 59820 ether);
     assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 59820 ether);
     assertEq(poolGetterFacet.liquidityOf(address(bnb)), 199.4 ether);
-    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10**8);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10 ** 8);
 
     vm.stopPrank();
     // ------- Alice session END -------
 
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
-    bnbPriceFeed.setLatestAnswer(600 * 10**8);
-    bnbPriceFeed.setLatestAnswer(500 * 10**8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(600 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(500 * 10 ** 8);
 
     // Oracle price updates, the following condition is expected:
     // 1. Pool should have (199.4 * 400) + (0.997 * 60000) = 139,580 USD
     assertEq(poolGetterFacet.getAumE18(false), 139580 ether);
 
-    wbtcPriceFeed.setLatestAnswer(90000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(100000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(80000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(90000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(100000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(80000 * 10 ** 8);
 
     // Oracle price updates, the following condition is expected:
     // 1. Pool should have (199.4 * 400) + (0.997 * 80000) = 159,520 USD
@@ -459,32 +413,24 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     bnb.approve(address(poolRouter), 100 ether);
     vm.expectRevert(abi.encodeWithSignature("LiquidityFacet_Slippage()"));
     poolRouter.swap(
-      address(bnb),
-      address(wbtc),
-      100 ether,
-      40000000,
-      BOB,
-      zeroBytesArr()
+      address(bnb), address(wbtc), 100 ether, 40000000, BOB, zeroBytesArr()
     );
   }
 
   function testCorrectness_WhenSwapSuccess_NativeIn() external {
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
 
     vm.deal(ALICE, 200 ether);
-    wbtc.mint(ALICE, 1 * 10**8);
+    wbtc.mint(ALICE, 1 * 10 ** 8);
 
     // ------- Alice session START -------
     vm.startPrank(ALICE);
     alp.approve(address(poolRouter), type(uint256).max);
     // Alice add liquidity 200 BNB (~$60,000)
-    poolRouter.addLiquidityNative{ value: 200 ether }(
-      address(bnb),
-      ALICE,
-      0,
-      zeroBytesArr()
+    poolRouter.addLiquidityNative{value: 200 ether}(
+      address(bnb), ALICE, 0, zeroBytesArr()
     );
 
     // Alice add 200 BNB as liquidity to the pool, the following condition is expected:
@@ -492,8 +438,10 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.getAumE18(false), 59820 ether);
 
     // Alice add liquidity 1 WBTC (~$60,000)
-    wbtc.approve(address(poolRouter), 1 * 10**8);
-    poolRouter.addLiquidity(address(wbtc), 1 * 10**8, ALICE, 0, zeroBytesArr());
+    wbtc.approve(address(poolRouter), 1 * 10 ** 8);
+    poolRouter.addLiquidity(
+      address(wbtc), 1 * 10 ** 8, ALICE, 0, zeroBytesArr()
+    );
 
     // Alice add another 1 WBTC as liquidity to the pool, the following condition is expected:
     // 1. Pool should have 59,820 + (1 * (1-0.003) * 60000) = 119,640 USD in AUM
@@ -511,22 +459,22 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 59820 ether);
     assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 59820 ether);
     assertEq(poolGetterFacet.liquidityOf(address(bnb)), 199.4 ether);
-    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10**8);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10 ** 8);
 
     vm.stopPrank();
     // ------- Alice session END -------
 
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
-    bnbPriceFeed.setLatestAnswer(600 * 10**8);
-    bnbPriceFeed.setLatestAnswer(500 * 10**8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(600 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(500 * 10 ** 8);
 
     // Oracle price updates, the following condition is expected:
     // 1. Pool should have (199.4 * 400) + (0.997 * 60000) = 139,580 USD
     assertEq(poolGetterFacet.getAumE18(false), 139580 ether);
 
-    wbtcPriceFeed.setLatestAnswer(90000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(100000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(80000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(90000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(100000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(80000 * 10 ** 8);
 
     // Oracle price updates, the following condition is expected:
     // 1. Pool should have (199.4 * 400) + (0.997 * 80000) = 159,520 USD
@@ -538,13 +486,8 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     vm.startPrank(BOB);
 
     // Bob swap 100 BNB for WBTC
-    poolRouter.swapNative{ value: 100 ether }(
-      address(bnb),
-      address(wbtc),
-      100 ether,
-      0,
-      BOB,
-      zeroBytesArr()
+    poolRouter.swapNative{value: 100 ether}(
+      address(bnb), address(wbtc), 100 ether, 0, BOB, zeroBytesArr()
     );
 
     // After Bob swap, the following condition is expected:
@@ -557,20 +500,20 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     // 7. Pool's BNB liquidity should be 199.4 + 100 = 299.4 BNB
     // 8. Pool's WBTC liquidity should be 0.997 - ((100 * 400 / 100000)) = 0.597 WBTC
     assertEq(poolGetterFacet.getAumE18(false), 167520 ether);
-    assertEq(wbtc.balanceOf(BOB), 0.3988 * 10**8);
+    assertEq(wbtc.balanceOf(BOB), 0.3988 * 10 ** 8);
     assertEq(poolGetterFacet.feeReserveOf(address(bnb)), 0.6 ether);
-    assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.0042 * 10**8);
+    assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.0042 * 10 ** 8);
     assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 99820 ether);
     assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 19820 ether);
     assertEq(poolGetterFacet.liquidityOf(address(bnb)), 299.4 ether);
-    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.597 * 10**8);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.597 * 10 ** 8);
 
     vm.stopPrank();
     // ------- Bob session END -------
 
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
-    bnbPriceFeed.setLatestAnswer(500 * 10**8);
-    bnbPriceFeed.setLatestAnswer(450 * 10**8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(500 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(450 * 10 ** 8);
 
     // ------- Alice session START -------
     vm.startPrank(ALICE);
@@ -582,13 +525,13 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
 
     poolGetterFacet.alp().approve(
       address(poolRouter),
-      (50_000 ether * poolGetterFacet.alp().totalSupply()) /
-        poolGetterFacet.getAumE18(false)
+      (50_000 ether * poolGetterFacet.alp().totalSupply())
+        / poolGetterFacet.getAumE18(false)
     );
     poolRouter.removeLiquidityNative(
       address(bnb),
-      (50_000 ether * poolGetterFacet.alp().totalSupply()) /
-        poolGetterFacet.getAumE18(false),
+      (50_000 ether * poolGetterFacet.alp().totalSupply())
+        / poolGetterFacet.getAumE18(false),
       ALICE,
       0,
       zeroBytesArr()
@@ -603,13 +546,13 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
 
     poolGetterFacet.alp().approve(
       address(poolRouter),
-      (50_000 ether * poolGetterFacet.alp().totalSupply()) /
-        poolGetterFacet.getAumE18(false)
+      (50_000 ether * poolGetterFacet.alp().totalSupply())
+        / poolGetterFacet.getAumE18(false)
     );
     poolRouter.removeLiquidity(
       address(wbtc),
-      (50_000 ether * poolGetterFacet.alp().totalSupply()) /
-        poolGetterFacet.getAumE18(false),
+      (50_000 ether * poolGetterFacet.alp().totalSupply())
+        / poolGetterFacet.getAumE18(false),
       ALICE,
       0,
       zeroBytesArr()
@@ -620,38 +563,31 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
 
     // Alice try remove 10000 USD worth of ALP from the pool with WBTC as tokenOut
     // Pool doesn't has any liquidity left, so this should revert
-    uint256 alpNeeded = (10_000 ether * poolGetterFacet.alp().totalSupply()) /
-      poolGetterFacet.getAumE18(false);
+    uint256 alpNeeded = (10_000 ether * poolGetterFacet.alp().totalSupply())
+      / poolGetterFacet.getAumE18(false);
 
     poolGetterFacet.alp().approve(address(poolRouter), alpNeeded);
     vm.expectRevert(stdError.arithmeticError);
     poolRouter.removeLiquidity(
-      address(wbtc),
-      alpNeeded,
-      ALICE,
-      0,
-      zeroBytesArr()
+      address(wbtc), alpNeeded, ALICE, 0, zeroBytesArr()
     );
   }
 
   function testCorrectness_WhenSwapSuccess_NativeOut() external {
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
 
     vm.deal(ALICE, 200 ether);
-    wbtc.mint(ALICE, 1 * 10**8);
+    wbtc.mint(ALICE, 1 * 10 ** 8);
 
     // ------- Alice session START -------
     vm.startPrank(ALICE);
     alp.approve(address(poolRouter), type(uint256).max);
 
     // Alice add liquidity 200 BNB (~$60,000)
-    poolRouter.addLiquidityNative{ value: 200 ether }(
-      address(bnb),
-      ALICE,
-      0,
-      zeroBytesArr()
+    poolRouter.addLiquidityNative{value: 200 ether}(
+      address(bnb), ALICE, 0, zeroBytesArr()
     );
 
     // Alice add 200 BNB as liquidity to the pool, the following condition is expected:
@@ -659,8 +595,10 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.getAumE18(false), 59820 ether);
 
     // Alice add liquidity 1 WBTC (~$60,000)
-    wbtc.approve(address(poolRouter), 1 * 10**8);
-    poolRouter.addLiquidity(address(wbtc), 1 * 10**8, ALICE, 0, zeroBytesArr());
+    wbtc.approve(address(poolRouter), 1 * 10 ** 8);
+    poolRouter.addLiquidity(
+      address(wbtc), 1 * 10 ** 8, ALICE, 0, zeroBytesArr()
+    );
 
     // Alice add another 1 WBTC as liquidity to the pool, the following condition is expected:
     // 1. Pool should have 59,820 + (1 * (1-0.003) * 60000) = 119,640 USD in AUM
@@ -678,41 +616,36 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 59820 ether);
     assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 59820 ether);
     assertEq(poolGetterFacet.liquidityOf(address(bnb)), 199.4 ether);
-    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10**8);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10 ** 8);
 
     vm.stopPrank();
     // ------- Alice session END -------
 
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
-    bnbPriceFeed.setLatestAnswer(600 * 10**8);
-    bnbPriceFeed.setLatestAnswer(500 * 10**8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(600 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(500 * 10 ** 8);
 
     // Oracle price updates, the following condition is expected:
     // 1. Pool should have (199.4 * 400) + (0.997 * 60000) = 139,580 USD
     assertEq(poolGetterFacet.getAumE18(false), 139580 ether);
 
-    wbtcPriceFeed.setLatestAnswer(90000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(100000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(80000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(90000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(100000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(80000 * 10 ** 8);
 
     // Oracle price updates, the following condition is expected:
     // 1. Pool should have (199.4 * 400) + (0.997 * 80000) = 159,520 USD
     assertEq(poolGetterFacet.getAumE18(false), 159520 ether);
 
-    wbtc.mint(BOB, 0.0075 * 10**8);
+    wbtc.mint(BOB, 0.0075 * 10 ** 8);
 
     // ------- Bob session START -------
     vm.startPrank(BOB);
 
     // Bob swap 0.0075 WBTC for BNB
-    wbtc.approve(address(poolRouter), 0.0075 * 10**8);
-    poolRouter.swapNative{ value: 0 ether }(
-      address(wbtc),
-      address(bnb),
-      0.0075 * 10**8,
-      0,
-      BOB,
-      zeroBytesArr()
+    wbtc.approve(address(poolRouter), 0.0075 * 10 ** 8);
+    poolRouter.swapNative{value: 0 ether}(
+      address(wbtc), address(bnb), 0.0075 * 10 ** 8, 0, BOB, zeroBytesArr()
     );
 
     // After Bob swap, the following condition is expected:
@@ -729,11 +662,11 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     assertEq(poolGetterFacet.getAumE18(false), 159720 ether);
     assertEq(address(BOB).balance, 0.997 ether);
     assertEq(poolGetterFacet.feeReserveOf(address(bnb)), 0.603 ether);
-    assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.003 * 10**8);
+    assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.003 * 10 ** 8);
     assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 59220 ether);
     assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 60420 ether);
     assertEq(poolGetterFacet.liquidityOf(address(bnb)), 198.4 ether);
-    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 1.0045 * 10**8);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 1.0045 * 10 ** 8);
 
     vm.stopPrank();
   }

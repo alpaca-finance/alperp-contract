@@ -77,5 +77,11 @@
   "TimelockController": "",
   "ProxyAdmin": "0x3dBcbbE5a361BF97D79538bCcED4dd03d04B9726",
   "Timelock": "",
-  "OpMultiSig": ""
+  "OpMultiSig": "",
+  "TradeMining": {
+    "address": "",
+    "rewarder": "",
+    "miningPoint": "",
+    "rewardToken": ""
+  }
 }

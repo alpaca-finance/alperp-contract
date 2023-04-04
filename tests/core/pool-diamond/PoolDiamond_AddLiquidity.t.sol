@@ -1,19 +1,26 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, LibPoolConfigV1, console, GetterFacetInterface, LiquidityFacetInterface, PoolRouter03 } from "./PoolDiamond_BaseTest.t.sol";
-import { ALP } from "src/tokens/ALP.sol";
+import {
+  PoolDiamond_BaseTest,
+  LibPoolConfigV1,
+  console,
+  GetterFacetInterface,
+  LiquidityFacetInterface,
+  PoolRouter04
+} from "./PoolDiamond_BaseTest.t.sol";
+import {ALP} from "src/tokens/ALP.sol";
 
 contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
   function setUp() public override {
@@ -27,18 +34,14 @@ contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
     poolAdminFacet.setTokenConfigs(tokens2, tokenConfigs2);
 
     // Feed prices
-    daiPriceFeed.setLatestAnswer(1 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
   }
 
   function testRevert_WhenTokenNotListed() external {
     vm.expectRevert(abi.encodeWithSignature("LiquidityFacet_BadToken()"));
-    poolLiquidityFacet.addLiquidity(
-      address(this),
-      address(usdc),
-      address(this)
-    );
+    poolLiquidityFacet.addLiquidity(address(this), address(usdc), address(this));
   }
 
   function testRevert_WhenAmountZero() external {
@@ -62,11 +65,7 @@ contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
     // Perform add liquidity
     dai.approve(address(poolRouter), 100 ether);
     poolRouter.addLiquidity(
-      address(dai),
-      100 ether,
-      ALICE,
-      99 ether,
-      zeroBytesArr()
+      address(dai), 100 ether, ALICE, 99 ether, zeroBytesArr()
     );
 
     // After Alice added DAI liquidity, the following criteria needs to satisfy:
@@ -94,9 +93,9 @@ contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
     vm.warp(block.timestamp + 1 days);
 
     // Feed BNB price
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
 
     // ------- Bob session -------
     vm.startPrank(BOB);
@@ -125,16 +124,16 @@ contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
     vm.stopPrank();
     // ------- Finish Bob session -------
 
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
-    bnbPriceFeed.setLatestAnswer(500 * 10**8);
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(500 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
 
     assertEq(poolGetterFacet.getAumE18(true), 598.2 ether);
     assertEq(poolGetterFacet.getAumE18(false), 498.5 ether);
 
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
 
     // Mint 0.01 WBTC (600 USD) to CAT.
     wbtc.mint(CAT, 1000000);
@@ -206,9 +205,9 @@ contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
     vm.warp(block.timestamp + 1 days);
 
     // Feed BNB price
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    bnbPriceFeed.setLatestAnswer(300 * 10**8);
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
 
     // ------- Bob session -------
     vm.startPrank(BOB);
@@ -238,16 +237,16 @@ contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
     vm.stopPrank();
     // ------- Finish Bob session -------
 
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
-    bnbPriceFeed.setLatestAnswer(500 * 10**8);
-    bnbPriceFeed.setLatestAnswer(400 * 10**8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(500 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
 
     assertEq(poolGetterFacet.getAumE18(true), 595.7 ether);
     assertEq(poolGetterFacet.getAumE18(false), 496.5 ether);
 
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
-    wbtcPriceFeed.setLatestAnswer(60000 * 10**8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
 
     // Mint 0.01 WBTC (600 USD) to CAT.
     wbtc.mint(CAT, 1000000);
@@ -296,18 +295,14 @@ contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
     dai.approve(address(poolRouter), 100 ether);
     vm.expectRevert(
       abi.encodeWithSelector(
-        PoolRouter03.PoolRouter_InsufficientOutputAmount.selector,
+        PoolRouter04.PoolRouter_InsufficientOutputAmount.selector,
         100 ether,
         99.7 ether
       )
     );
 
     poolRouter.addLiquidity(
-      address(dai),
-      100 ether,
-      ALICE,
-      100 ether,
-      zeroBytesArr()
+      address(dai), 100 ether, ALICE, 100 ether, zeroBytesArr()
     );
     vm.stopPrank();
   }
@@ -323,11 +318,7 @@ contract PoolDiamond_AddLiquidityTest is PoolDiamond_BaseTest {
     // Perform add liquidity
     dai.approve(address(poolRouter), 100 ether);
     poolRouter.addLiquidity(
-      address(dai),
-      100 ether,
-      ALICE,
-      99 ether,
-      zeroBytesArr()
+      address(dai), 100 ether, ALICE, 99 ether, zeroBytesArr()
     );
 
     address alp = address(GetterFacetInterface(poolDiamond).alp());

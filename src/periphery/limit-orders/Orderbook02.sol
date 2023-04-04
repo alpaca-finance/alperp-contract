@@ -1,45 +1,35 @@
 // SPDX-License-Identifier: MIT
 /**
- *   ∩~~~~∩
- *   ξ ･×･ ξ
- *   ξ　~　ξ
- *   ξ　　 ξ
- *   ξ　　 “~～~～〇
- *   ξ　　　　　　 ξ
- *   ξ ξ ξ~～~ξ ξ ξ
+ *   ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
 
 pragma solidity 0.8.17;
 
-import {ReentrancyGuardUpgradeable} from
-  "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import {SafeERC20Upgradeable} from
-  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import {IERC20Upgradeable} from
-  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {AddressUpgradeable} from
-  "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import {OwnableUpgradeable} from
-  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {IWNative} from "../../../interfaces/IWNative.sol";
-import {IOnchainPriceUpdater} from
-  "../../../interfaces/IOnChainPriceUpdater.sol";
+// OZ
+import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import {IWNativeRelayer} from "../../../interfaces/IWNativeRelayer.sol";
-import {GetterFacetInterface} from "../interfaces/GetterFacetInterface.sol";
-import {LiquidityFacetInterface} from
-  "../interfaces/LiquidityFacetInterface.sol";
-import {PerpTradeFacetInterface} from
-  "../interfaces/PerpTradeFacetInterface.sol";
-import {PoolOracle} from "../../PoolOracle.sol";
-import {
-  IterableMapping,
-  Orders,
-  OrderType,
-  itmap
-} from "../libraries/IterableMapping.sol";
+// Alperp
+import {IWNative} from "@alperp/interfaces/IWNative.sol";
+import {IOnchainPriceUpdater} from "@alperp/interfaces/IOnChainPriceUpdater.sol";
+import {IWNativeRelayer} from "@alperp/interfaces/IWNativeRelayer.sol";
+import {GetterFacetInterface} from "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {LiquidityFacetInterface} from "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
+import {PerpTradeFacetInterface} from "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
+import {PoolOracle} from "@alperp/core/PoolOracle.sol";
+import {IterableMapping,Orders,OrderType,itmap} from "@alperp/periphery/limit-orders/libraries/IterableMapping.sol";
+import {ITradeMiningManager} from "@alperp/interfaces/ITradeMiningManager.sol";
 
 contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -103,6 +93,8 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   IOnchainPriceUpdater public oraclePriceUpdater;
 
   address public wnativeRelayer;
+
+  ITradeMiningManager public tradeMiningManager;
 
   event CreateIncreaseOrder(
     address indexed account,
@@ -248,10 +240,13 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 amountOut
   );
 
-  event UpdateMinExecutionFee(uint256 minExecutionFee);
-  event UpdateMinPurchaseTokenAmountUsd(uint256 minPurchaseTokenAmountUsd);
-  event SetWhitelist(address whitelistAddress, bool oldAllow, bool newAllow);
-  event SetIsAllowAllExecutor(bool isAllow);
+  event UpdateMinExecutionFee(uint256 _minExecutionFee);
+  event UpdateMinPurchaseTokenAmountUsd(uint256 _minPurchaseTokenAmountUsd);
+  event SetWhitelist(address _whitelistAddress, bool _oldAllow, bool _newAllow);
+  event SetIsAllowAllExecutor(bool _isAllow);
+  event SetTradeMiningManager(
+    address _prevTradeMiningManager, address _newTradeMiningManager
+  );
 
   error InvalidSender();
   error InvalidPathLength();
@@ -331,6 +326,18 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     minPurchaseTokenAmountUsd = _minPurchaseTokenAmountUsd;
 
     emit UpdateMinPurchaseTokenAmountUsd(_minPurchaseTokenAmountUsd);
+  }
+
+  /// @notice Set a new trade mining manager
+  /// @param _newTradeMiningManager A new trade mining manager
+  function setTradeMiningManager(ITradeMiningManager _newTradeMiningManager)
+    external
+    onlyOwner
+  {
+    emit SetTradeMiningManager(
+      address(tradeMiningManager), address(_newTradeMiningManager)
+    );
+    tradeMiningManager = _newTradeMiningManager;
   }
 
   function getSwapOrder(address _account, uint256 _orderIndex)
@@ -551,9 +558,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
         !validateSwapOrderPriceWithTriggerAboveThreshold(
           order.path, order.triggerRatio
         )
-      ) {
-        revert InvalidPriceForExecution();
-      }
+      ) revert InvalidPriceForExecution();
     }
 
     delete swapOrders[_account][_orderIndex];
@@ -904,6 +909,18 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     // pay executor
     _transferOutETH(order.executionFee, _feeReceiver);
+
+    if (address(tradeMiningManager) != address(0)) {
+      // If tradeMiningManager is set, then call it to update trade mining state
+      tradeMiningManager.onIncreasePosition(
+        order.account,
+        order.subAccountId,
+        order.purchaseToken,
+        order.indexToken,
+        order.sizeDelta,
+        order.isLong
+      );
+    }
 
     emit ExecuteIncreaseOrder(
       order.account,
