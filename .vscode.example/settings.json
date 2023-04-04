@@ -1,14 +1,8 @@
 {
-  "solidity.compileUsingRemoteVersion": "v0.8.14+commit.80d49f37",
+  "solidity.compileUsingRemoteVersion": "v0.8.17+commit.8df45f5f",
   "editor.formatOnSave": true,
+  "editor.tabSize": 2,
   "[solidity]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "JuanBlanco.solidity"
   },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "editor.tabSize": 2
 }

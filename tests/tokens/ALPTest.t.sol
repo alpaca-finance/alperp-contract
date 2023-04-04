@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity >=0.8.4 <0.9.0;
 
-import { BaseTest } from "../base/BaseTest.sol";
-import { ALP } from "src/tokens/ALP.sol";
+import {BaseTest} from "../base/BaseTest.sol";
+import {ALP} from "src/tokens/ALP.sol";
 
 contract ALPTest is BaseTest {
   ALP internal alp;
@@ -66,8 +66,7 @@ contract ALPTest is BaseTest {
     vm.startPrank(BOB);
     vm.expectRevert(
       abi.encodeWithSelector(
-        ALP.ALP_Cooldown.selector,
-        block.timestamp + 1 days
+        ALP.ALP_Cooldown.selector, block.timestamp + 1 days
       )
     );
     alp.transfer(ALICE, 88 ether);

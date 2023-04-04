@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import { PoolDiamond_BaseTest, console, AccessControlFacetInterface, LibAccessControl } from "./PoolDiamond_BaseTest.t.sol";
+import {
+  PoolDiamond_BaseTest,
+  console,
+  AccessControlFacetInterface,
+  LibAccessControl
+} from "./PoolDiamond_BaseTest.t.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract PoolDiamond_AccessControlTest is PoolDiamond_BaseTest {
@@ -16,8 +21,7 @@ contract PoolDiamond_AccessControlTest is PoolDiamond_BaseTest {
   function testCorrectness_WhenHasRole() external {
     assertTrue(
       accessControlFacet.hasRole(
-        LibAccessControl.DEFAULT_ADMIN_ROLE,
-        address(this)
+        LibAccessControl.DEFAULT_ADMIN_ROLE, address(this)
       )
     );
 
@@ -30,9 +34,7 @@ contract PoolDiamond_AccessControlTest is PoolDiamond_BaseTest {
     assertFalse(
       accessControlFacet.hasRole(LibAccessControl.DEFAULT_ADMIN_ROLE, ALICE)
     );
-    assertFalse(
-      accessControlFacet.hasRole(LibAccessControl.FARM_KEEPER, ALICE)
-    );
+    assertFalse(accessControlFacet.hasRole(LibAccessControl.FARM_KEEPER, ALICE));
     assertFalse(
       accessControlFacet.hasRole(keccak256("NON_EXISTING_ROLE"), ALICE)
     );
@@ -84,9 +86,7 @@ contract PoolDiamond_AccessControlTest is PoolDiamond_BaseTest {
     assertFalse(accessControlFacet.hasRole(role, ALICE));
   }
 
-  function testCorrectness_WhenRevokeRole_WhenRevokerIsNotARoleAdmin()
-    external
-  {
+  function testCorrectness_WhenRevokeRole_WhenRevokerIsNotARoleAdmin() external {
     bytes32 role = keccak256("TEST_ROLE");
     accessControlFacet.grantRole(role, ALICE);
     assertTrue(accessControlFacet.hasRole(role, ALICE));
@@ -107,10 +107,7 @@ contract PoolDiamond_AccessControlTest is PoolDiamond_BaseTest {
   function testCorrectness_WhenRenounceRole_WhenCallerEqToAccountArgument()
     external
   {
-    accessControlFacet.renounceRole(
-      LibAccessControl.FARM_KEEPER,
-      address(this)
-    );
+    accessControlFacet.renounceRole(LibAccessControl.FARM_KEEPER, address(this));
     assertFalse(
       accessControlFacet.hasRole(LibAccessControl.FARM_KEEPER, address(this))
     );
@@ -123,9 +120,6 @@ contract PoolDiamond_AccessControlTest is PoolDiamond_BaseTest {
     vm.expectRevert(
       abi.encodeWithSignature("LibAccessControl_CanOnlyRenounceSelf()")
     );
-    accessControlFacet.renounceRole(
-      LibAccessControl.FARM_KEEPER,
-      address(this)
-    );
+    accessControlFacet.renounceRole(LibAccessControl.FARM_KEEPER, address(this));
   }
 }

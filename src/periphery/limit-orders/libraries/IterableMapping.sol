@@ -18,6 +18,7 @@ struct IndexValue {
   uint256 keyIndex;
   Orders value;
 }
+
 struct KeyFlag {
   uint256 key;
   bool deleted;
@@ -30,15 +31,15 @@ struct itmap {
 }
 
 library IterableMapping {
-  function insert(
-    itmap storage self,
-    uint256 key,
-    Orders memory value
-  ) internal returns (bool replaced) {
+  function insert(itmap storage self, uint256 key, Orders memory value)
+    internal
+    returns (bool replaced)
+  {
     uint256 keyIndex = self.data[key].keyIndex;
     self.data[key].value = value;
-    if (keyIndex > 0) return true;
-    else {
+    if (keyIndex > 0) {
+      return true;
+    } else {
       keyIndex = self.keys.length;
       self.keys.push();
       self.data[key].keyIndex = keyIndex + 1;
@@ -88,8 +89,9 @@ library IterableMapping {
     view
     returns (uint256 r_keyIndex)
   {
-    while (keyIndex < self.keys.length && self.keys[keyIndex].deleted)
+    while (keyIndex < self.keys.length && self.keys[keyIndex].deleted) {
       keyIndex++;
+    }
     return keyIndex;
   }
 

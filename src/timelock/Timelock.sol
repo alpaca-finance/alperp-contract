@@ -14,7 +14,7 @@
 
 pragma solidity 0.8.17;
 
-import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract Timelock {
   using SafeMath for uint256;
@@ -192,12 +192,10 @@ contract Timelock {
     }
 
     // solium-disable-next-line security/no-call-value
-    (bool success, bytes memory returnData) = target.call{ value: value }(
-      callData
-    );
+    (bool success, bytes memory returnData) =
+      target.call{value: value}(callData);
     require(
-      success,
-      "Timelock::executeTransaction: Transaction execution reverted."
+      success, "Timelock::executeTransaction: Transaction execution reverted."
     );
 
     emit ExecuteTransaction(txHash, target, value, signature, data, eta);

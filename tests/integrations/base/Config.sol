@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
 contract Config {
@@ -24,8 +24,7 @@ contract Config {
     0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56;
   address public constant WBTC_TOKEN =
     0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c;
-  address public constant BNB_TOKEN =
-    0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
+  address public constant BNB_TOKEN = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
 
   address public constant CHAINLINK_ORACLE =
     0x634902128543b25265da350e2d961C7ff540fC71;

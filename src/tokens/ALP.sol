@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ *   ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
-import { ERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract ALP is ERC20Upgradeable, OwnableUpgradeable {
   mapping(address => bool) public whitelist;
@@ -47,8 +48,9 @@ contract ALP is ERC20Upgradeable, OwnableUpgradeable {
     external
     onlyOwner
   {
-    if (newLiquidityCooldown > MAX_COOLDOWN_DURATION)
+    if (newLiquidityCooldown > MAX_COOLDOWN_DURATION) {
       revert ALP_BadLiquidityCooldown(newLiquidityCooldown);
+    }
     uint256 oldCooldown = liquidityCooldown;
     liquidityCooldown = newLiquidityCooldown;
     emit ALP_SetLiquidityCooldown(oldCooldown, newLiquidityCooldown);
@@ -74,15 +76,16 @@ contract ALP is ERC20Upgradeable, OwnableUpgradeable {
     _burn(from, amount);
   }
 
-  function _beforeTokenTransfer(
-    address from,
-    address to,
-    uint256 amount
-  ) internal view override {
+  function _beforeTokenTransfer(address from, address to, uint256 amount)
+    internal
+    view
+    override
+  {
     if (whitelist[from] || whitelist[to]) return;
 
     uint256 cooldownExpireAt = cooldown[from];
-    if (amount > 0 && block.timestamp < cooldownExpireAt)
+    if (amount > 0 && block.timestamp < cooldownExpireAt) {
       revert ALP_Cooldown(cooldownExpireAt);
+    }
   }
 }

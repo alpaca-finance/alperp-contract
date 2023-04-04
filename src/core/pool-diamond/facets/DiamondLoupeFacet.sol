@@ -1,25 +1,27 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
-/******************************************************************************\
-* Author: Nick Mudge <nick@perfectabstractions.com> (https://twitter.com/mudgen)
-* EIP-2535 Diamonds: https://eips.ethereum.org/EIPS/eip-2535
-/******************************************************************************/
+/**
+ * \
+ * Author: Nick Mudge <nick@perfectabstractions.com> (https://twitter.com/mudgen)
+ * EIP-2535 Diamonds: https://eips.ethereum.org/EIPS/eip-2535
+ * /*****************************************************************************
+ */
 
-import { LibDiamond } from "../libraries/LibDiamond.sol";
-import { DiamondLoupeInterface } from "../interfaces/DiamondLoupeInterface.sol";
-import { ERC165Interface } from "../interfaces/ERC165Interface.sol";
+import {LibDiamond} from "../libraries/LibDiamond.sol";
+import {DiamondLoupeInterface} from "../interfaces/DiamondLoupeInterface.sol";
+import {ERC165Interface} from "../interfaces/ERC165Interface.sol";
 
 // The functions in DiamondLoupeFacet MUST be added to a diamond.
 // The EIP-2535 Diamond standard requires these functions.
@@ -43,9 +45,8 @@ contract DiamondLoupeFacet is DiamondLoupeInterface, ERC165Interface {
     for (uint256 i; i < numFacets; i++) {
       address facetAddress_ = ds.facetAddresses[i];
       facets_[i].facetAddress = facetAddress_;
-      facets_[i].functionSelectors = ds
-        .facetFunctionSelectors[facetAddress_]
-        .functionSelectors;
+      facets_[i].functionSelectors =
+        ds.facetFunctionSelectors[facetAddress_].functionSelectors;
     }
   }
 
@@ -59,9 +60,8 @@ contract DiamondLoupeFacet is DiamondLoupeInterface, ERC165Interface {
     returns (bytes4[] memory facetFunctionSelectors_)
   {
     LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
-    facetFunctionSelectors_ = ds
-      .facetFunctionSelectors[_facet]
-      .functionSelectors;
+    facetFunctionSelectors_ =
+      ds.facetFunctionSelectors[_facet].functionSelectors;
   }
 
   /// @notice Get all the facet addresses used by a diamond.
@@ -87,9 +87,8 @@ contract DiamondLoupeFacet is DiamondLoupeInterface, ERC165Interface {
     returns (address facetAddress_)
   {
     LibDiamond.DiamondStorage storage ds = LibDiamond.diamondStorage();
-    facetAddress_ = ds
-      .selectorToFacetAndPosition[_functionSelector]
-      .facetAddress;
+    facetAddress_ =
+      ds.selectorToFacetAndPosition[_functionSelector].facetAddress;
   }
 
   // This implements ERC-165.

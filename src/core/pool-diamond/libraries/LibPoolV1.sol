@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ *   ∩~~~~∩ 
+ *   ξ ･×･ ξ 
+ *   ξ　~　ξ 
+ *   ξ　　 ξ 
+ *   ξ　　 “~～~～〇 
+ *   ξ　　　　　　 ξ 
+ *   ξ ξ ξ~～~ξ ξ ξ 
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { StrategyInterface } from "../../../interfaces/StrategyInterface.sol";
-import { ALP } from "../../../tokens/ALP.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { SafeCast } from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import { PoolOracle } from "../../PoolOracle.sol";
-import { FarmFacetInterface } from "../interfaces/FarmFacetInterface.sol";
-import { LibPoolConfigV1 } from "./LibPoolConfigV1.sol";
+import {StrategyInterface} from "../../../interfaces/StrategyInterface.sol";
+import {ALP} from "../../../tokens/ALP.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import {PoolOracle} from "../../PoolOracle.sol";
+import {FarmFacetInterface} from "../interfaces/FarmFacetInterface.sol";
+import {LibPoolConfigV1} from "./LibPoolConfigV1.sol";
 
 library LibPoolV1 {
   using SafeERC20 for IERC20;
@@ -147,15 +147,16 @@ library LibPoolV1 {
   function allowed(address account) internal view {
     PoolV1DiamondStorage storage poolV1ds = poolV1DiamondStorage();
     // Load PoolConfigV1 diamond storage
-    LibPoolConfigV1.PoolConfigV1DiamondStorage
-      storage poolConfigds = LibPoolConfigV1.poolConfigV1DiamondStorage();
+    LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigds =
+      LibPoolConfigV1.poolConfigV1DiamondStorage();
 
     if (account != msg.sender && poolConfigds.router != msg.sender) {
       if (!poolV1ds.plugins[msg.sender]) {
         revert LibPoolV1_ForbiddenPlugin();
       }
-      if (!poolV1ds.approvedPlugins[account][msg.sender])
+      if (!poolV1ds.approvedPlugins[account][msg.sender]) {
         revert LibPoolV1_Forbidden();
+      }
     }
   }
 
@@ -187,16 +188,16 @@ library LibPoolV1 {
 
   function increasePoolLiquidity(address token, uint256 amount) internal {
     PoolV1DiamondStorage storage poolV1ds = poolV1DiamondStorage();
-    LibPoolConfigV1.PoolConfigV1DiamondStorage
-      storage poolConfigDs = LibPoolConfigV1.poolConfigV1DiamondStorage();
+    LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigDs =
+      LibPoolConfigV1.poolConfigV1DiamondStorage();
 
-    LibPoolConfigV1.StrategyData memory strategyData = poolConfigDs
-      .strategyDataOf[token];
+    LibPoolConfigV1.StrategyData memory strategyData =
+      poolConfigDs.strategyDataOf[token];
 
     poolV1ds.liquidityOf[token] += amount;
     if (
-      IERC20(token).balanceOf(address(this)) + strategyData.principle <
-      poolV1ds.liquidityOf[token]
+      IERC20(token).balanceOf(address(this)) + strategyData.principle
+        < poolV1ds.liquidityOf[token]
     ) revert LibPoolV1_LiquidityMismatch();
     emit IncreasePoolLiquidity(token, amount);
   }
@@ -205,8 +206,9 @@ library LibPoolV1 {
     PoolV1DiamondStorage storage poolV1ds = poolV1DiamondStorage();
 
     poolV1ds.liquidityOf[token] -= amount;
-    if (poolV1ds.liquidityOf[token] < poolV1ds.reservedOf[token])
+    if (poolV1ds.liquidityOf[token] < poolV1ds.reservedOf[token]) {
       revert LibPoolV1_InsufficientLiquidity();
+    }
     emit DecreasePoolLiquidity(token, amount);
   }
 
@@ -245,8 +247,9 @@ library LibPoolV1 {
     PoolV1DiamondStorage storage poolV1ds = poolV1DiamondStorage();
 
     poolV1ds.reservedOf[token] += amount;
-    if (poolV1ds.reservedOf[token] > poolV1ds.liquidityOf[token])
+    if (poolV1ds.reservedOf[token] > poolV1ds.liquidityOf[token]) {
       revert LibPoolV1_InsufficientLiquidity();
+    }
     emit IncreaseReserved(token, amount);
   }
 
@@ -279,8 +282,9 @@ library LibPoolV1 {
     poolV1ds.shortSizeOf[token] += amountUsd;
 
     if (shortCeiling != 0) {
-      if (poolV1ds.shortSizeOf[token] > shortCeiling)
+      if (poolV1ds.shortSizeOf[token] > shortCeiling) {
         revert LibPoolV1_OverShortCeiling();
+      }
     }
 
     emit IncreaseShortSize(token, amountUsd);
@@ -310,27 +314,24 @@ library LibPoolV1 {
   // ------------------------------
   function realizedFarmPnL(address token) internal {
     // Load PoolConfigV1 diamond storage
-    LibPoolConfigV1.PoolConfigV1DiamondStorage
-      storage poolConfigV1ds = LibPoolConfigV1.poolConfigV1DiamondStorage();
+    LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigV1ds =
+      LibPoolConfigV1.poolConfigV1DiamondStorage();
 
     StrategyInterface strategy = poolConfigV1ds.strategyOf[token];
 
-    if (address(strategy) != address(0))
+    if (address(strategy) != address(0)) {
       FarmFacetInterface(address(this)).farm(token, false);
+    }
   }
 
-  function tokenOut(
-    address token,
-    address to,
-    uint256 amountOut
-  ) internal {
+  function tokenOut(address token, address to, uint256 amountOut) internal {
     // Load PoolV1 diamond storage
-    LibPoolV1.PoolV1DiamondStorage storage poolV1ds = LibPoolV1
-      .poolV1DiamondStorage();
+    LibPoolV1.PoolV1DiamondStorage storage poolV1ds =
+      LibPoolV1.poolV1DiamondStorage();
 
     // Load PoolConfigV1 diamond storage
-    LibPoolConfigV1.PoolConfigV1DiamondStorage
-      storage poolConfigV1ds = LibPoolConfigV1.poolConfigV1DiamondStorage();
+    LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigV1ds =
+      LibPoolConfigV1.poolConfigV1DiamondStorage();
 
     StrategyInterface strategy = poolConfigV1ds.strategyOf[token];
     uint256 balance = IERC20(token).balanceOf(address(this));
@@ -352,8 +353,8 @@ library LibPoolV1 {
       // If amount to be withdrawn > 0, withdraw from strategy
       if (amountIn > 0) {
         // Handle when physical tokens in Pool < amountOut, then we need to withdraw from strategy.
-        LibPoolConfigV1.StrategyData storage strategyData = poolConfigV1ds
-          .strategyDataOf[token];
+        LibPoolConfigV1.StrategyData storage strategyData =
+          poolConfigV1ds.strategyDataOf[token];
 
         // Witthdraw funds from strategy
         uint256 actualAmountIn = strategy.withdraw(amountIn);
@@ -383,11 +384,7 @@ library LibPoolV1 {
     return nextBalance - prevBalance;
   }
 
-  function pushTokens(
-    address token,
-    address to,
-    uint256 amount
-  ) internal {
+  function pushTokens(address token, address to, uint256 amount) internal {
     PoolV1DiamondStorage storage poolV1ds = poolV1DiamondStorage();
 
     IERC20(token).safeTransfer(to, amount);
@@ -402,7 +399,7 @@ library LibPoolV1 {
     uint256 toTokenDecimals,
     uint256 amount
   ) internal pure returns (uint256) {
-    return (amount * 10**toTokenDecimals) / 10**fromTokenDecimals;
+    return (amount * 10 ** toTokenDecimals) / 10 ** fromTokenDecimals;
   }
 
   function convertUsde30ToTokens(
@@ -415,9 +412,8 @@ library LibPoolV1 {
     // Load PoolV1 diamond storage
     PoolV1DiamondStorage storage poolV1ds = poolV1DiamondStorage();
 
-    return
-      (amountUsd * (10**LibPoolConfigV1.getTokenDecimalsOf(token))) /
-      poolV1ds.oracle.getPrice(token, isUseMaxPrice);
+    return (amountUsd * (10 ** LibPoolConfigV1.getTokenDecimalsOf(token)))
+      / poolV1ds.oracle.getPrice(token, isUseMaxPrice);
   }
 
   function convertUsde30ToTokens(
@@ -430,9 +426,8 @@ library LibPoolV1 {
     // Load PoolV1 diamond storage
     PoolV1DiamondStorage storage poolV1ds = poolV1DiamondStorage();
 
-    return
-      (amountUsd * int256(10**LibPoolConfigV1.getTokenDecimalsOf(token))) /
-      int256(poolV1ds.oracle.getPrice(token, isUseMaxPrice));
+    return (amountUsd * int256(10 ** LibPoolConfigV1.getTokenDecimalsOf(token)))
+      / int256(poolV1ds.oracle.getPrice(token, isUseMaxPrice));
   }
 
   function convertTokensToUsde30(
@@ -445,25 +440,22 @@ library LibPoolV1 {
     // Load PoolV1 diamond storage
     PoolV1DiamondStorage storage poolV1ds = poolV1DiamondStorage();
 
-    return
-      (amountTokens * poolV1ds.oracle.getPrice(token, isUseMaxPrice)) /
-      (10**LibPoolConfigV1.getTokenDecimalsOf(token));
+    return (amountTokens * poolV1ds.oracle.getPrice(token, isUseMaxPrice))
+      / (10 ** LibPoolConfigV1.getTokenDecimalsOf(token));
   }
 
-  function increaseOpenInterest(
-    bool isLong,
-    address indexToken,
-    uint256 amount
-  ) internal {
+  function increaseOpenInterest(bool isLong, address indexToken, uint256 amount)
+    internal
+  {
     PoolV1DiamondStorage storage poolV1ds = poolV1DiamondStorage();
 
     if (isLong) {
       poolV1ds.openInterestLong[indexToken] += amount;
-      uint256 openInterestLongCeiling = LibPoolConfigV1
-        .getTokenOpenInterestLongCeilingOf(indexToken);
+      uint256 openInterestLongCeiling =
+        LibPoolConfigV1.getTokenOpenInterestLongCeilingOf(indexToken);
       if (
-        openInterestLongCeiling > 0 &&
-        poolV1ds.openInterestLong[indexToken] > openInterestLongCeiling
+        openInterestLongCeiling > 0
+          && poolV1ds.openInterestLong[indexToken] > openInterestLongCeiling
       ) {
         revert LibPoolV1_OverOpenInterestLongCeiling();
       }
@@ -473,11 +465,9 @@ library LibPoolV1 {
     emit IncreaseOpenInterest(isLong, indexToken, amount);
   }
 
-  function decreaseOpenInterest(
-    bool isLong,
-    address indexToken,
-    uint256 amount
-  ) internal {
+  function decreaseOpenInterest(bool isLong, address indexToken, uint256 amount)
+    internal
+  {
     PoolV1DiamondStorage storage poolV1ds = poolV1DiamondStorage();
 
     if (isLong) {

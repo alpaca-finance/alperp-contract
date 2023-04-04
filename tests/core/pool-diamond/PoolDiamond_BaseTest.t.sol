@@ -1,28 +1,61 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { BaseTest, MockWNative, console, stdError, MockStrategy, MockDonateVault, ALP, MockFlashLoanBorrower, LibPoolConfigV1, PoolOracle, PoolRouter03, OwnershipFacetInterface, GetterFacetInterface, LiquidityFacetInterface, PerpTradeFacetInterface, AdminFacetInterface, FarmFacetInterface, AccessControlFacetInterface, LibAccessControl, FundingRateFacetInterface, Orderbook02, MarketOrderRouter, FastPriceFeed, PythPriceFeed, FakePyth } from "../../base/BaseTest.sol";
+/// OZ
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+/// Pyth
+import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
-import { IPyth } from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
+/// Alperp tests
+import {
+  BaseTest,
+  MockWNative,
+  console,
+  stdError,
+  MockStrategy,
+  MockDonateVault,
+  ALP,
+  AP,
+  MockFlashLoanBorrower,
+  LibPoolConfigV1,
+  PoolOracle,
+  PoolRouter04,
+  OwnershipFacetInterface,
+  GetterFacetInterface,
+  LiquidityFacetInterface,
+  PerpTradeFacetInterface,
+  AdminFacetInterface,
+  FarmFacetInterface,
+  AccessControlFacetInterface,
+  LibAccessControl,
+  FundingRateFacetInterface,
+  Orderbook02,
+  MarketOrderRouter,
+  FastPriceFeed,
+  PythPriceFeed,
+  FakePyth,
+  TradeMiningManager
+} from "@alperp-tests/base/BaseTest.sol";
 
 abstract contract PoolDiamond_BaseTest is BaseTest {
   PoolOracle internal poolOracle;
   address internal poolDiamond;
-  PoolRouter03 internal poolRouter;
+  PoolRouter04 internal poolRouter;
   ALP internal alp;
+  TradeMiningManager internal tradeMiningManager;
+  AP internal ap;
 
   MockWNative internal revenueToken;
 
@@ -45,22 +78,20 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
 
     BaseTest.PoolConfigConstructorParams memory poolConfigParams = BaseTest
       .PoolConfigConstructorParams({
-        treasury: TREASURY,
-        fundingInterval: 1 hours,
-        mintBurnFeeBps: 30,
-        taxBps: 50,
-        stableBorrowingRateFactor: 100,
-        borrowingRateFactor: 100,
-        fundingRateFactor: 25,
-        liquidationFeeUsd: 5 * 10**30
-      });
+      treasury: TREASURY,
+      fundingInterval: 1 hours,
+      mintBurnFeeBps: 30,
+      taxBps: 50,
+      stableBorrowingRateFactor: 100,
+      borrowingRateFactor: 100,
+      fundingRateFactor: 25,
+      liquidationFeeUsd: 5 * 10 ** 30
+    });
 
     (poolOracle, poolDiamond) = deployPoolDiamond(poolConfigParams);
 
-    (
-      address[] memory tokens,
-      PoolOracle.PriceFeedInfo[] memory priceFeedInfo
-    ) = buildDefaultSetPriceFeedInput();
+    (address[] memory tokens, PoolOracle.PriceFeedInfo[] memory priceFeedInfo) =
+      buildDefaultSetPriceFeedInput();
     poolOracle.setPriceFeed(tokens, priceFeedInfo);
 
     poolAdminFacet = AdminFacetInterface(poolDiamond);
@@ -77,18 +108,22 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
     pyth = deployFakePyth(1, 0.01 ether); // no older than 1 sec for getPrice, 0.01 for fee
     pythPriceFeed = deployPythPriceFeed(address(pyth));
 
+    // Deploy Trade Mining
+    ap = deployAP();
+    tradeMiningManager = deployTradeMiningManager(address(ap));
+
     poolRouter = deployPoolRouter(
       address(bnb),
       poolDiamond,
-      address(pythPriceFeed)
+      address(pythPriceFeed),
+      address(tradeMiningManager)
     );
     poolAdminFacet.setRouter(address(poolRouter));
 
     alp.setWhitelist(address(poolRouter), true);
     // Grant Farm Keeper Role For This testing contract
     poolAccessControlFacet.grantRole(
-      LibAccessControl.FARM_KEEPER,
-      address(this)
+      LibAccessControl.FARM_KEEPER, address(this)
     );
 
     // Grant Plugin for Orderbook (Limit Order) and MarketOrderRouter for (Market Order)
@@ -102,11 +137,7 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
     );
     poolAdminFacet.setPlugin(address(orderbook), true);
     marketOrderRouter = deployMarketOrderRouter(
-      poolDiamond,
-      address(poolOracle),
-      address(bnb),
-      1 ether,
-      0.01 ether
+      poolDiamond, address(poolOracle), address(bnb), 1 ether, 0.01 ether
     );
     poolAdminFacet.setPlugin(address(marketOrderRouter), true);
 
@@ -115,6 +146,17 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
     pythPriceFeed.setUpdater(address(orderbook), true);
     pythPriceFeed.setUpdater(address(poolRouter), true);
     pythPriceFeed.setMaxPriceAge(15);
+
+    // Config trade mining.
+    ap.setMinter(address(tradeMiningManager), true);
+    tradeMiningManager.setAuth(address(poolRouter), true);
+    tradeMiningManager.setAuth(address(orderbook), true);
+    tradeMiningManager.setPeriod(1, 1735689600);
+    tradeMiningManager.setAp(ap);
+
+    // Set tradeMiningManager on poolRouter and orderbook.
+    poolRouter.setTradeMiningManager(tradeMiningManager);
+    orderbook.setTradeMiningManager(tradeMiningManager);
   }
 
   function checkPoolBalanceWithState(address token, int256 offset) internal {
@@ -122,18 +164,17 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
     assertEq(
       balance,
       uint256(
-        int256(poolGetterFacet.liquidityOf(token)) +
-          int256(poolGetterFacet.feeReserveOf(token)) +
-          offset
+        int256(poolGetterFacet.liquidityOf(token))
+          + int256(poolGetterFacet.feeReserveOf(token)) + offset
       )
     );
   }
 
-  function getPriceBits(
-    uint256 wbtcPrice,
-    uint256 wethPrice,
-    uint256 bnbPrice
-  ) internal pure returns (uint256) {
+  function getPriceBits(uint256 wbtcPrice, uint256 wethPrice, uint256 bnbPrice)
+    internal
+    pure
+    returns (uint256)
+  {
     uint256 priceBits = 0;
     priceBits = priceBits | (wbtcPrice << (0 * 32));
     priceBits = priceBits | (wethPrice << (1 * 32));

@@ -1,25 +1,28 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { ISecondaryPriceFeed } from "../interfaces/ISecondaryPriceFeed.sol";
-import { IMarketOrderRouter } from "../interfaces/IMarketOrderRouter.sol";
-import { PoolOracle } from "../core/PoolOracle.sol";
-import { Orderbook } from "../core/pool-diamond/limit-orders/Orderbook.sol";
+/// OZ
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-/// @notice This contract will be deprecated after 0.3.1
+/// Alperp
+import {ISecondaryPriceFeed} from "@alperp/interfaces/ISecondaryPriceFeed.sol";
+import {IMarketOrderRouter} from "@alperp/interfaces/IMarketOrderRouter.sol";
+import {PoolOracle} from "@alperp/core/PoolOracle.sol";
+import {Orderbook} from "@alperp/periphery/limit-orders/Orderbook.sol";
+
+/// @title FastPriceFeed - DPRECATED. This contract is no longer used.
 contract FastPriceFeed is OwnableUpgradeable {
   // fit data in a uint256 slot to save gas costs
   struct PriceDataItem {
@@ -28,13 +31,14 @@ contract FastPriceFeed is OwnableUpgradeable {
     uint32 cumulativeRefDelta; // cumulative Chainlink price delta
     uint32 cumulativeFastDelta; // cumulative fast price delta
   }
+
   struct LimitOrderKey {
     address primaryAccount;
     uint256 subAccountId;
     uint256 orderIndex;
   }
 
-  uint256 public constant PRICE_PRECISION = 10**30;
+  uint256 public constant PRICE_PRECISION = 10 ** 30;
 
   uint256 public constant CUMULATIVE_DELTA_PRECISION = 10 * 1000 * 1000;
 
@@ -381,12 +385,12 @@ contract FastPriceFeed is OwnableUpgradeable {
     _setPricesWithBits(_priceBits, _timestamp, _checksum);
 
     IMarketOrderRouter _positionRouter = IMarketOrderRouter(positionRouter);
-    uint256 maxEndIndexForIncrease = _positionRouter
-      .increasePositionRequestKeysStart() + _maxIncreasePositions;
-    uint256 maxEndIndexForDecrease = _positionRouter
-      .decreasePositionRequestKeysStart() + _maxDecreasePositions;
-    uint256 maxEndIndexForSwap = _positionRouter.swapOrderRequestKeysStart() +
-      _maxSwapOrders;
+    uint256 maxEndIndexForIncrease =
+      _positionRouter.increasePositionRequestKeysStart() + _maxIncreasePositions;
+    uint256 maxEndIndexForDecrease =
+      _positionRouter.decreasePositionRequestKeysStart() + _maxDecreasePositions;
+    uint256 maxEndIndexForSwap =
+      _positionRouter.swapOrderRequestKeysStart() + _maxSwapOrders;
 
     if (_endIndexForIncreasePositions > maxEndIndexForIncrease) {
       _endIndexForIncreasePositions = maxEndIndexForIncrease;
@@ -401,12 +405,10 @@ contract FastPriceFeed is OwnableUpgradeable {
     }
 
     _positionRouter.executeIncreasePositions(
-      _endIndexForIncreasePositions,
-      _feeReceiver
+      _endIndexForIncreasePositions, _feeReceiver
     );
     _positionRouter.executeDecreasePositions(
-      _endIndexForDecreasePositions,
-      _feeReceiver
+      _endIndexForDecreasePositions, _feeReceiver
     );
     _positionRouter.executeSwapOrders(_endIndexForSwapOrders, _feeReceiver);
   }
@@ -424,16 +426,14 @@ contract FastPriceFeed is OwnableUpgradeable {
     _setPricesWithBits(_priceBits, _timestamp, _checksum);
 
     Orderbook _orderbook = Orderbook(payable(orderbook));
-    for (uint256 i = 0; i < _increaseOrders.length; ) {
+    for (uint256 i = 0; i < _increaseOrders.length;) {
       if (!_revertOnError) {
-        try
-          _orderbook.executeIncreaseOrder(
-            _increaseOrders[i].primaryAccount,
-            _increaseOrders[i].subAccountId,
-            _increaseOrders[i].orderIndex,
-            payable(_feeReceiver)
-          )
-        {} catch {}
+        try _orderbook.executeIncreaseOrder(
+          _increaseOrders[i].primaryAccount,
+          _increaseOrders[i].subAccountId,
+          _increaseOrders[i].orderIndex,
+          payable(_feeReceiver)
+        ) {} catch {}
       } else {
         _orderbook.executeIncreaseOrder(
           _increaseOrders[i].primaryAccount,
@@ -448,16 +448,14 @@ contract FastPriceFeed is OwnableUpgradeable {
       }
     }
 
-    for (uint256 i = 0; i < _decreaseOrders.length; ) {
+    for (uint256 i = 0; i < _decreaseOrders.length;) {
       if (!_revertOnError) {
-        try
-          _orderbook.executeDecreaseOrder(
-            _decreaseOrders[i].primaryAccount,
-            _decreaseOrders[i].subAccountId,
-            _decreaseOrders[i].orderIndex,
-            payable(_feeReceiver)
-          )
-        {} catch {}
+        try _orderbook.executeDecreaseOrder(
+          _decreaseOrders[i].primaryAccount,
+          _decreaseOrders[i].subAccountId,
+          _decreaseOrders[i].orderIndex,
+          payable(_feeReceiver)
+        ) {} catch {}
       } else {
         _orderbook.executeDecreaseOrder(
           _decreaseOrders[i].primaryAccount,
@@ -472,15 +470,13 @@ contract FastPriceFeed is OwnableUpgradeable {
       }
     }
 
-    for (uint256 i = 0; i < _swapOrders.length; ) {
+    for (uint256 i = 0; i < _swapOrders.length;) {
       if (!_revertOnError) {
-        try
-          _orderbook.executeSwapOrder(
-            _swapOrders[i].primaryAccount,
-            _swapOrders[i].orderIndex,
-            payable(_feeReceiver)
-          )
-        {} catch {}
+        try _orderbook.executeSwapOrder(
+          _swapOrders[i].primaryAccount,
+          _swapOrders[i].orderIndex,
+          payable(_feeReceiver)
+        ) {} catch {}
       } else {
         _orderbook.executeSwapOrder(
           _swapOrders[i].primaryAccount,
@@ -504,10 +500,7 @@ contract FastPriceFeed is OwnableUpgradeable {
   }
 
   function enableFastPrice() external onlySigner {
-    require(
-      disableFastPriceVotes[msg.sender],
-      "FastPriceFeed: already enabled"
-    );
+    require(disableFastPriceVotes[msg.sender], "FastPriceFeed: already enabled");
     disableFastPriceVotes[msg.sender] = false;
     disableFastPriceVoteCount = disableFastPriceVoteCount - 1;
 
@@ -525,33 +518,33 @@ contract FastPriceFeed is OwnableUpgradeable {
   // - in case the maxDeviationBasisPoints between _refPrice and fastPrice is exceeded
   // - in case watchers flag an issue
   // - in case the cumulativeFastDelta exceeds the cumulativeRefDelta by the maxCumulativeDeltaDiff
-  function getPrice(
-    address _token,
-    uint256 _refPrice,
-    bool _maximise
-  ) external view returns (uint256) {
+  function getPrice(address _token, uint256 _refPrice, bool _maximise)
+    external
+    view
+    returns (uint256)
+  {
     if (block.timestamp > lastUpdatedAt + maxPriceUpdateDelay) {
       if (_maximise) {
-        return
-          (_refPrice * (BASIS_POINTS_DIVISOR + spreadBasisPointsIfChainError)) /
-          (BASIS_POINTS_DIVISOR);
+        return (
+          _refPrice * (BASIS_POINTS_DIVISOR + spreadBasisPointsIfChainError)
+        ) / (BASIS_POINTS_DIVISOR);
       }
 
-      return
-        (_refPrice * (BASIS_POINTS_DIVISOR - spreadBasisPointsIfChainError)) /
-        (BASIS_POINTS_DIVISOR);
+      return (
+        _refPrice * (BASIS_POINTS_DIVISOR - spreadBasisPointsIfChainError)
+      ) / (BASIS_POINTS_DIVISOR);
     }
 
     if (block.timestamp > lastUpdatedAt + priceDuration) {
       if (_maximise) {
-        return
-          (_refPrice * (BASIS_POINTS_DIVISOR + spreadBasisPointsIfInactive)) /
-          (BASIS_POINTS_DIVISOR);
+        return (
+          _refPrice * (BASIS_POINTS_DIVISOR + spreadBasisPointsIfInactive)
+        ) / (BASIS_POINTS_DIVISOR);
       }
 
-      return
-        (_refPrice * (BASIS_POINTS_DIVISOR - (spreadBasisPointsIfInactive))) /
-        (BASIS_POINTS_DIVISOR);
+      return (
+        _refPrice * (BASIS_POINTS_DIVISOR - (spreadBasisPointsIfInactive))
+      ) / (BASIS_POINTS_DIVISOR);
     }
 
     uint256 fastPrice = prices[_token];
@@ -559,15 +552,14 @@ contract FastPriceFeed is OwnableUpgradeable {
       return _refPrice;
     }
 
-    uint256 diffBasisPoints = _refPrice > fastPrice
-      ? _refPrice - (fastPrice)
-      : fastPrice - (_refPrice);
+    uint256 diffBasisPoints =
+      _refPrice > fastPrice ? _refPrice - (fastPrice) : fastPrice - (_refPrice);
     diffBasisPoints = (diffBasisPoints * (BASIS_POINTS_DIVISOR)) / (_refPrice);
 
     // create a spread between the _refPrice and the fastPrice if the maxDeviationBasisPoints is exceeded
     // or if watchers have flagged an issue with the fast price
-    bool hasSpread = !favorFastPrice(_token) ||
-      diffBasisPoints > maxDeviationBasisPoints;
+    bool hasSpread =
+      !favorFastPrice(_token) || diffBasisPoints > maxDeviationBasisPoints;
 
     if (hasSpread) {
       return _refPrice;
@@ -595,8 +587,9 @@ contract FastPriceFeed is OwnableUpgradeable {
       uint256 cumulativeFastDelta
     ) = getPriceData(_token);
     if (
-      cumulativeFastDelta > cumulativeRefDelta &&
-      cumulativeFastDelta - cumulativeRefDelta > maxCumulativeDeltaDiffs[_token]
+      cumulativeFastDelta > cumulativeRefDelta
+        && cumulativeFastDelta - cumulativeRefDelta
+          > maxCumulativeDeltaDiffs[_token]
     ) {
       // force a spread if the cumulative delta for the fast price feed exceeds the cumulative delta
       // for the Chainlink price feed by the maxCumulativeDeltaDiff allowed
@@ -609,12 +602,7 @@ contract FastPriceFeed is OwnableUpgradeable {
   function getPriceData(address _token)
     public
     view
-    returns (
-      uint256,
-      uint256,
-      uint256,
-      uint256
-    )
+    returns (uint256, uint256, uint256, uint256)
   {
     PriceDataItem memory data = priceData[_token];
     return (
@@ -673,42 +661,34 @@ contract FastPriceFeed is OwnableUpgradeable {
         uint256 refDeltaAmount = refPrice > prevRefPrice
           ? refPrice - prevRefPrice
           : prevRefPrice - refPrice;
-        uint256 fastDeltaAmount = fastPrice > _price
-          ? fastPrice - _price
-          : _price - fastPrice;
+        uint256 fastDeltaAmount =
+          fastPrice > _price ? fastPrice - _price : _price - fastPrice;
 
         // reset cumulative delta values if it is a new time window
-        if (
-          refTime / priceDataInterval != block.timestamp / priceDataInterval
-        ) {
+        if (refTime / priceDataInterval != block.timestamp / priceDataInterval)
+        {
           cumulativeRefDelta = 0;
           cumulativeFastDelta = 0;
         }
 
         if (prevRefPrice > 0) {
-          cumulativeRefDelta =
-            cumulativeRefDelta +
-            ((refDeltaAmount * CUMULATIVE_DELTA_PRECISION) / prevRefPrice);
+          cumulativeRefDelta = cumulativeRefDelta
+            + ((refDeltaAmount * CUMULATIVE_DELTA_PRECISION) / prevRefPrice);
         }
         if (fastPrice > 0) {
-          cumulativeFastDelta =
-            cumulativeFastDelta +
-            ((fastDeltaAmount * CUMULATIVE_DELTA_PRECISION) / fastPrice);
+          cumulativeFastDelta = cumulativeFastDelta
+            + ((fastDeltaAmount * CUMULATIVE_DELTA_PRECISION) / fastPrice);
         }
       }
 
       if (
-        cumulativeFastDelta > cumulativeRefDelta &&
-        cumulativeFastDelta - cumulativeRefDelta >
-        maxCumulativeDeltaDiffs[_token]
+        cumulativeFastDelta > cumulativeRefDelta
+          && cumulativeFastDelta - cumulativeRefDelta
+            > maxCumulativeDeltaDiffs[_token]
       ) {
         emit MaxCumulativeDeltaDiffExceeded(
-          _token,
-          refPrice,
-          fastPrice,
-          cumulativeRefDelta,
-          cumulativeFastDelta
-        );
+          _token, refPrice, fastPrice, cumulativeRefDelta, cumulativeFastDelta
+          );
       }
 
       _setPriceData(_token, refPrice, cumulativeRefDelta, cumulativeFastDelta);
@@ -719,7 +699,7 @@ contract FastPriceFeed is OwnableUpgradeable {
         cumulativeRefDelta,
         cumulativeFastDelta,
         _checksum
-      );
+        );
     }
 
     prices[_token] = _price;

@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 pragma solidity 0.8.17;
 
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { IERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import { ERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import { SafeERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
-import { IRewarder } from "./interfaces/IRewarder.sol";
-import { IStaking } from "./interfaces/IStaking.sol";
+import {IRewarder} from "./interfaces/IRewarder.sol";
+import {IStaking} from "./interfaces/IStaking.sol";
 
 contract ALPStaking is IStaking, OwnableUpgradeable {
   using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -39,10 +39,7 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
   address public compounder;
 
   event LogDeposit(
-    address indexed caller,
-    address indexed user,
-    address token,
-    uint256 amount
+    address indexed caller, address indexed user, address token, uint256 amount
   );
   event LogWithdraw(address indexed caller, address token, uint256 amount);
   event LogAddStakingToken(address newToken, address[] newRewarders);
@@ -58,11 +55,12 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
     onlyOwner
   {
     if (stakingToken != address(0)) revert ALPStaking_StakingTokenExisted();
-    if (ERC20Upgradeable(newToken).decimals() != 18)
+    if (ERC20Upgradeable(newToken).decimals() != 18) {
       revert ALPStaking_BadDecimals();
+    }
 
     uint256 length = newRewarders.length;
-    for (uint256 i = 0; i < length; ) {
+    for (uint256 i = 0; i < length;) {
       _updatePool(newToken, newRewarders[i]);
 
       emit LogAddStakingToken(newToken, newRewarders);
@@ -74,8 +72,9 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
 
   function addRewarder(address newRewarder) external onlyOwner {
     if (stakingToken == address(0)) revert ALPStaking_StakingTokenNotExisted();
-    if (ERC20Upgradeable(stakingToken).decimals() != 18)
+    if (ERC20Upgradeable(stakingToken).decimals() != 18) {
       revert ALPStaking_BadDecimals();
+    }
 
     _updatePool(stakingToken, newRewarder);
 
@@ -88,16 +87,16 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
   ) external onlyOwner {
     uint256 tokenLength = stakingTokenRewarders[token].length;
     address removedRewarder = stakingTokenRewarders[token][removeRewarderIndex];
-    stakingTokenRewarders[token][removeRewarderIndex] = stakingTokenRewarders[
-      token
-    ][tokenLength - 1];
+    stakingTokenRewarders[token][removeRewarderIndex] =
+      stakingTokenRewarders[token][tokenLength - 1];
     stakingTokenRewarders[token].pop();
     isRewarder[removedRewarder] = false;
   }
 
   function _updatePool(address newToken, address newRewarder) internal {
-    if (!isDuplicatedRewarder(newToken, newRewarder))
+    if (!isDuplicatedRewarder(newToken, newRewarder)) {
       stakingTokenRewarders[newToken].push(newRewarder);
+    }
 
     stakingToken = newToken;
     if (!isRewarder[newRewarder]) {
@@ -111,7 +110,7 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
     returns (bool)
   {
     uint256 length = stakingTokenRewarders[_stakingToken].length;
-    for (uint256 i = 0; i < length; ) {
+    for (uint256 i = 0; i < length;) {
       if (stakingTokenRewarders[_stakingToken][i] == rewarder) {
         return true;
       }
@@ -127,15 +126,11 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
     compounder = compounder_;
   }
 
-  function deposit(
-    address to,
-    address token,
-    uint256 amount
-  ) external {
+  function deposit(address to, address token, uint256 amount) external {
     if (stakingToken != token) revert ALPStaking_UnknownStakingToken();
 
     uint256 length = stakingTokenRewarders[token].length;
-    for (uint256 i = 0; i < length; ) {
+    for (uint256 i = 0; i < length;) {
       address rewarder = stakingTokenRewarders[token][i];
 
       IRewarder(rewarder).onDeposit(to, amount);
@@ -146,11 +141,7 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
     }
 
     userTokenAmount[token][to] += amount;
-    IERC20Upgradeable(token).safeTransferFrom(
-      msg.sender,
-      address(this),
-      amount
-    );
+    IERC20Upgradeable(token).safeTransferFrom(msg.sender, address(this), amount);
 
     emit LogDeposit(msg.sender, to, token, amount);
   }
@@ -178,11 +169,12 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
 
   function _withdraw(address token, uint256 amount) internal {
     if (stakingToken != token) revert ALPStaking_UnknownStakingToken();
-    if (userTokenAmount[token][msg.sender] < amount)
+    if (userTokenAmount[token][msg.sender] < amount) {
       revert ALPStaking_InsufficientTokenAmount();
+    }
 
     uint256 length = stakingTokenRewarders[token].length;
-    for (uint256 i = 0; i < length; ) {
+    for (uint256 i = 0; i < length;) {
       address rewarder = stakingTokenRewarders[token][i];
 
       IRewarder(rewarder).onWithdraw(msg.sender, amount);
@@ -213,7 +205,7 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
     address[] memory rewarders
   ) internal {
     uint256 length = rewarders.length;
-    for (uint256 i = 0; i < length; ) {
+    for (uint256 i = 0; i < length;) {
       if (!isRewarder[rewarders[i]]) {
         revert ALPStaking_NotRewarder();
       }
@@ -226,7 +218,7 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
     }
   }
 
-  function calculateShare(address rewarder, address user)
+  function calculateShare(address, /* rewarder */ address user)
     external
     view
     returns (uint256)
@@ -234,7 +226,7 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
     return userTokenAmount[stakingToken][user];
   }
 
-  function calculateTotalShare(address rewarder)
+  function calculateTotalShare(address /* rewarder */ )
     external
     view
     returns (uint256)

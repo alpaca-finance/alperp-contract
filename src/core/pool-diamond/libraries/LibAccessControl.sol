@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
@@ -25,14 +25,10 @@ library LibAccessControl {
     bytes32 indexed newAdminRole
   );
   event RoleGranted(
-    bytes32 indexed role,
-    address indexed account,
-    address indexed sender
+    bytes32 indexed role, address indexed account, address indexed sender
   );
   event RoleRevoked(
-    bytes32 indexed role,
-    address indexed account,
-    address indexed sender
+    bytes32 indexed role, address indexed account, address indexed sender
   );
 
   // -------------
@@ -52,6 +48,7 @@ library LibAccessControl {
     mapping(address => bool) members;
     bytes32 adminRole;
   }
+
   struct AccessControlDiamondStorage {
     mapping(bytes32 => RoleData) roles;
   }
@@ -73,21 +70,17 @@ library LibAccessControl {
    * To change a role's admin, use {_setRoleAdmin}.
    */
   function _getRoleAdmin(bytes32 role) internal view returns (bytes32) {
-    AccessControlDiamondStorage
-      storage accessControlDs = accessControlDiamondStorage();
+    AccessControlDiamondStorage storage accessControlDs =
+      accessControlDiamondStorage();
     return accessControlDs.roles[role].adminRole;
   }
 
   /**
    * @dev Returns `true` if `account` has been granted `role`.
    */
-  function _hasRole(bytes32 role, address account)
-    internal
-    view
-    returns (bool)
-  {
-    AccessControlDiamondStorage
-      storage accessControlDs = accessControlDiamondStorage();
+  function _hasRole(bytes32 role, address account) internal view returns (bool) {
+    AccessControlDiamondStorage storage accessControlDs =
+      accessControlDiamondStorage();
     return accessControlDs.roles[role].members[account];
   }
 
@@ -153,8 +146,8 @@ library LibAccessControl {
    * Emits a {RoleAdminChanged} event.
    */
   function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal {
-    AccessControlDiamondStorage
-      storage accessControlDs = accessControlDiamondStorage();
+    AccessControlDiamondStorage storage accessControlDs =
+      accessControlDiamondStorage();
     bytes32 previousAdminRole = _getRoleAdmin(role);
     accessControlDs.roles[role].adminRole = adminRole;
     emit RoleAdminChanged(role, previousAdminRole, adminRole);
@@ -169,8 +162,8 @@ library LibAccessControl {
    */
   function _grantRole(bytes32 role, address account) internal {
     if (!_hasRole(role, account)) {
-      AccessControlDiamondStorage
-        storage accessControlDs = accessControlDiamondStorage();
+      AccessControlDiamondStorage storage accessControlDs =
+        accessControlDiamondStorage();
       accessControlDs.roles[role].members[account] = true;
       emit RoleGranted(role, account, msg.sender);
     }
@@ -185,8 +178,8 @@ library LibAccessControl {
    */
   function _revokeRole(bytes32 role, address account) internal {
     if (_hasRole(role, account)) {
-      AccessControlDiamondStorage
-        storage accessControlDs = accessControlDiamondStorage();
+      AccessControlDiamondStorage storage accessControlDs =
+        accessControlDiamondStorage();
       accessControlDs.roles[role].members[account] = false;
       emit RoleRevoked(role, account, msg.sender);
     }

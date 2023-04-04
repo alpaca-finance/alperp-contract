@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 /**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
+ * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
+ * Alpaca Fin Corporation
+ */
 
 pragma solidity 0.8.17;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import { MintableTokenInterface } from "../../interfaces/MintableTokenInterface.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {MintableTokenInterface} from "../../interfaces/MintableTokenInterface.sol";
 
 contract BaseMintableToken is Ownable, ERC20, MintableTokenInterface {
   error BaseMintableToken_NotMinter();
@@ -57,8 +57,9 @@ contract BaseMintableToken is Ownable, ERC20, MintableTokenInterface {
   }
 
   function mint(address to, uint256 amount) public override onlyMinter {
-    if (totalSupply() + amount > maxSupply)
+    if (totalSupply() + amount > maxSupply) {
       revert BaseMintableToken_MintExceedMaxSupply();
+    }
     _mint(to, amount);
   }
 
@@ -67,8 +68,9 @@ contract BaseMintableToken is Ownable, ERC20, MintableTokenInterface {
   }
 
   function setMaxSupply(uint256 newMaxSupply_) external onlyOwner {
-    if (newMaxSupply_ > maxSupplyCap)
+    if (newMaxSupply_ > maxSupplyCap) {
       revert BaseMintableToken_ExceedMaxSupplyCap();
+    }
     uint256 oldMaxSupply = maxSupplyCap;
     maxSupply = newMaxSupply_;
 
