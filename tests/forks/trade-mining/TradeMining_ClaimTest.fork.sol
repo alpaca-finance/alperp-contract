@@ -87,15 +87,6 @@ contract TradeMining_ClaimForkTest is TradeMining_BaseForkTest {
       0xe45216Ac4816A5Ec5378B1D13dE8aA9F262ce9De,
       0xe45216Ac4816A5Ec5378B1D13dE8aA9F262ce9De
     );
-    //   function executeIncreaseOrder(
-    //   address _address,
-    //   uint256 _subAccountId,
-    //   uint256 _orderIndex,
-    //   address payable _feeReceiver,
-    //   bytes[] calldata _priceUpdateData,
-    //   address[] calldata _tokens,
-    //   uint256[] calldata _prices
-    // ) external nonReentrant whitelisted
     address[] memory tokens = new address[](1);
     tokens[0] = address(forkWbnb);
     uint256[] memory prices = new uint256[](1);
@@ -115,7 +106,6 @@ contract TradeMining_ClaimForkTest is TradeMining_BaseForkTest {
     assertEq(forkAp.balanceOf(address(this)), 60_000 ether);
 
     // Feed Paradeen
-    // feed(uint256[] memory _timestamps, uint256[] memory _amounts)
     uint256[] memory timestamps = new uint256[](1);
     timestamps[0] = 1680739200;
     uint256[] memory amounts = new uint256[](1);
