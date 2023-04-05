@@ -26,6 +26,8 @@ contract Config {
     0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c;
   address public constant WBNB_TOKEN =
     0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
+  address public constant ALPACA_TOKEN =
+    0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F;
 
   address public constant CHAINLINK_ORACLE =
     0x634902128543b25265da350e2d961C7ff540fC71;
@@ -45,6 +47,8 @@ contract Config {
     0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE;
 
   /// Alperp
+  address public constant POOL_DIAMOND_ADDRESS =
+    0x18A15bF2Aa1E514dc660Cc4B08d05f9f6f0FdC4e;
   address public constant POOL_ROUTER_04 =
     0x5E8466ed06f7Acaa78Ab21b0F5FEc6810afcC199;
   address public constant ORDER_BOOK =

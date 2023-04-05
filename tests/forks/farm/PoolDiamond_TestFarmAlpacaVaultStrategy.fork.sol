@@ -78,10 +78,10 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     poolFarmFacet.setStrategyOf(address(forkWbtc), wbtcFarmStrategy);
 
     // set as pending
-    poolFarmFacet.setStrategyOf(address(forkBnb), bnbFarmStrategy);
+    poolFarmFacet.setStrategyOf(address(forkWbnb), bnbFarmStrategy);
     vm.warp(block.timestamp + 1 weeks + 1);
     // committing the pending strategy
-    poolFarmFacet.setStrategyOf(address(forkBnb), bnbFarmStrategy);
+    poolFarmFacet.setStrategyOf(address(forkWbnb), bnbFarmStrategy);
 
     // Grant Farm Keeper Role For EVE
     poolAccessControlFacet.grantRole(LibAccessControl.FARM_KEEPER, EVE);

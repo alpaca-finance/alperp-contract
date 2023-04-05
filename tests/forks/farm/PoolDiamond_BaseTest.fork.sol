@@ -19,12 +19,11 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {MockPyth as FakePyth} from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
 import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
-/// Chainlink
-import {ChainlinkPriceFeedInterface} from
-  "@alperp/interfaces/ChainLinkPriceFeedInterface.sol";
-
 /// Alperp Tests
-import {ForkBaseTest} from "@alperp-tests/forks/base/BaseTest.sol";
+import {
+  ForkBaseTest,
+  ChainlinkPriceFeedInterface
+} from "@alperp-tests/forks/base/ForkBaseTest.sol";
 import {console} from "@alperp-tests/utils/console.sol";
 import {math} from "@alperp-tests/utils/math.sol";
 
@@ -109,14 +108,6 @@ contract PoolDiamond_BaseForkTest is ForkBaseTest {
 
   ALP internal alp;
 
-  IERC20 internal forkBusd;
-  IERC20 internal forkWbtc;
-  IERC20 internal forkBnb;
-
-  ChainlinkPriceFeedInterface internal forkBusdPriceFeed;
-  ChainlinkPriceFeedInterface internal forkWbtcPriceFeed;
-  ChainlinkPriceFeedInterface internal forkBnbPriceFeed;
-
   PythPriceFeed internal pythPriceFeed;
   IPyth internal pyth;
 
@@ -128,7 +119,7 @@ contract PoolDiamond_BaseForkTest is ForkBaseTest {
     address[] memory tokens = new address[](3);
     tokens[0] = address(forkBusd);
     tokens[1] = address(forkWbtc);
-    tokens[2] = address(forkBnb);
+    tokens[2] = address(forkWbnb);
 
     LibPoolConfigV1.TokenConfig[] memory tokenConfigs =
       new LibPoolConfigV1.TokenConfig[](3);
@@ -176,7 +167,7 @@ contract PoolDiamond_BaseForkTest is ForkBaseTest {
   function setUp() public virtual {
     forkBusd = IERC20(BUSD_TOKEN);
     forkWbtc = IERC20(WBTC_TOKEN);
-    forkBnb = IERC20(WBNB_TOKEN);
+    forkWbnb = IERC20(WBNB_TOKEN);
 
     forkBusdPriceFeed = ChainlinkPriceFeedInterface(BUSD_CHAINLINK_ORACLE);
     forkWbtcPriceFeed = ChainlinkPriceFeedInterface(WBTC_CHAINLINK_ORACLE);
@@ -222,7 +213,7 @@ contract PoolDiamond_BaseForkTest is ForkBaseTest {
     pyth = deployFakePyth(1, 0.01 ether); // no older than 1 sec for getPrice, 0.01 for fee
     pythPriceFeed = deployPythPriceFeed(address(pyth));
     poolRouter =
-      deployPoolRouter(address(forkBnb), poolDiamond, address(pythPriceFeed));
+      deployPoolRouter(address(forkWbnb), poolDiamond, address(pythPriceFeed));
     poolAdminFacet.setRouter(address(poolRouter));
 
     alp.setWhitelist(address(poolRouter), true);
