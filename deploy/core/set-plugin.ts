@@ -6,7 +6,7 @@ import { getConfig } from "../utils/config";
 
 const config = getConfig();
 
-const plugin = config.Pools.ALP.orderbook;
+const plugin = config.PoolRouter;
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];

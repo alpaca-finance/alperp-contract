@@ -24,7 +24,7 @@
       }
     }
   },
-  "PoolRouter": "0x73B1413E861a0844D6A8f6BE42c4B791E27c5DE2",
+  "PoolRouter": "0x5E8466ed06f7Acaa78Ab21b0F5FEc6810afcC199",
   "WNativeRelayer": "0xE1D2CA01bc88F325fF7266DD2165944f3CAf0D3D",
   "Pools": {
     "ALP": {
@@ -79,9 +79,9 @@
   "Timelock": "",
   "OpMultiSig": "",
   "TradeMining": {
-    "tradeMiningManager": "",
-    "paradeen": "",
+    "tradeMiningManager": "0xD78C4b5dfcb1EdD23654A59EBc733c3Fe133DD36",
+    "paradeen": "0xBA61db6b2CFEbC1580BF692389e831B24bb0a5eF",
     "AP": "0x2Fb74F8E1e9EFaEEc31e57946e0C1bC6853ca4f1",
-    "rewardToken": ""
+    "rewardToken": "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F"
   }
 }

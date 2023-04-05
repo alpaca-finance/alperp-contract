@@ -1,12 +1,8 @@
 -include .env
 
-export FOUNDRY_TEST=src/tests/integrations
-export FOUNDRY_ETH_RPC_URL=${ARCHIVE_NODE_RPC}
-export FOUNDRY_FORK_BLOCK_NUMBER=22558708
-
-
-test-integration: node_modules
-	@forge test -vvv --ffi -c tests/integrations
+test-fork:
+	@echo "Running fork tests on ${ARCHIVE_NODE_RPC} at block ${FORK_BLOCK}"
+	@forge test --watch -vvv --fork-url ${ARCHIVE_NODE_RPC} --fork-block-number ${FORK_BLOCK} --match-contract \ForkTest\
 
 .PHONY: config
 config:

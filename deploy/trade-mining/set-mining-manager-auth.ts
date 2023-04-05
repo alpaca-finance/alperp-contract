@@ -7,12 +7,11 @@ import { getConfig } from "../utils/config";
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = getConfig();
 
-  const MINER_MANAGER_ADDRESS = config.TradeMining.address;
   const WHITELIST_ADDRESSES = [config.PoolRouter, config.Pools.ALP.orderbook];
 
   const deployer = (await ethers.getSigners())[0];
   const tradeMiningManager = TradeMiningManager__factory.connect(
-    MINER_MANAGER_ADDRESS,
+    config.TradeMining.tradeMiningManager,
     deployer
   );
 

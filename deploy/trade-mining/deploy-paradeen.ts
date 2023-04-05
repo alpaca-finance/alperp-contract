@@ -10,7 +10,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];
 
   const AP = config.TradeMining.AP;
-  const START_WEEK_CURSOR = 1680566400;
+  const START_WEEK_CURSOR = 1680739200;
   const REWARD_TOKEN = config.Tokens.ALPACA;
   const EMERGENCY_RETURN = deployer.address;
 

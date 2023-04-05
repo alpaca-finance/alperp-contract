@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -24,7 +24,8 @@ contract Config {
     0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56;
   address public constant WBTC_TOKEN =
     0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c;
-  address public constant BNB_TOKEN = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
+  address public constant WBNB_TOKEN =
+    0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
 
   address public constant CHAINLINK_ORACLE =
     0x634902128543b25265da350e2d961C7ff540fC71;
@@ -42,4 +43,15 @@ contract Config {
     0x264990fbd0A4796A3E3d8E37C4d5F87a3aCa5Ebf;
   address public constant BNB_CHAINLINK_ORACLE =
     0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE;
+
+  /// Alperp
+  address public constant POOL_ROUTER_04 =
+    0x5E8466ed06f7Acaa78Ab21b0F5FEc6810afcC199;
+  address public constant ORDER_BOOK =
+    0x366B1360d7D43aa6A8335E27696035f4EA66293f;
+  address public constant PARADEEN = 0xBA61db6b2CFEbC1580BF692389e831B24bb0a5eF;
+  address public constant AP_ADDRESS =
+    0x2Fb74F8E1e9EFaEEc31e57946e0C1bC6853ca4f1;
+  address public constant POOL_ORACLE =
+    0x9fD00Faef95cc028bc343BaC1fC11E870635B974;
 }
