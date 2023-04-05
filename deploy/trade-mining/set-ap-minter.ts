@@ -7,11 +7,10 @@ import { getConfig } from "../utils/config";
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = getConfig();
 
-  const TOKEN_ADDRESS = config.Tokens.AP;
-  const MINTER_ADDRESSES = [config.TradeMining.address];
+  const MINTER_ADDRESSES = [config.TradeMining.tradeMiningManager];
 
   const deployer = (await ethers.getSigners())[0];
-  const ap = AP__factory.connect(TOKEN_ADDRESS, deployer);
+  const ap = AP__factory.connect(config.TradeMining.AP, deployer);
   const tokenSymbol = await ap.symbol();
 
   for (let i = 0; i < MINTER_ADDRESSES.length; i++) {

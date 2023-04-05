@@ -8,7 +8,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = getConfig();
 
   const MINEABLE_ADDRESSES = [config.PoolRouter, config.Pools.ALP.orderbook];
-  const MINER_ADDRESS = config.TradeMining.address;
 
   const deployer = (await ethers.getSigners())[0];
 
@@ -18,11 +17,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       deployer
     );
     console.log(
-      `> Setting miner [${i + 1}/${
+      `> [${i + 1}/${
         MINEABLE_ADDRESSES.length
-      }] for mineable: ${MINER_ADDRESS}`
+      }] Set trade mining manager for ${MINEABLE_ADDRESSES}`
     );
-    const tx = await tradeMiningManager.setTradeMiningManager(MINER_ADDRESS);
+    const tx = await tradeMiningManager.setTradeMiningManager(
+      config.TradeMining.tradeMiningManager
+    );
     console.log(`> ⛓ Tx submitted: ${tx.hash}`);
     console.log(`> Waiting for tx to be mined...`);
     await tx.wait();
