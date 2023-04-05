@@ -81,7 +81,7 @@
   "TradeMining": {
     "address": "",
     "rewarder": "",
-    "miningPoint": "",
+    "miningPoint": "0x2Fb74F8E1e9EFaEEc31e57946e0C1bC6853ca4f1",
     "rewardToken": ""
   }
 }

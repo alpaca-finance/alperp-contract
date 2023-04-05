@@ -58,6 +58,7 @@ contract AP is OwnableUpgradeable, IAP {
   event SetMinter(address _minter, bool _newAllow);
   event Mint(uint256 _weekTimestamp, address _to, uint256 _amount);
 
+  /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() {
     _disableInitializers();
   }
