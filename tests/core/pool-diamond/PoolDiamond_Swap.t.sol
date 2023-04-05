@@ -669,4 +669,148 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
 
     vm.stopPrank();
   }
+
+  function testCorrectness_WhenDynamicFeeEnabled_WhenSwapSuccess() external {
+    daiPriceFeed.setLatestAnswer(1 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(300 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(60000 * 10 ** 8);
+
+    bnb.mint(ALICE, 200 ether);
+    wbtc.mint(ALICE, 1 * 10 ** 8);
+
+    // ------- Alice session START -------
+    vm.startPrank(ALICE);
+
+    // Alice add liquidity 200 BNB (~$60,000)
+    bnb.approve(address(poolRouter), 200 ether);
+    alp.approve(address(poolRouter), type(uint256).max);
+    poolRouter.addLiquidity(address(bnb), 200 ether, ALICE, 0, zeroBytesArr());
+
+    // Alice add 200 BNB as liquidity to the pool, the following condition is expected:
+    // 1. Pool should have 200 * (1-0.003) * 300 = 59820 USD in AUM
+    assertEq(poolGetterFacet.getAumE18(false), 59820 ether);
+
+    // Alice add liquidity 1 WBTC (~$60,000)
+    wbtc.approve(address(poolRouter), 1 * 10 ** 8);
+    alp.approve(address(poolRouter), type(uint256).max);
+    poolRouter.addLiquidity(
+      address(wbtc), 1 * 10 ** 8, ALICE, 0, zeroBytesArr()
+    );
+
+    // Alice add another 1 WBTC as liquidity to the pool, the following condition is expected:
+    // 1. Pool should have 59,820 + (1 * (1-0.003) * 60000) = 119,640 USD in AUM
+    // 2. Alice should have 119,640 ALP
+    // 3. Pool should make 200 * 0.003 = 0.6 BNB in fee
+    // 4. Pool should make 1 * 0.003 = 0.003 WBTC in fee
+    // 5. USD debt for BNB should be 59,820 USD
+    // 6. USD debt for WBTC should be 59,820 USD
+    // 7. Pool's BNB liquidity should be 200 * (1-0.003) = 199.4 BNB
+    // 8. Pool's WBTC liquidity should be 1 * (1-0.003) = 0.997 WBTC
+    assertEq(poolGetterFacet.getAumE18(false), 119640 ether);
+    assertEq(poolGetterFacet.alp().balanceOf(ALICE), 119640 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(bnb)), 0.6 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 300000);
+    assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 59820 ether);
+    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 59820 ether);
+    assertEq(poolGetterFacet.liquidityOf(address(bnb)), 199.4 ether);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.997 * 10 ** 8);
+
+    vm.stopPrank();
+    // ------- Alice session END -------
+
+    // Dynamic fee is enabled here.
+    poolAdminFacet.setIsDynamicFeeEnable(true);
+
+    bnbPriceFeed.setLatestAnswer(400 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(600 * 10 ** 8);
+    bnbPriceFeed.setLatestAnswer(500 * 10 ** 8);
+
+    // Oracle price updates, the following condition is expected:
+    // 1. Pool should have (199.4 * 400) + (0.997 * 60000) = 139,580 USD
+    assertEq(poolGetterFacet.getAumE18(false), 139580 ether);
+
+    wbtcPriceFeed.setLatestAnswer(90000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(100000 * 10 ** 8);
+    wbtcPriceFeed.setLatestAnswer(80000 * 10 ** 8);
+
+    // Oracle price updates, the following condition is expected:
+    // 1. Pool should have (199.4 * 400) + (0.997 * 80000) = 159,520 USD
+    assertEq(poolGetterFacet.getAumE18(false), 159520 ether);
+    // 2. Pool should have (199.4 * 600) + (0.997 * 100_000) = 219_340 USD
+    assertEq(poolGetterFacet.getAumE18(true), 219340 ether);
+
+    // Assert target value.
+    // 1. BNB's target value should be:
+    // = 219_340 * 10_000 / 30_000 = 73_113.333333333333333333
+    // 2. WBTC's target value should be:
+    // = 219_340 * 10_000 / 30_000 = 73_113.333333333333333333
+    // 3. DAI's target value should be:
+    // = 219_340 * 10_000 / 30_000 = 73_113.333333333333333333
+    // 4. BNB's current value should be:
+    // = 199.4 * 600 = 119_640 USD
+    // 5. WBTC's current value should be:
+    // = 0.997 * 100_000 = 99_700 USD
+    // 6. DAI's current value should be:
+    // = 0 USD
+    assertEq(
+      poolGetterFacet.getTargetValue(address(bnb)),
+      73_113.333333333333333333 ether
+    );
+    assertEq(
+      poolGetterFacet.getTargetValue(address(wbtc)),
+      73_113.333333333333333333 ether
+    );
+    assertEq(
+      poolGetterFacet.getTargetValue(address(dai)),
+      73_113.333333333333333333 ether
+    );
+    assertEq(
+      poolGetterFacet.getCurrentValueOf(address(bnb), true), 119_640 ether
+    );
+    assertEq(
+      poolGetterFacet.getCurrentValueOf(address(wbtc), true), 99_700 ether
+    );
+    assertEq(poolGetterFacet.getCurrentValueOf(address(dai), true), 0 ether);
+
+    bnb.mint(BOB, 100 ether);
+
+    // ------- Bob session START -------
+    vm.startPrank(BOB);
+
+    // Bob swap 100 BNB for WBTC
+    bnb.approve(address(poolRouter), 100 ether);
+    poolRouter.swap(
+      address(bnb), address(wbtc), 100 ether, 0, BOB, zeroBytesArr()
+    );
+
+    // After Bob swap, the following condition is expected:
+    // 1. Pool should have 159520 + (100 * 400) - ((100 * 400 / 100000) * 80000) = 167520 USD in AUM
+    // 2. Bob should get:
+    //  Find out swap fee:
+    //  feeIn  = ((119_640 - 73_113.333333333333333333) + ((119_640 + 40_000) - 73_113.333333333333333333)) / 2
+    //         = 66526.66666666667
+    //  tax    = 50 * 66_526.66666666667 / 73_113.333333333333333333
+    //  tax    = 45
+    //  fee    = 45 + 30 = 75
+    //  feeOut = 0 due to this swap action helps WBTC back to its weight
+    //  Hence, fee is known. Now calculate amountOut.
+    //  amoutOut = (100 * 400 / 100000) * (1 - 0.0075) = 0.397 WBTC
+    // 3. Pool should make 200 * 0.003 = 0.6 BNB in fee
+    // 4. Pool should make (1 * 0.003) + ((100 * 400 / 100000) * 0.0075) = 0.006 WBTC in fee
+    // 5. USD debt for BNB should be 59820 + (100 * 400) = 99820 USD
+    // 6. USD debt for WBTC should be 59820 - (100 * 400) = 19820 USD
+    // 7. Pool's BNB liquidity should be 199.4 + 100 = 299.4 BNB
+    // 8. Pool's WBTC liquidity should be 0.997 - ((100 * 400 / 100000)) = 0.597 WBTC
+    assertEq(poolGetterFacet.getAumE18(false), 167520 ether);
+    assertEq(wbtc.balanceOf(BOB), 0.397 * 10 ** 8);
+    assertEq(poolGetterFacet.feeReserveOf(address(bnb)), 0.6 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(wbtc)), 0.006 * 10 ** 8);
+    assertEq(poolGetterFacet.usdDebtOf(address(bnb)), 99820 ether);
+    assertEq(poolGetterFacet.usdDebtOf(address(wbtc)), 19820 ether);
+    assertEq(poolGetterFacet.liquidityOf(address(bnb)), 299.4 ether);
+    assertEq(poolGetterFacet.liquidityOf(address(wbtc)), 0.597 * 10 ** 8);
+
+    vm.stopPrank();
+    // ------- Bob session END -------
+  }
 }
