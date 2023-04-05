@@ -17,14 +17,18 @@ import {LibReentrancyGuard} from "../libraries/LibReentrancyGuard.sol";
 import {LibPoolV1} from "../libraries/LibPoolV1.sol";
 import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {SafeERC20} from
+  "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {FarmFacetInterface} from "../interfaces/FarmFacetInterface.sol";
 import {GetterFacetInterface} from "../interfaces/GetterFacetInterface.sol";
-import {FundingRateFacetInterface} from "../interfaces/FundingRateFacetInterface.sol";
-import {LiquidityFacetInterface} from "../interfaces/LiquidityFacetInterface.sol";
-import {FlashLoanBorrowerInterface} from "../../../interfaces/FlashLoanBorrowerInterface.sol";
+import {FundingRateFacetInterface} from
+  "../interfaces/FundingRateFacetInterface.sol";
+import {LiquidityFacetInterface} from
+  "../interfaces/LiquidityFacetInterface.sol";
+import {FlashLoanBorrowerInterface} from
+  "../../../interfaces/FlashLoanBorrowerInterface.sol";
 import {StrategyInterface} from "../../../interfaces/StrategyInterface.sol";
 
 contract LiquidityFacet is LiquidityFacetInterface {
@@ -136,21 +140,21 @@ contract LiquidityFacet is LiquidityFacetInterface {
         token,
         (fee * tokenPriceUsd) / 10 ** ERC20(token).decimals(),
         fee
-        );
+      );
     } else if (action == LiquidityAction.ADD_LIQUIDITY) {
       emit CollectAddLiquidityFee(
         account,
         token,
         (fee * tokenPriceUsd) / 10 ** ERC20(token).decimals(),
         fee
-        );
+      );
     } else if (action == LiquidityAction.REMOVE_LIQUIDITY) {
       emit CollectRemoveLiquidityFee(
         account,
         token,
         (fee * tokenPriceUsd) / 10 ** ERC20(token).decimals(),
         fee
-        );
+      );
     }
 
     return amountAfterFee;
@@ -186,24 +190,26 @@ contract LiquidityFacet is LiquidityFacetInterface {
 
     LibPoolV1.realizedFarmPnL(token);
 
-    uint256 aum = GetterFacetInterface(address(this)).getAumE18(true);
+    uint256 aumE18 = GetterFacetInterface(address(this)).getAumE18(true);
     uint256 lpSupply = poolV1ds.alp.totalSupply();
 
-    uint256 usdDebt =
-      _join(token, amount, receiver, account, LiquidityAction.ADD_LIQUIDITY);
-    uint256 mintAmount = aum == 0 ? usdDebt : (usdDebt * lpSupply) / aum;
+    uint256 usdDebt = _join(
+      token, aumE18, amount, receiver, account, LiquidityAction.ADD_LIQUIDITY
+    );
+    uint256 mintAmount = aumE18 == 0 ? usdDebt : (usdDebt * lpSupply) / aumE18;
 
     poolV1ds.alp.mint(receiver, mintAmount);
 
     emit AddLiquidity(
-      account, token, amount, aum, lpSupply, usdDebt, mintAmount
-      );
+      account, token, amount, aumE18, lpSupply, usdDebt, mintAmount
+    );
 
     return mintAmount;
   }
 
   function _join(
     address token,
+    uint256 aumE18,
     uint256 amount,
     address receiver,
     address account,
@@ -224,7 +230,7 @@ contract LiquidityFacet is LiquidityFacetInterface {
     if (tokenValueUsd == 0) revert LiquidityFacet_InsufficientLiquidityMint();
 
     uint256 feeBps = GetterFacetInterface(address(this)).getAddLiquidityFeeBps(
-      token, tokenValueUsd
+      token, aumE18, tokenValueUsd
     );
     uint256 amountAfterDepositFee =
       _collectSwapFee(token, price, amount, feeBps, account, action);
@@ -263,30 +269,36 @@ contract LiquidityFacet is LiquidityFacetInterface {
 
     LibPoolV1.realizedFarmPnL(tokenOut);
 
-    uint256 aum = GetterFacetInterface(address(this)).getAumE18(false);
+    uint256 aumE18 = GetterFacetInterface(address(this)).getAumE18(false);
     uint256 lpSupply = poolV1ds.alp.totalSupply();
 
-    uint256 lpUsdValue = (liquidity * aum) / lpSupply;
+    uint256 lpUsdValue = (liquidity * aumE18) / lpSupply;
     // Adjust totalUsdDebt if lpUsdValue > totalUsdDebt.
     if (poolV1ds.totalUsdDebt < lpUsdValue) {
       poolV1ds.totalUsdDebt += lpUsdValue - poolV1ds.totalUsdDebt;
     }
     uint256 amountOut = _exit(
-      tokenOut, lpUsdValue, receiver, account, LiquidityAction.REMOVE_LIQUIDITY
+      tokenOut,
+      aumE18,
+      lpUsdValue,
+      receiver,
+      account,
+      LiquidityAction.REMOVE_LIQUIDITY
     );
 
     poolV1ds.alp.burn(address(this), liquidity);
     LibPoolV1.tokenOut(tokenOut, receiver, amountOut);
 
     emit RemoveLiquidity(
-      account, tokenOut, liquidity, aum, lpSupply, lpUsdValue, amountOut
-      );
+      account, tokenOut, liquidity, aumE18, lpSupply, lpUsdValue, amountOut
+    );
 
     return amountOut;
   }
 
   function _exit(
     address token,
+    uint256 aumE18,
     uint256 usdValue,
     address receiver,
     address account,
@@ -312,7 +324,7 @@ contract LiquidityFacet is LiquidityFacetInterface {
     poolV1ds.totalUsdDebt -= usdValue;
 
     uint256 burnFeeBps = GetterFacetInterface(address(this))
-      .getRemoveLiquidityFeeBps(token, usdValue);
+      .getRemoveLiquidityFeeBps(token, aumE18, usdValue);
     amountOut = _collectSwapFee(
       token,
       poolV1ds.oracle.getMinPrice(token),
@@ -425,7 +437,7 @@ contract LiquidityFacet is LiquidityFacetInterface {
       vars.amountOut,
       amountOutAfterFee,
       swapFeeBps
-      );
+    );
 
     return amountOutAfterFee;
   }
@@ -479,8 +491,7 @@ contract LiquidityFacet is LiquidityFacetInterface {
 
       emit FlashLoan(
         address(borrower), tokens[i], amounts[i], vars.fees[i], receivers[i]
-        );
-
+      );
       unchecked {
         ++i;
       }

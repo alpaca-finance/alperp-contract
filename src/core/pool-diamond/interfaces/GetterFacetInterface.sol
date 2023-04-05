@@ -253,7 +253,7 @@ interface GetterFacetInterface {
 
   function getTargetValue(address token) external view returns (uint256);
 
-  function getAddLiquidityFeeBps(address token, uint256 value)
+  function getAddLiquidityFeeBps(address token, uint256 aum, uint256 value)
     external
     view
     returns (uint256);
@@ -264,11 +264,16 @@ interface GetterFacetInterface {
     bool isUseMaxPrice
   ) external view returns (uint256);
 
+  function getCurrentValueOf(address token, bool isUseMaxPrice)
+    external
+    view
+    returns (uint256);
+
   function getAum(bool isUseMaxPrice) external view returns (uint256);
 
   function getAumE18(bool isUseMaxPrice) external view returns (uint256);
 
-  function getRemoveLiquidityFeeBps(address token, uint256 value)
+  function getRemoveLiquidityFeeBps(address token, uint256 aum, uint256 value)
     external
     view
     returns (uint256);

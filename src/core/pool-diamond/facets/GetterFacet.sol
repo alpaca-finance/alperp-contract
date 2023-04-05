@@ -12,15 +12,21 @@
  */
 pragma solidity 0.8.17;
 
+/// OZ
+import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
+
+/// Alperp
 import {PoolOracle} from "../../PoolOracle.sol";
 import {LibPoolV1} from "../libraries/LibPoolV1.sol";
 import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
-
 import {GetterFacetInterface} from "../interfaces/GetterFacetInterface.sol";
 import {StrategyInterface} from "../../../interfaces/StrategyInterface.sol";
 import {ALP} from "../../../tokens/ALP.sol";
 
 contract GetterFacet is GetterFacetInterface {
+  using SafeCast for int256;
+  using SafeCast for uint256;
+
   error GetterFacet_BadSubAccountId();
   error GetterFacet_InvalidAveragePrice();
 
@@ -637,25 +643,132 @@ contract GetterFacet is GetterFacetInterface {
     return LibPoolV1.getSubAccount(primary, subAccountId);
   }
 
+  /// @notice Return target value of a token in USD
+  /// @dev Return in 1e18 format
+  /// @param token The token address
   function getTargetValue(address token) public view returns (uint256) {
-    // SLOAD
-    LibPoolV1.PoolV1DiamondStorage storage poolV1ds =
-      LibPoolV1.poolV1DiamondStorage();
+    return _getTargetValue(token, getAumE18(true));
+  }
+
+  /// @notice Calculate target value of a token in USD
+  /// @dev Return in 1e18 format
+  /// @param token The token address
+  /// @param totalAumE18 The total asset under management in 1e18
+  function _getTargetValue(address token, uint256 totalAumE18)
+    internal
+    view
+    returns (uint256)
+  {
     // Load PoolConfigV1 diamond storage
     LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigDs =
       LibPoolConfigV1.poolConfigV1DiamondStorage();
 
-    uint256 cachedTotalUsdDebt = poolV1ds.totalUsdDebt;
+    if (totalAumE18 == 0) return 0;
 
-    if (cachedTotalUsdDebt == 0) return 0;
-
-    return (cachedTotalUsdDebt * poolConfigDs.tokenMetas[token].weight)
+    return totalAumE18 * poolConfigDs.tokenMetas[token].weight
       / poolConfigDs.totalTokenWeight;
   }
 
   // ---------------------------
   // Asset under management math
   // ---------------------------
+
+  /// @notice Return short pnl of a given token
+  /// @param poolV1ds Pool's diamond storage
+  /// @param token token to calculate short pnl
+  function _getShortPnlOf(
+    LibPoolV1.PoolV1DiamondStorage storage poolV1ds,
+    address token
+  ) internal view returns (int256) {
+    uint256 shortSize = poolV1ds.shortSizeOf[token];
+    uint256 shortAveragePrice = poolV1ds.shortAveragePriceOf[token];
+    if (shortSize > 0 && shortAveragePrice > 0) {
+      uint256 priceDelta;
+      uint256 maxPrice = poolV1ds.oracle.getMaxPrice(token);
+      unchecked {
+        priceDelta = shortAveragePrice > maxPrice
+          ? shortAveragePrice - maxPrice
+          : maxPrice - shortAveragePrice;
+      }
+      // Findout delta (can be either profit or loss) of short positions.
+      uint256 delta = (shortSize * priceDelta) / shortAveragePrice;
+      if (maxPrice < shortAveragePrice) {
+        // Short is in profit. Hence pool is loss.
+        return -(delta.toInt256());
+      } else {
+        // Short is in loss. Hence pool is profit.
+        return delta.toInt256();
+      }
+    }
+    return 0;
+  }
+
+  /// @notice Calculate current value of an asset in the pool. Factored in trader PnL.
+  /// @dev Return in 1e18
+  /// @param token Token to calculate current value
+  /// @param isUseMaxPrice use max or min price
+  function getCurrentValueOf(address token, bool isUseMaxPrice)
+    public
+    view
+    returns (uint256)
+  {
+    LibPoolV1.PoolV1DiamondStorage storage poolV1ds =
+      LibPoolV1.poolV1DiamondStorage();
+
+    uint256 price = !isUseMaxPrice
+      ? poolV1ds.oracle.getMinPrice(token)
+      : poolV1ds.oracle.getMaxPrice(token);
+    uint256 liquidity = poolV1ds.liquidityOf[token];
+    uint256 decimals = LibPoolConfigV1.getTokenDecimalsOf(token);
+
+    // Handle strategy delta
+    (bool isStrategyProfit, uint256 strategyDelta) =
+      LibPoolConfigV1.getStrategyDelta(token);
+    if (isStrategyProfit) liquidity += strategyDelta;
+    else liquidity -= strategyDelta;
+
+    if (LibPoolConfigV1.isStableToken(token)) {
+      // Handing value if it is stable coin
+      // If token is a stable coin, try to find
+      // best-effort value due to we compressed PnL to one variable.
+      // best-effort short PnL alloc = Pool's short profits * stable coin utilization
+      // current value = liquidity * price - best-effort short PnL alloc
+      address tokenCursor =
+        LibPoolConfigV1.getNextAllowTokenOf(LINKEDLIST_START);
+      int256 shortPnl = 0;
+      uint256 totalStableReserved = 0;
+      while (tokenCursor != LINKEDLIST_END) {
+        if (LibPoolConfigV1.isStableToken(tokenCursor)) {
+          // If it is a stablecoin then sum to totalStableReserved normalized in token's decimals
+          totalStableReserved += LibPoolV1.convertTokenDecimals(
+            LibPoolConfigV1.getTokenDecimalsOf(tokenCursor),
+            decimals,
+            poolV1ds.reservedOf[tokenCursor]
+          );
+        } else {
+          // If not then calculate short profit
+          shortPnl += _getShortPnlOf(poolV1ds, tokenCursor);
+        }
+        tokenCursor = LibPoolConfigV1.getNextAllowTokenOf(tokenCursor);
+      }
+      liquidity = liquidity * price / 10 ** decimals;
+      shortPnl = totalStableReserved > 0
+        ? shortPnl * poolV1ds.reservedOf[token].toInt256()
+          / totalStableReserved.toInt256()
+        : int256(0);
+      return liquidity.toInt256() + shortPnl < 0
+        ? uint256(0)
+        : (liquidity.toInt256() + shortPnl).toUint256() / 1e12;
+    } else {
+      // Handing value calculation if it is volitle asset
+      // If token is a volatile asset,
+      // current value = ((liquidity - reserved) * price) + guaranteedUsd
+      return (
+        (((liquidity - poolV1ds.reservedOf[token]) * price) / 10 ** decimals)
+          + poolV1ds.guaranteedUsdOf[token]
+      ) / 1e12;
+    }
+  }
 
   function getAum(bool isUseMaxPrice) public view returns (uint256) {
     LibPoolV1.PoolV1DiamondStorage storage poolV1ds =
@@ -720,7 +833,7 @@ contract GetterFacet is GetterFacetInterface {
         + poolV1ds.fundingFeeReceivable;
   }
 
-  function getAumE18(bool isUseMaxPrice) external view returns (uint256) {
+  function getAumE18(bool isUseMaxPrice) public view returns (uint256) {
     return (getAum(isUseMaxPrice) * 10 ** 18) / PRICE_PRECISION;
   }
 
@@ -728,26 +841,31 @@ contract GetterFacet is GetterFacetInterface {
   // Delta Liquidity Fee Math
   // ------------------------
 
+  /// @notice Calculate fee based on pool's weight.
+  /// @dev lower fee when help pool moves closer to the target weight.
+  /// @param token The address of a token that is changing.
+  /// @param aumE18 The aum of the pool in E18 format.
+  /// @param value The value to change in USD (E18 format).
+  /// @param feeBps The base fee bps
+  /// @param _taxBps The tax fee based on change in underlying.
+  /// @param direction The liquidity direction. Add or Remove.
   function getFeeBps(
     address token,
+    uint256 aumE18,
     uint256 value,
     uint256 feeBps,
     uint256 _taxBps,
     LiquidityDirection direction
   ) internal view returns (uint256) {
-    // Load PoolV1 Diamond Storage
-    LibPoolV1.PoolV1DiamondStorage storage poolV1ds =
-      LibPoolV1.poolV1DiamondStorage();
-
     if (!LibPoolConfigV1.isDynamicFeeEnable()) return feeBps;
 
-    uint256 startValue = poolV1ds.usdDebtOf[token];
+    uint256 startValue = getCurrentValueOf(token, true);
     uint256 nextValue = startValue + value;
     if (direction == LiquidityDirection.REMOVE) {
       nextValue = value > startValue ? 0 : startValue - value;
     }
 
-    uint256 targetValue = getTargetValue(token);
+    uint256 targetValue = _getTargetValue(token, aumE18);
     if (targetValue == 0) return feeBps;
 
     uint256 startTargetDiff = startValue > targetValue
@@ -775,7 +893,7 @@ contract GetterFacet is GetterFacetInterface {
     return feeBps + _taxBps;
   }
 
-  function getAddLiquidityFeeBps(address token, uint256 value)
+  function getAddLiquidityFeeBps(address token, uint256 aum, uint256 value)
     external
     view
     returns (uint256)
@@ -786,6 +904,7 @@ contract GetterFacet is GetterFacetInterface {
 
     return getFeeBps(
       token,
+      aum,
       value,
       poolConfigV1ds.mintBurnFeeBps,
       poolConfigV1ds.taxBps,
@@ -793,7 +912,7 @@ contract GetterFacet is GetterFacetInterface {
     );
   }
 
-  function getRemoveLiquidityFeeBps(address token, uint256 value)
+  function getRemoveLiquidityFeeBps(address token, uint256 aum, uint256 value)
     external
     view
     returns (uint256)
@@ -804,6 +923,7 @@ contract GetterFacet is GetterFacetInterface {
 
     return getFeeBps(
       token,
+      aum,
       value,
       poolConfigV1ds.mintBurnFeeBps,
       poolConfigV1ds.taxBps,
@@ -826,10 +946,21 @@ contract GetterFacet is GetterFacetInterface {
       isStableSwap ? poolConfigV1ds.stableSwapFeeBps : poolConfigV1ds.swapFeeBps;
     uint64 _taxBps =
       isStableSwap ? poolConfigV1ds.stableTaxBps : poolConfigV1ds.taxBps;
-    uint256 feeBpsIn =
-      getFeeBps(tokenIn, usdDebt, baseFeeBps, _taxBps, LiquidityDirection.ADD);
+    uint256 feeBpsIn = getFeeBps(
+      tokenIn,
+      getAumE18(true),
+      usdDebt,
+      baseFeeBps,
+      _taxBps,
+      LiquidityDirection.ADD
+    );
     uint256 feeBpsOut = getFeeBps(
-      tokenOut, usdDebt, baseFeeBps, _taxBps, LiquidityDirection.REMOVE
+      tokenOut,
+      getAumE18(false),
+      usdDebt,
+      baseFeeBps,
+      _taxBps,
+      LiquidityDirection.REMOVE
     );
 
     // Return the highest feeBps.
