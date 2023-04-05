@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -301,7 +301,6 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     assertEq(bnb.balanceOf(ALICE), 99699999999999999999);
 
     // Alice remove 50000 USD worth of ALP from the pool with WBTC as tokenOut
-
     poolGetterFacet.alp().approve(
       address(poolRouter),
       (50_000 ether * poolGetterFacet.alp().totalSupply())
