@@ -9,15 +9,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const deployer = (await ethers.getSigners())[0];
 
-  const POINT_TOKEN = config.TradeMining.miningPoint;
-  const START_WEEK_CURSOR = 2777;
-  const REWARD_TOKEN = config.Tokens.USDT;
+  const AP = config.TradeMining.AP;
+  const START_WEEK_CURSOR = 1680566400;
+  const REWARD_TOKEN = config.Tokens.ALPACA;
   const EMERGENCY_RETURN = deployer.address;
 
   console.log(`> Deploying Paradeen Contract`);
   const Paradeen = await ethers.getContractFactory("Paradeen", deployer);
   const paradeen = await upgrades.deployProxy(Paradeen, [
-    POINT_TOKEN,
+    AP,
     START_WEEK_CURSOR,
     REWARD_TOKEN,
     EMERGENCY_RETURN,
@@ -28,7 +28,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(`> Tx mined!`);
   console.log(`> Deployed at: ${paradeen.address}`);
 
-  config.TradeMining.rewarder = paradeen.address;
+  config.TradeMining.paradeen = paradeen.address;
   config.TradeMining.rewardToken = REWARD_TOKEN;
   writeConfigFile(config);
 

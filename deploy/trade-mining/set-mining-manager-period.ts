@@ -7,7 +7,7 @@ import { getConfig } from "../utils/config";
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = getConfig();
 
-  const MINER_ADDRESS = config.TradeMining.address;
+  const MINER_ADDRESS = config.TradeMining.tradeMiningManager;
   const START_TIMESTAMP = 1679875200;
   const END_TIMESTAMP = 1682899200;
 

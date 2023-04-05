@@ -78,9 +78,9 @@
   "Timelock": "",
   "OpMultiSig": "",
   "TradeMining": {
-    "address": "",
-    "rewarder": "",
-    "miningPoint": "",
+    "tradeMiningManager": "",
+    "paradeen": "",
+    "AP": "",
     "rewardToken": ""
   }
 }

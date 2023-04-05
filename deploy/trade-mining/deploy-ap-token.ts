@@ -17,7 +17,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(`Deploying AP Token Contract`);
   console.log(`Deployed at: ${ap.address}`);
 
-  config.TradeMining.miningPoint = ap.address;
+  config.TradeMining.AP = ap.address;
   writeConfigFile(config);
 
   const implAddress = await getImplementationAddress(
