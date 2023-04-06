@@ -76,6 +76,7 @@ import {PoolConfigInitializer} from
 import {AccessControlInitializer} from
   "@alperp/core/pool-diamond/initializers/AccessControlInitializer.sol";
 import {PoolDiamond} from "@alperp/core/pool-diamond/PoolDiamond.sol";
+import {IWNativeRelayer} from "@alperp/interfaces/IWNativeRelayer.sol";
 
 /// Alperp - Tokens
 import {ALP} from "@alperp/tokens/ALP.sol";
@@ -121,9 +122,20 @@ import {MockStrategy} from "@alperp-tests/mocks/MockStrategy.sol";
 import {MockPyth as FakePyth} from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
 import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
+/// Chainlink
+import {ChainlinkPriceFeedInterface} from
+  "@alperp/interfaces/ChainLinkPriceFeedInterface.sol";
+
+// Forge
+import {StdStorage, stdStorage} from "@forge-std/StdStorage.sol";
+
 // solhint-disable const-name-snakecase
 // solhint-disable no-inline-assembly
 contract BaseTest is DSTest {
+  using stdStorage for StdStorage;
+
+  StdStorage stdStore;
+
   uint256 internal constant PRICE_PRECISION = 10 ** 30;
   uint256 internal constant BPS = 10000;
 
@@ -191,6 +203,11 @@ contract BaseTest is DSTest {
     usdcPriceFeed = deployMockChainlinkPriceFeed();
 
     proxyAdmin = new ProxyAdmin();
+  }
+
+  function motherload(address token, address account, uint256 amount) internal {
+    stdStore.target(token).sig(IERC20.balanceOf.selector).with_key(account)
+      .checked_write(amount);
   }
 
   function zeroBytesArr() internal pure returns (bytes[] memory) {
@@ -842,7 +859,16 @@ contract BaseTest is DSTest {
     );
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
 
-    return PoolRouter04(payable(_proxy));
+    MockWNativeRelayer _mockWNativeRelayer = deployWNativeRelayer(_wNative);
+    address[] memory callers = new address[](1);
+    callers[0] = _proxy;
+    _mockWNativeRelayer.setCallerOk(callers, true);
+
+    PoolRouter04 _poolRouter = PoolRouter04(payable(_proxy));
+
+    _poolRouter.setWNativeRelayer(IWNativeRelayer(address(_mockWNativeRelayer)));
+
+    return _poolRouter;
   }
 
   function deployWNativeRelayer(address _weth)

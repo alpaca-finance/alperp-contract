@@ -2,18 +2,9 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers } from "hardhat";
 import { FeedableRewarder__factory } from "../../typechain";
-import { getConfig } from "../utils/config";
 
-const config = getConfig();
-
-const FEEDER: string = "";
-const REWARDERS: string[] = [
-  (
-    config.Staking.ALPStaking.rewarders.find(
-      (o) => o.name === "ALP Staking Protocol Revenue"
-    ) as any
-  ).address,
-];
+const FEEDER: string = "0x091f7A0a84F12d188EC92C070464D387714B6a92";
+const REWARDERS: string[] = ["0x2D4DdBb76CBb2aFf2553A5B4017318fd87586fA4"];
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];

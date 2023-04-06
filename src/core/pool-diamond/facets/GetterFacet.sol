@@ -732,7 +732,7 @@ contract GetterFacet is GetterFacetInterface {
       // If token is a stable coin, try to find
       // best-effort value due to we compressed PnL to one variable.
       // best-effort short PnL alloc = Pool's short profits * stable coin utilization
-      // current value = liquidity * price - best-effort short PnL alloc
+      // current value = liquidity * price + best-effort short PnL alloc
       address tokenCursor =
         LibPoolConfigV1.getNextAllowTokenOf(LINKEDLIST_START);
       int256 shortPnl = 0;

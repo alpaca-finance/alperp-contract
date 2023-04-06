@@ -24,7 +24,7 @@
       }
     }
   },
-  "PoolRouter": "0x73B1413E861a0844D6A8f6BE42c4B791E27c5DE2",
+  "PoolRouter": "0x5E8466ed06f7Acaa78Ab21b0F5FEc6810afcC199",
   "WNativeRelayer": "0xE1D2CA01bc88F325fF7266DD2165944f3CAf0D3D",
   "Pools": {
     "ALP": {
@@ -38,9 +38,9 @@
         "farm": "0x9f7E3d6698D669c63c566BA524E262E62F9eA589",
         "diamondCut": "0xFe3cB354e80f209088f854c6A10b7afE1d0dAc51",
         "diamondLoupe": "0x92dF001fad9847784AE3082610840b135A672BB3",
-        "liquidity": "0xD052ada2402b7bB200d16F738C857C8454b1661a",
+        "liquidity": "0x547db635355fDACf7D0612934E8Bfd5A984aAFb4",
         "fundingRate": "0x1f2a297A8495bd69569b5b4CFf487Bfb71987746",
-        "getter": "0x48c362867fbC464c44C5ea3DA4524B1F6a91871b",
+        "getter": "0x85116CAF6279E92aF32a43D6a861e0847e59F97a",
         "ownership": "0xBd363c9E24E3cF780BEdf7ae0c7F24a4477C9C01",
         "perpTrade": "0xD2De80625dC085b221AFeACD5b78839d18F1d1c3",
         "diamondInitializer": "0xEB786a76B3C00fBA21344361f1E1F71A8c7C7A0C",
@@ -79,9 +79,9 @@
   "Timelock": "",
   "OpMultiSig": "",
   "TradeMining": {
-    "tradeMiningManager": "",
-    "paradeen": "",
-    "AP": "",
-    "rewardToken": ""
+    "tradeMiningManager": "0xD78C4b5dfcb1EdD23654A59EBc733c3Fe133DD36",
+    "paradeen": "0xBA61db6b2CFEbC1580BF692389e831B24bb0a5eF",
+    "AP": "0x2Fb74F8E1e9EFaEEc31e57946e0C1bC6853ca4f1",
+    "rewardToken": "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F"
   }
 }
