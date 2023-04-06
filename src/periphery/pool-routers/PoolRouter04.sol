@@ -13,19 +13,27 @@
 pragma solidity 0.8.17;
 
 /// OZ
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {ReentrancyGuardUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 /// Alperp
 import {IWNative} from "@alperp/interfaces/IWNative.sol";
-import {LiquidityFacetInterface} from "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
-import {GetterFacetInterface} from "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
-import {PerpTradeFacetInterface} from "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
+import {LiquidityFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
+import {GetterFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {PerpTradeFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
 import {IOnchainPriceUpdater} from "@alperp/interfaces/IOnChainPriceUpdater.sol";
 import {PoolOracle} from "@alperp/core/PoolOracle.sol";
 import {ITradeMiningManager} from "@alperp/interfaces/ITradeMiningManager.sol";
+import {IWNativeRelayer} from "@alperp/interfaces/IWNativeRelayer.sol";
 
 /// @title PoolRouter04 is responsible for swapping tokens and managing liquidity
 /// @notice  This Router will apply pyth oracle mechanism
@@ -48,9 +56,13 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   address public pool;
   IOnchainPriceUpdater public oraclePriceUpdater;
   ITradeMiningManager public tradeMiningManager;
+  IWNativeRelayer public wNativeRelayer;
 
   event SetTradeMiningManager(
     address _prevTradeMiningManager, address _newTradeMiningManager
+  );
+  event SetWNativeRelayer(
+    address _prevWNativeRelayer, address _newWNativeRelayer
   );
 
   /// @custom:oz-upgrades-unsafe-allow constructor
@@ -127,8 +139,16 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   {
     emit SetTradeMiningManager(
       address(tradeMiningManager), address(_newTradeMiningManager)
-      );
+    );
     tradeMiningManager = _newTradeMiningManager;
+  }
+
+  function setWNativeRelayer(IWNativeRelayer _wNativeRelayer)
+    external
+    onlyOwner
+  {
+    emit SetWNativeRelayer(address(wNativeRelayer), address(_wNativeRelayer));
+    wNativeRelayer = _wNativeRelayer;
   }
 
   function addLiquidity(
@@ -215,8 +235,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       revert PoolRouter_InsufficientOutputAmount(minAmountOut, receivedAmount);
     }
 
-    WNATIVE.withdraw(receivedAmount);
-    payable(receiver).transfer(receivedAmount);
+    _transferOutETH(receivedAmount, receiver);
 
     return receivedAmount;
   }
@@ -384,8 +403,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
           minAmountOut, amountOutFromPosition
         );
       }
-      WNATIVE.withdraw(amountOutFromPosition);
-      payable(receiver).transfer(amountOutFromPosition);
+      _transferOutETH(amountOutFromPosition, receiver);
     } else {
       uint256 amountOutFromSwap = _swap(
         address(this),
@@ -395,8 +413,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
         minAmountOut,
         address(this)
       );
-      WNATIVE.withdraw(amountOutFromSwap);
-      payable(receiver).transfer(amountOutFromSwap);
+      _transferOutETH(amountOutFromSwap, receiver);
     }
   }
 
@@ -460,8 +477,7 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
         msg.sender, tokenIn, tokenOut, minAmountOut, address(this)
       );
 
-      WNATIVE.withdraw(amountOut);
-      payable(receiver).transfer(amountOut);
+      _transferOutETH(amountOut, receiver);
       return amountOut;
     } else {
       return LiquidityFacetInterface(pool).swap(
@@ -470,7 +486,18 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     }
   }
 
+  function _transferOutETH(uint256 _amountOut, address _receiver) private {
+    // Prevent istanbul msg.sender.transfer problem
+    IERC20Upgradeable(address(WNATIVE)).safeTransfer(
+      address(wNativeRelayer), _amountOut
+    );
+    wNativeRelayer.withdraw(_amountOut);
+
+    payable(_receiver).transfer(_amountOut);
+  }
+
   receive() external payable {
-    assert(msg.sender == address(WNATIVE)); // only accept NATIVE via fallback from the WNATIVE contract
+    // Only accept NATIVE via fallback from the wNativeRelayer contract
+    require(msg.sender == address(wNativeRelayer), "!wNativeRelayer");
   }
 }

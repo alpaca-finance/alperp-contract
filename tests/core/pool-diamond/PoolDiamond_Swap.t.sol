@@ -813,4 +813,8 @@ contract PoolDiamond_SwapTest is PoolDiamond_BaseTest {
     vm.stopPrank();
     // ------- Bob session END -------
   }
+
+  receive() external payable {
+    // fallback to receive native
+  }
 }

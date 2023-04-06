@@ -2970,7 +2970,7 @@
             "label": "WNATIVE",
             "offset": 0,
             "slot": "151",
-            "type": "t_contract(IWNative)31653",
+            "type": "t_contract(IWNative)31992",
             "contract": "PoolRouter04",
             "src": "src/periphery/pool-routers/PoolRouter04.sol:49"
           },
@@ -2986,7 +2986,7 @@
             "label": "oraclePriceUpdater",
             "offset": 0,
             "slot": "153",
-            "type": "t_contract(IOnchainPriceUpdater)31405",
+            "type": "t_contract(IOnchainPriceUpdater)31744",
             "contract": "PoolRouter04",
             "src": "src/periphery/pool-routers/PoolRouter04.sol:50"
           },
@@ -2994,7 +2994,7 @@
             "label": "tradeMiningManager",
             "offset": 0,
             "slot": "154",
-            "type": "t_contract(ITradeMiningManager)31626",
+            "type": "t_contract(ITradeMiningManager)31965",
             "contract": "PoolRouter04",
             "src": "src/periphery/pool-routers/PoolRouter04.sol:52"
           }
@@ -3016,15 +3016,15 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(IOnchainPriceUpdater)31405": {
+          "t_contract(IOnchainPriceUpdater)31744": {
             "label": "contract IOnchainPriceUpdater",
             "numberOfBytes": "20"
           },
-          "t_contract(ITradeMiningManager)31626": {
+          "t_contract(ITradeMiningManager)31965": {
             "label": "contract ITradeMiningManager",
             "numberOfBytes": "20"
           },
-          "t_contract(IWNative)31653": {
+          "t_contract(IWNative)31992": {
             "label": "contract IWNative",
             "numberOfBytes": "20"
           },
@@ -3756,6 +3756,153 @@
           "t_mapping(t_uint256,t_uint256)": {
             "label": "mapping(uint256 => uint256)",
             "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "97d324ca3359d77907a22c82409aafabc12a652149658cd45ca8aeb5f8578b8d": {
+      "address": "0x1eE625599a8F35bF49cD37b6758031F346A3B8DF",
+      "txHash": "0x307099879ec6a3277e78f60e7c217471d33af262adfa9da9a40ab116c83858e3",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "WNATIVE",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IWNative)31992",
+            "contract": "PoolRouter04",
+            "src": "src/periphery/pool-routers/PoolRouter04.sol:54"
+          },
+          {
+            "label": "pool",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_address",
+            "contract": "PoolRouter04",
+            "src": "src/periphery/pool-routers/PoolRouter04.sol:54"
+          },
+          {
+            "label": "oraclePriceUpdater",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_contract(IOnchainPriceUpdater)31744",
+            "contract": "PoolRouter04",
+            "src": "src/periphery/pool-routers/PoolRouter04.sol:55"
+          },
+          {
+            "label": "tradeMiningManager",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_contract(ITradeMiningManager)31965",
+            "contract": "PoolRouter04",
+            "src": "src/periphery/pool-routers/PoolRouter04.sol:56"
+          },
+          {
+            "label": "wNativeRelayer",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_contract(IWNativeRelayer)32000",
+            "contract": "PoolRouter04",
+            "src": "src/periphery/pool-routers/PoolRouter04.sol:58"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IOnchainPriceUpdater)31744": {
+            "label": "contract IOnchainPriceUpdater",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ITradeMiningManager)31965": {
+            "label": "contract ITradeMiningManager",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IWNative)31992": {
+            "label": "contract IWNative",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IWNativeRelayer)32000": {
+            "label": "contract IWNativeRelayer",
+            "numberOfBytes": "20"
           },
           "t_uint256": {
             "label": "uint256",

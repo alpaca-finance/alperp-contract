@@ -22,8 +22,9 @@ enum FacetCutAction {
 }
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const FACET = "GetterFacet";
+  const FACET = "LiquidityFacet";
   const INITIALIZER_ADDRESS = ethers.constants.AddressZero;
+  const OLD_FACET_ADDRESS = "0xD052ada2402b7bB200d16F738C857C8454b1661a";
 
   const deployer = (await ethers.getSigners())[0];
 
@@ -46,9 +47,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const existedFacetCuts = (await diamondLoupeFacet.facets())
     .map((each) => each.functionSelectors)
     .reduce((result, array) => result.concat(array), []);
+
+  const previousFacet = (await diamondLoupeFacet.facets()).find(
+    (each) => each.facetAddress == OLD_FACET_ADDRESS
+  );
+  if (!previousFacet) {
+    console.log("Previous facet not found");
+    return;
+  }
+
   const facetCuts: Array<DiamondCutInterface.FacetCutStruct> = [];
   const replaceSelectors: Array<string> = [];
   const addSelectors: Array<string> = [];
+  const removeSelectors: Array<string> = [];
   const functionSelectors = getSelectors(contractFactory);
   // Loop through each selector to find out if it needs to replace or add
   for (const selector of functionSelectors) {
@@ -58,6 +69,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       addSelectors.push(selector);
     }
   }
+  // Loop through existed facet cuts to find out selectors to remove
+  for (const selector of previousFacet.functionSelectors) {
+    if (!functionSelectors.includes(selector)) {
+      removeSelectors.push(selector);
+    }
+  }
+
   console.log(`> Build the facetCuts array from ${FACET} contract`);
   // Put the replaceSelectors and addSelectors into facetCuts
   if (replaceSelectors.length > 0) {
@@ -72,6 +90,14 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       facetAddress,
       action: FacetCutAction.Add,
       functionSelectors: addSelectors,
+    });
+  }
+  if (removeSelectors.length > 0) {
+    // Get the old facet address based on the selector
+    facetCuts.push({
+      facetAddress: ethers.constants.AddressZero,
+      action: FacetCutAction.Remove,
+      functionSelectors: removeSelectors,
     });
   }
 
@@ -95,6 +121,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       };
     })
   );
+  console.log(`> Found ${removeSelectors.length} selectors to remove`);
+  console.log(`> Methods to remove:`);
+  console.table(
+    removeSelectors.map((each) => {
+      return {
+        functionName: "unknown (TODO: integrate with 4bytes dictionary)",
+        selector: each,
+      };
+    })
+  );
 
   // Ask for confirmation
   const confirmExecuteDiamondCut = readlineSync.question("Confirm? (y/n): ");
@@ -113,7 +149,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const tx = await diamondCutFacet.diamondCut(
     facetCuts,
     INITIALIZER_ADDRESS,
-    "0x"
+    "0x",
+    { gasLimit: 10000000 }
   );
   console.log(`> Tx is submitted: ${tx.hash}`);
   console.log(`> Waiting for tx to be mined`);
