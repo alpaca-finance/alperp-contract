@@ -10,7 +10,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const POOL = config.Pools.ALP.poolDiamond;
   const PYTH_PRICE_ID = config.Pools.ALP.pythPriceFeed;
 
-
   const deployer = (await ethers.getSigners())[0];
 
   console.log(`> Deploying LiquidationRouter01 Contract`);
