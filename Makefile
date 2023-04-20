@@ -5,8 +5,8 @@ test-unit:
 	@forge test --watch -vvv --no-match-contract \ForkTest\
 
 test-fork:
-	@echo "Running fork tests on ${ARCHIVE_NODE_RPC} at block ${FORK_BLOCK}"
-	@forge test --watch -vvv --fork-url ${ARCHIVE_NODE_RPC} --fork-block-number ${FORK_BLOCK} --match-contract \ForkTest\
+	@echo "Running fork tests"
+	@forge test --watch -vvv --match-contract \ForkTest\
 
 .PHONY: config
 config:

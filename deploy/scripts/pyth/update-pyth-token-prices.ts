@@ -1,8 +1,8 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers } from "hardhat";
-import { IPyth__factory, PythPriceFeed__factory } from "../../typechain";
-import { getConfig } from "../utils/config";
+import { IPyth__factory, PythPriceFeed__factory } from "../../../typechain";
+import { getConfig } from "../../utils/config";
 import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
 import * as readlineSync from "readline-sync";
 

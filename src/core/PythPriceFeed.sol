@@ -192,20 +192,14 @@ contract PythPriceFeed is
   }
 
   /// @notice A function for getting price of a token
-  /// @dev ref price is the price that is passed from the caller, it's used when we want to ignore pyth price (from favor ref price or when pyth price is stale)
-  /// @dev ref price is injected via priceOracle (primary price feeder)
   /// @param _token - a token address
-  /// @param _referencePrice - a reference price
+  /// @return price in PRICE_PRECISION decimals
   function getPrice(
     address _token,
-    uint256 _referencePrice,
+    uint256 /* _referencePrice */,
     bool /*_maximise*/
   ) external view returns (uint256) {
-    if (favorRefPrice) {
-      return _referencePrice;
-    }
-
-    // Use cahced price if it has been updated at the same block
+    // Use cached price if it has been updated at the same block
     CachedPrice memory cachedPrice = cachedPriceOf[_token];
     if (
       cachedPrice.price != 0
@@ -214,24 +208,15 @@ contract PythPriceFeed is
       return cachedPrice.price;
     }
 
+    // Get priceId from token
     bytes32 priceID = tokenPriceId[_token];
-    // Read the current value of priceID, aborting the transaction if the price has not been updated recently.
-    // Every chain has a default recency threshold which can be retrieved by calling the getValidTimePeriod() function on the contract.
-    // Please see IPyth.sol for variants of this function that support configurable recency thresholds and other useful features.
 
-    try pyth.getPriceNoOlderThan(priceID, maxPriceAge) returns (
-      PythStructs.Price memory _price
-    ) {
-      uint256 tokenDecimals = _price.expo < 0
-        ? (10 ** int256(-_price.expo).toUint256())
-        : 10 ** int256(_price.expo).toUint256();
-      return
-        ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
-    } catch {
-      // if some problem occurred (e.g. price is older than maxPriceAge)
-      // return reference price from primary source
-      return _referencePrice;
-    }
+    // Get price from pyth, revert if price is stale
+    PythStructs.Price memory _price = pyth.getPriceNoOlderThan(priceID, maxPriceAge);
+    uint256 tokenDecimals = _price.expo < 0
+      ? (10 ** int256(-_price.expo).toUint256())
+      : 10 ** int256(_price.expo).toUint256();
+    return ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
   }
 
   /// @custom:oz-upgrades-unsafe-allow constructor

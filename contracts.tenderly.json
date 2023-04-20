@@ -33,6 +33,7 @@
       "poolDiamond": "0xeA6d51c82a551ea66Bd5D0DE71C19356179DdaaE",
       "pythPriceFeed": "0x6C831Dc94BE4B61fc3Be6F2b6c3CFCD444707DEC",
       "oracle": "0x1db2910EF4860440Fc09B7E6baE7AdF4C9cfAa0C",
+      "oracle02": "",
       "orderbook": "0xaBB3cb336704EA7d9FaFd22bEEb16cEA90c1f7e8",
       "facets": {
         "admin": "0x52E01884650b0c83bF809F85992764b497E91a21",

@@ -73,49 +73,6 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
       ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
   }
 
-  function testCorrectness_WhenPriceIsOlderThanMaxPrice() external {
-    // set max price agge to 15
-    pythPriceFeed.setMaxPriceAge(15);
-
-    // set price
-    PriceFeedData memory data = PriceFeedData({
-      id: WBNB_PRICE_ID,
-      price: int64(28895911666),
-      conf: uint64(16436851),
-      expo: int32(-8),
-      emaPrice: int64(28895911666),
-      emaConf: uint64(16436851),
-      publishTime: uint64(block.timestamp)
-    });
-    bytes memory priceFeedData = FakePyth(address(pyth))
-      .createPriceFeedUpdateData({
-      id: data.id,
-      price: data.price,
-      conf: data.conf,
-      expo: data.expo,
-      emaPrice: data.emaPrice,
-      emaConf: data.emaConf,
-      publishTime: data.publishTime
-    });
-
-    // update price in a Pyth contract
-    bytes[] memory priceFeedDatas = new bytes[](1);
-    priceFeedDatas[0] = priceFeedData;
-    pyth.updatePriceFeeds{value: FEE}(priceFeedDatas);
-
-    // set token to the correct price id
-    pythPriceFeed.setTokenPriceId(address(bnb), WBNB_PRICE_ID);
-
-    // warp to 16 seconds later, so that price is older than MaxAge (15 seconds)
-    vm.warp(block.timestamp + 16);
-
-    // get price, should return ref price instead
-    uint256 refPrice = 20000 * 10 ** 30;
-    uint256 price = pythPriceFeed.getPrice(address(bnb), refPrice, true);
-
-    assertEq(price, refPrice);
-  }
-
   function testCorrectness_WhenPriceIsNotOlderThanMaxPrice() external {
     // set max price agge to 15
     pythPriceFeed.setMaxPriceAge(15);
@@ -179,79 +136,6 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     // Price should be 28895911666 * 10**30 / 10**8 = 288959116660000000000000000000000
     // Omit maximize since conf can be very large, hence use only the price from pyth
     assertEq(price, 288959116660000000000000000000000);
-  }
-
-  function testCorrectness_WhenFavorRefPrice() external {
-    // set max price agge to 15
-    pythPriceFeed.setMaxPriceAge(15);
-
-    // set price
-    PriceFeedData memory data = PriceFeedData({
-      id: WBNB_PRICE_ID,
-      price: int64(27775911666),
-      conf: uint64(16436851),
-      expo: int32(-8),
-      emaPrice: int64(28895911666),
-      emaConf: uint64(16436851),
-      publishTime: uint64(block.timestamp)
-    });
-    bytes memory priceFeedData = FakePyth(address(pyth))
-      .createPriceFeedUpdateData({
-      id: data.id,
-      price: data.price,
-      conf: data.conf,
-      expo: data.expo,
-      emaPrice: data.emaPrice,
-      emaConf: data.emaConf,
-      publishTime: data.publishTime
-    });
-
-    // update price in a Pyth contract
-    bytes[] memory priceFeedDatas = new bytes[](1);
-    priceFeedDatas[0] = priceFeedData;
-    pyth.updatePriceFeeds{value: FEE}(priceFeedDatas);
-
-    // set token to the correct price id
-    pythPriceFeed.setTokenPriceId(address(bnb), WBNB_PRICE_ID);
-
-    // favor ref price
-    pythPriceFeed.setFavorRefPrice(true);
-
-    // warp to 15 seconds later, set price again
-    vm.warp(block.timestamp + 15);
-
-    // set price
-    data = PriceFeedData({
-      id: WBNB_PRICE_ID,
-      price: int64(28895911666),
-      conf: uint64(16436851),
-      expo: int32(-8),
-      emaPrice: int64(28895911666),
-      emaConf: uint64(16436851),
-      publishTime: uint64(block.timestamp)
-    });
-    priceFeedData = FakePyth(address(pyth)).createPriceFeedUpdateData({
-      id: data.id,
-      price: data.price,
-      conf: data.conf,
-      expo: data.expo,
-      emaPrice: data.emaPrice,
-      emaConf: data.emaConf,
-      publishTime: data.publishTime
-    });
-
-    // update price in a Pyth contract
-    priceFeedDatas[0] = priceFeedData;
-    pyth.updatePriceFeeds{value: FEE}(priceFeedDatas);
-
-    // warp to 15 seconds later, so that it's still within MaxAge (15 seconds)
-    vm.warp(block.timestamp + 15);
-
-    // get price, should return ref price instead since the price we feed is stale now
-    uint256 refPrice = 20000 * 10 ** 30;
-    uint256 price = pythPriceFeed.getPrice(address(bnb), refPrice, true);
-
-    assertEq(price, refPrice);
   }
 
   function testCorrectness_WhenGetCachedPriceAtSameBlockWithSetCachedPrice()
@@ -405,5 +289,45 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
     uint256 price = pythPriceFeed.getPrice(address(bnb), 290 * 10 ** 30, true);
 
     assertEq(price, fastWBNBPrice);
+  }
+
+  function testRevert_WhenPriceIsOlderThanMaxPriceAge() external {
+    // set max price agge to 15
+    pythPriceFeed.setMaxPriceAge(15);
+
+    // set price
+    PriceFeedData memory data = PriceFeedData({
+      id: WBNB_PRICE_ID,
+      price: int64(28895911666),
+      conf: uint64(16436851),
+      expo: int32(-8),
+      emaPrice: int64(28895911666),
+      emaConf: uint64(16436851),
+      publishTime: uint64(block.timestamp)
+    });
+    bytes memory priceFeedData = FakePyth(address(pyth))
+      .createPriceFeedUpdateData({
+      id: data.id,
+      price: data.price,
+      conf: data.conf,
+      expo: data.expo,
+      emaPrice: data.emaPrice,
+      emaConf: data.emaConf,
+      publishTime: data.publishTime
+    });
+
+    // update price in a Pyth contract
+    bytes[] memory priceFeedDatas = new bytes[](1);
+    priceFeedDatas[0] = priceFeedData;
+    pyth.updatePriceFeeds{value: FEE}(priceFeedDatas);
+
+    // set token to the correct price id
+    pythPriceFeed.setTokenPriceId(address(bnb), WBNB_PRICE_ID);
+
+    // warp to 16 seconds later, so that price is older than MaxAge (15 seconds)
+    vm.warp(block.timestamp + 16);
+
+    vm.expectRevert(abi.encodeWithSignature("StalePrice()"));
+    pythPriceFeed.getPrice(address(bnb), 0, true);
   }
 }

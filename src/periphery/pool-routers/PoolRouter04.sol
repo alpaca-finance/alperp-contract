@@ -58,6 +58,9 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   ITradeMiningManager public tradeMiningManager;
   IWNativeRelayer public wNativeRelayer;
 
+  event SetOraclePriceUpdater(
+    address _prevOraclePriceUpdater, address _newOraclePriceUpdater
+  );
   event SetTradeMiningManager(
     address _prevTradeMiningManager, address _newTradeMiningManager
   );
@@ -131,6 +134,16 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
         revert PoolRouter_MarkPriceTooHigh(acceptablePrice, actualPrice);
       }
     }
+  }
+
+  function setOraclePriceUpdater(IOnchainPriceUpdater _newOraclePriceUpdater)
+    external
+    onlyOwner
+  {
+    emit SetOraclePriceUpdater(
+      address(oraclePriceUpdater), address(_newOraclePriceUpdater)
+    );
+    oraclePriceUpdater = _newOraclePriceUpdater;
   }
 
   function setTradeMiningManager(ITradeMiningManager _newTradeMiningManager)
