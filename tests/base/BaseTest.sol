@@ -13,16 +13,17 @@
 pragma solidity >=0.8.4 <0.9.0;
 
 /// Test
-import {DSTest} from "./DSTest.sol";
-import {VM} from "../utils/VM.sol";
 import {console} from "../utils/console.sol";
 import {stdError} from "../utils/stdError.sol";
 import {math} from "../utils/math.sol";
+import {ATest} from "@alperp-tests/base/ATest.sol";
 
 /// OZ
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ProxyAdmin} from
   "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+import {TransparentUpgradeableProxy} from
+  "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 // Alperp - Diamond
 // Libs
@@ -94,6 +95,7 @@ import {MarketOrderRouter} from
 
 /// Alperp - Oracles
 import {PoolOracle} from "@alperp/core/PoolOracle.sol";
+import {PoolOracle02} from "@alperp/core/PoolOracle02.sol";
 import {FastPriceFeed} from "@alperp/core/FastPriceFeed.sol";
 import {PythPriceFeed} from "@alperp/core/PythPriceFeed.sol";
 
@@ -127,11 +129,12 @@ import {ChainlinkPriceFeedInterface} from
   "@alperp/interfaces/ChainLinkPriceFeedInterface.sol";
 
 // Forge
+import {TestBase} from "@forge-std/Base.sol";
 import {StdStorage, stdStorage} from "@forge-std/StdStorage.sol";
 
 // solhint-disable const-name-snakecase
 // solhint-disable no-inline-assembly
-contract BaseTest is DSTest {
+contract BaseTest is TestBase, ATest {
   using stdStorage for StdStorage;
 
   StdStorage stdStore;
@@ -159,8 +162,6 @@ contract BaseTest is DSTest {
     uint64 fundingRateFactor;
     uint256 liquidationFeeUsd;
   }
-
-  VM internal constant vm = VM(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
 
   // Note: Avoid using address(1) as it is reserved for Ecrecover.
   // ref: https://ethereum.stackexchange.com/questions/89447/how-does-ecrecover-get-compiled
@@ -313,6 +314,49 @@ contract BaseTest is DSTest {
     });
 
     return (tokens, tokenConfigs);
+  }
+
+  function buildPoolOracle02DefaultSetPriceFeedInput()
+    internal
+    view
+    returns (address[] memory, PoolOracle02.PriceFeedInfo[] memory)
+  {
+    address[] memory tokens = new address[](5);
+    tokens[0] = address(bnb);
+    tokens[1] = address(weth);
+    tokens[2] = address(wbtc);
+    tokens[3] = address(dai);
+    tokens[4] = address(usdc);
+
+    PoolOracle02.PriceFeedInfo[] memory priceFeedInfo =
+      new PoolOracle02.PriceFeedInfo[](5);
+    priceFeedInfo[0] = PoolOracle02.PriceFeedInfo({
+      decimals: 8,
+      spreadBps: 0,
+      isStrictStable: false
+    });
+    priceFeedInfo[1] = PoolOracle02.PriceFeedInfo({
+      decimals: 8,
+      spreadBps: 0,
+      isStrictStable: false
+    });
+    priceFeedInfo[2] = PoolOracle02.PriceFeedInfo({
+      decimals: 8,
+      spreadBps: 0,
+      isStrictStable: false
+    });
+    priceFeedInfo[3] = PoolOracle02.PriceFeedInfo({
+      decimals: 8,
+      spreadBps: 0,
+      isStrictStable: false
+    });
+    priceFeedInfo[4] = PoolOracle02.PriceFeedInfo({
+      decimals: 8,
+      spreadBps: 0,
+      isStrictStable: true
+    });
+
+    return (tokens, priceFeedInfo);
   }
 
   function buildDefaultSetTokenConfigInput3()
@@ -761,6 +805,19 @@ contract BaseTest is DSTest {
     );
     address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
     return PoolOracle(payable(_proxy));
+  }
+
+  function deployPoolOracle02(address corePriceFeed)
+    internal
+    returns (PoolOracle02)
+  {
+    bytes memory _logicBytecode =
+      abi.encodePacked(vm.getCode("./out/PoolOracle02.sol/PoolOracle02.json"));
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize(address)")), corePriceFeed
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+    return PoolOracle02(payable(_proxy));
   }
 
   function deployPoolDiamond(

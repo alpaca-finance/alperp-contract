@@ -11,9 +11,12 @@ import {
   AP,
   FakePyth,
   IPyth,
-  PoolOracle
+  PoolOracle,
+  console
 } from "@alperp-tests/forks/base/ForkBaseTest.sol";
 
 contract TradeMining_BaseForkTest is ForkBaseTest {
-  function setUp() public virtual {}
+  function setUp() public virtual {
+    vm.createSelectFork(vm.envString("BSC_MAINNET_RPC"), 27078173);
+  }
 }

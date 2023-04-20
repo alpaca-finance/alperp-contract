@@ -89,6 +89,11 @@
       "address": "0xaB9238851B9DbED94136058603a6D9E8833a1F75",
       "txHash": "0xed85153a3bf8460d7e82d1bd9273308289f8da36ff15cbddac4584b98a4ee852",
       "kind": "transparent"
+    },
+    {
+      "address": "0x6eA6614661Bf7Dc515e8f40B37A1c1f8cd923dAA",
+      "txHash": "0x05d70d299809187ede69b559a355a13d8423f68ac9d4697d3d48c41b47118eac",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -1994,9 +1999,9 @@
             "label": "pyth",
             "offset": 0,
             "slot": "101",
-            "type": "t_contract(IPyth)41154",
+            "type": "t_contract(IPyth)31849",
             "contract": "PythPriceFeed",
-            "src": "src/core/PythPriceFeed.sol:44"
+            "src": "src/core/PythPriceFeed.sol:43"
           },
           {
             "label": "tokenPriceId",
@@ -2004,7 +2009,7 @@
             "slot": "102",
             "type": "t_mapping(t_address,t_bytes32)",
             "contract": "PythPriceFeed",
-            "src": "src/core/PythPriceFeed.sol:44"
+            "src": "src/core/PythPriceFeed.sol:43"
           },
           {
             "label": "maxPriceAge",
@@ -2012,7 +2017,7 @@
             "slot": "103",
             "type": "t_uint256",
             "contract": "PythPriceFeed",
-            "src": "src/core/PythPriceFeed.sol:47"
+            "src": "src/core/PythPriceFeed.sol:46"
           },
           {
             "label": "favorRefPrice",
@@ -2020,7 +2025,7 @@
             "slot": "104",
             "type": "t_bool",
             "contract": "PythPriceFeed",
-            "src": "src/core/PythPriceFeed.sol:47"
+            "src": "src/core/PythPriceFeed.sol:46"
           },
           {
             "label": "isUpdater",
@@ -2028,15 +2033,15 @@
             "slot": "105",
             "type": "t_mapping(t_address,t_bool)",
             "contract": "PythPriceFeed",
-            "src": "src/core/PythPriceFeed.sol:49"
+            "src": "src/core/PythPriceFeed.sol:48"
           },
           {
             "label": "cachedPriceOf",
             "offset": 0,
             "slot": "106",
-            "type": "t_mapping(t_address,t_struct(CachedPrice)12190_storage)",
+            "type": "t_mapping(t_address,t_struct(CachedPrice)12197_storage)",
             "contract": "PythPriceFeed",
-            "src": "src/core/PythPriceFeed.sol:52"
+            "src": "src/core/PythPriceFeed.sol:51"
           }
         ],
         "types": {
@@ -2060,7 +2065,7 @@
             "label": "bytes32",
             "numberOfBytes": "32"
           },
-          "t_contract(IPyth)41154": {
+          "t_contract(IPyth)31849": {
             "label": "contract IPyth",
             "numberOfBytes": "20"
           },
@@ -2072,11 +2077,11 @@
             "label": "mapping(address => bytes32)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_struct(CachedPrice)12190_storage)": {
+          "t_mapping(t_address,t_struct(CachedPrice)12197_storage)": {
             "label": "mapping(address => struct PythPriceFeed.CachedPrice)",
             "numberOfBytes": "32"
           },
-          "t_struct(CachedPrice)12190_storage": {
+          "t_struct(CachedPrice)12197_storage": {
             "label": "struct PythPriceFeed.CachedPrice",
             "members": [
               {
@@ -4035,6 +4040,310 @@
           "t_uint256": {
             "label": "uint256",
             "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "b4999f9c1ccf5c302a57263950a149c120f1a398ed72cf2fee34b60416d28ca0": {
+      "address": "0x71e7819a21046027872B52a8efdE5E162eA36262",
+      "txHash": "0x95366e1c99452c4911fb5ee12c97511ba2aa4de63a38136702aeb0ac510a9f33",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "corePriceFeed",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_contract(IPriceFeed)32176",
+            "contract": "PoolOracle02",
+            "src": "src/core/PoolOracle02.sol:36"
+          },
+          {
+            "label": "priceFeedInfo",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_mapping(t_address,t_struct(PriceFeedInfo)12192_storage)",
+            "contract": "PoolOracle02",
+            "src": "src/core/PoolOracle02.sol:37"
+          },
+          {
+            "label": "maxStrictPriceDeviation",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_uint256",
+            "contract": "PoolOracle02",
+            "src": "src/core/PoolOracle02.sol:39"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IPriceFeed)32176": {
+            "label": "contract IPriceFeed",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_struct(PriceFeedInfo)12192_storage)": {
+            "label": "mapping(address => struct PoolOracle02.PriceFeedInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(PriceFeedInfo)12192_storage": {
+            "label": "struct PoolOracle02.PriceFeedInfo",
+            "members": [
+              {
+                "label": "decimals",
+                "type": "t_uint8",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "spreadBps",
+                "type": "t_uint64",
+                "offset": 1,
+                "slot": "0"
+              },
+              {
+                "label": "isStrictStable",
+                "type": "t_bool",
+                "offset": 9,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "ba2869b159f7f636ca121acbf0610a27bc41a10859a6b48404e11bcecca6edd1": {
+      "address": "0xd6f5cB283177b9Fa77C5B8C7Fd0b715a9D72b755",
+      "txHash": "0x46f42eedfdac25e35b01853229c3fd7bf85f643465eab073efd9a3ebe789fd5e",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "pyth",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_contract(IPyth)32190",
+            "contract": "PythPriceFeed",
+            "src": "src/core/PythPriceFeed.sol:43"
+          },
+          {
+            "label": "tokenPriceId",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_mapping(t_address,t_bytes32)",
+            "contract": "PythPriceFeed",
+            "src": "src/core/PythPriceFeed.sol:43"
+          },
+          {
+            "label": "maxPriceAge",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_uint256",
+            "contract": "PythPriceFeed",
+            "src": "src/core/PythPriceFeed.sol:46"
+          },
+          {
+            "label": "favorRefPrice",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_bool",
+            "contract": "PythPriceFeed",
+            "src": "src/core/PythPriceFeed.sol:46"
+          },
+          {
+            "label": "isUpdater",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "PythPriceFeed",
+            "src": "src/core/PythPriceFeed.sol:48"
+          },
+          {
+            "label": "cachedPriceOf",
+            "offset": 0,
+            "slot": "106",
+            "type": "t_mapping(t_address,t_struct(CachedPrice)12534_storage)",
+            "contract": "PythPriceFeed",
+            "src": "src/core/PythPriceFeed.sol:51"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IPyth)32190": {
+            "label": "contract IPyth",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bytes32)": {
+            "label": "mapping(address => bytes32)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(CachedPrice)12534_storage)": {
+            "label": "mapping(address => struct PythPriceFeed.CachedPrice)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(CachedPrice)12534_storage": {
+            "label": "struct PythPriceFeed.CachedPrice",
+            "members": [
+              {
+                "label": "price",
+                "type": "t_uint192",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "updatedBlock",
+                "type": "t_uint64",
+                "offset": 24,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint192": {
+            "label": "uint192",
+            "numberOfBytes": "24"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
           },
           "t_uint8": {
             "label": "uint8",

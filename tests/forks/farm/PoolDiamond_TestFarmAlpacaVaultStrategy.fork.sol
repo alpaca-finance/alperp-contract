@@ -50,7 +50,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     super.setUp();
 
     vm.prank(WBTC_PHILANTROPHIST);
-    forkWbtc.transfer(address(this), 1000 ether);
+    forkBtcb.transfer(address(this), 1000 ether);
 
     vm.prank(BUSD_PHILANTROPHIST);
     forkBusd.transfer(address(this), 1000 ether);
@@ -72,10 +72,10 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     poolFarmFacet.setStrategyOf(address(forkBusd), busdFarmStrategy);
 
     // set as pending
-    poolFarmFacet.setStrategyOf(address(forkWbtc), wbtcFarmStrategy);
+    poolFarmFacet.setStrategyOf(address(forkBtcb), wbtcFarmStrategy);
     vm.warp(block.timestamp + 1 weeks + 1);
     // committing the pending strategy
-    poolFarmFacet.setStrategyOf(address(forkWbtc), wbtcFarmStrategy);
+    poolFarmFacet.setStrategyOf(address(forkBtcb), wbtcFarmStrategy);
 
     // set as pending
     poolFarmFacet.setStrategyOf(address(forkWbnb), bnbFarmStrategy);
@@ -87,9 +87,9 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     poolAccessControlFacet.grantRole(LibAccessControl.FARM_KEEPER, EVE);
 
     // 20240.97 e30
-    prices.wbtcMinPrice = poolOracle.getMinPrice(address(forkWbtc));
+    prices.wbtcMinPrice = poolOracle.getMinPrice(address(forkBtcb));
     // 20245.458 e30
-    prices.wbtcMaxPrice = poolOracle.getMaxPrice(address(forkWbtc));
+    prices.wbtcMaxPrice = poolOracle.getMaxPrice(address(forkBtcb));
     // 1 e30
     prices.busdMinPrice = poolOracle.getMinPrice(address(forkBusd));
     // 1.00000761 e30
@@ -98,24 +98,24 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
 
   function testFarmableModuleCorrectness_WhenAddLiquidity() public {
     // Set strategy target bps to be 50%
-    poolFarmFacet.setStrategyTargetBps(WBTC_TOKEN, 5000);
+    poolFarmFacet.setStrategyTargetBps(BTCB_TOKEN, 5000);
 
-    forkWbtc.approve(address(poolRouter), 5 ether);
+    forkBtcb.approve(address(poolRouter), 5 ether);
     // 1. adding liquidity into an empty pool
     poolRouter.addLiquidity(
-      address(forkWbtc), 5 ether, address(this), 0, zeroBytesArr()
+      address(forkBtcb), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // there are 0.003% deposit fee
     // = 5 * (1-0.003)
     // = 4.985 liquidity
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 4.985 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 4.985 ether, 2
     );
     assertCloseWei(
-      poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether, 2
+      poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether, 2
     );
-    assertEq(poolGetterFacet.strategyDataOf(address(forkWbtc)).principle, 0);
+    assertEq(poolGetterFacet.strategyDataOf(address(forkBtcb)).principle, 0);
 
     // should not be different more than price * 2 rounded up
     // min AUM = liquidity * min price
@@ -137,24 +137,24 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // 2. FarmKeeper trying to farm & rebalance the pool
     // a profit/loss should be realized after this as there are part of liquidity in the farming vault
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), true);
+    poolFarmFacet.farm(address(forkBtcb), true);
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 4.985 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 4.985 ether, 2
     );
     assertCloseWei(
-      poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether, 2
+      poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether, 2
     );
     // 50% of liquidity will be rebalanced into farmable module
     // = 4.985 / 2
     // = 2.4925 in both pool and farm module
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
     // 2.4925 + 0.015 (0.003% deposit fee in the reserve)
-    assertEq(forkWbtc.balanceOf(address(poolDiamond)), 2.5075 ether);
+    assertEq(forkBtcb.balanceOf(address(poolDiamond)), 2.5075 ether);
 
     // min AUM = liquidity * min price
     // 4.985 * 20240.97
@@ -173,15 +173,15 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     );
 
     // 3. adding more liquidity
-    forkWbtc.approve(address(poolRouter), 5 ether);
+    forkBtcb.approve(address(poolRouter), 5 ether);
     // adding liquidity will also realizeFarmPnL
     poolRouter.addLiquidity(
-      address(forkWbtc), 5 ether, address(this), 0, zeroBytesArr()
+      address(forkBtcb), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // principle is left unchanged as there are no rebalancing, 2 wei is from precision loss
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -190,10 +190,10 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // = 4.985 + (5 * (1-0.003))
     // = 9.97 liquidity
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 9.97 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 9.97 ether, 2
     );
     assertCloseWei(
-      poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.03 ether, 2
+      poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.03 ether, 2
     );
 
     // min AUM = liquidity * min price
@@ -215,24 +215,24 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
 
   function testFarmableModuleCorrectness_WhenAddAndRemoveLiquidity() public {
     // Set strategy target bps to be 50%
-    poolFarmFacet.setStrategyTargetBps(WBTC_TOKEN, 5000);
+    poolFarmFacet.setStrategyTargetBps(BTCB_TOKEN, 5000);
 
-    forkWbtc.approve(address(poolRouter), 5 ether);
+    forkBtcb.approve(address(poolRouter), 5 ether);
     // 1. adding liquidity into an empty pool
     poolRouter.addLiquidity(
-      address(forkWbtc), 5 ether, address(this), 0, zeroBytesArr()
+      address(forkBtcb), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // there are 0.003% deposit fee
     // = 5 * (1-0.003)
     // = 4.985 liquidity
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 4.985 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 4.985 ether, 2
     );
     assertCloseWei(
-      poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether, 2
+      poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether, 2
     );
-    assertEq(poolGetterFacet.strategyDataOf(address(forkWbtc)).principle, 0);
+    assertEq(poolGetterFacet.strategyDataOf(address(forkBtcb)).principle, 0);
 
     // should not be different more than price * 2 rounded up
     // min AUM = liquidity * min price
@@ -254,24 +254,24 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // 2. FarmKeeper trying to farm & rebalance the pool
     // a profit/loss should be realized after this as there are part of liquidity in the farming vault
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), true);
+    poolFarmFacet.farm(address(forkBtcb), true);
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 4.985 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 4.985 ether, 2
     );
     assertCloseWei(
-      poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether, 2
+      poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether, 2
     );
     // 50% of liquidity will be rebalanced into farmable module
     // = 4.985 / 2
     // = 2.4925 in both pool and farm module
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
     // 2.4925 + 0.015 (0.003% deposit fee in the reserve)
-    assertEq(forkWbtc.balanceOf(address(poolDiamond)), 2.5075 ether);
+    assertEq(forkBtcb.balanceOf(address(poolDiamond)), 2.5075 ether);
 
     // min AUM = liquidity * min price
     // 4.985 * 20240.97
@@ -290,15 +290,15 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     );
 
     // 3. adding more liquidity
-    forkWbtc.approve(address(poolRouter), 5 ether);
+    forkBtcb.approve(address(poolRouter), 5 ether);
     // adding liquidity will also realizeFarmPnL
     poolRouter.addLiquidity(
-      address(forkWbtc), 5 ether, address(this), 0, zeroBytesArr()
+      address(forkBtcb), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // principle is left unchanged as there are no rebalancing, 2 wei is from precision loss
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -307,10 +307,10 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // = 4.985 + (5 * (1-0.003))
     // = 9.97 liquidity
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 9.97 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 9.97 ether, 2
     );
     assertCloseWei(
-      poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.03 ether, 2
+      poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.03 ether, 2
     );
 
     // min AUM = liquidity * min price
@@ -336,7 +336,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     IERC20(address(alp)).approve(address(poolRouter), 100000 ether);
 
     poolRouter.removeLiquidity(
-      address(forkWbtc),
+      address(forkBtcb),
       100000 ether, // liquidity,
       address(this),
       0,
@@ -363,7 +363,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // 9.97 - (4.939927029373892898)
     // = 5.030072970626107102
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)),
+      poolGetterFacet.liquidityOf(address(forkBtcb)),
       5.030072970626107102 ether,
       2
     );
@@ -371,14 +371,14 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // total fee collected
     // 0.03 + 0.014819781088121678
     assertCloseWei(
-      poolGetterFacet.feeReserveOf(address(forkWbtc)),
+      poolGetterFacet.feeReserveOf(address(forkBtcb)),
       0.044819781088121678 ether,
       2
     );
 
     // principle is left unchanged as there are no rebalancing
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -402,10 +402,10 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // 5. FarmKeeper trying to farm & rebalance the pool
     // a profit/loss should be realized after this as there are part of liquidity in the farming vault
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), true);
+    poolFarmFacet.farm(address(forkBtcb), true);
 
     assertCloseBps(
-      poolGetterFacet.liquidityOf(address(forkWbtc)),
+      poolGetterFacet.liquidityOf(address(forkBtcb)),
       5.030072970626107102 ether,
       2
     );
@@ -413,39 +413,39 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // principle can be different from targetDeloyedFund because of share calculation during a withdrawl, but it shouldn't be that different (10 BPS delta)
     // 5.030072970626107102 / 2
     assertCloseBps(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.515036485313053551 ether,
       10
     );
   }
 
   function testFarmableModuleCorrectness_WhenIncreasePerpPosition() public {
-    poolFarmFacet.setStrategyTargetBps(address(forkWbtc), 5000);
+    poolFarmFacet.setStrategyTargetBps(address(forkBtcb), 5000);
     poolFarmFacet.setStrategyTargetBps(address(forkBusd), 5000);
 
-    forkWbtc.approve(address(poolRouter), 5 ether);
+    forkBtcb.approve(address(poolRouter), 5 ether);
     // 1. adding liquidity into an empty pool
     poolRouter.addLiquidity(
-      address(forkWbtc), 5 ether, address(this), 0, zeroBytesArr()
+      address(forkBtcb), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // there are 0.003% deposit fee
     // = 5 * (1-0.003)
     // = 4.985 liquidity
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 4.985 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 4.985 ether, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
-    assertEq(poolGetterFacet.strategyDataOf(address(forkWbtc)).principle, 0);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
+    assertEq(poolGetterFacet.strategyDataOf(address(forkBtcb)).principle, 0);
 
     // min AumE18
-    // forkWbtc AUM ( forkWbtc liquidity * forkWbtc min price)
+    // forkBtcb AUM ( forkBtcb liquidity * forkBtcb min price)
     // = 4.985 * 20240.97
     // = 100901.23545
     assertEq(poolGetterFacet.getAumE18(false), 100901.23545 ether);
 
     // max AumE18
-    // forkWbtc AUM ( forkWbtc liquidity * forkWbtc max price)
+    // forkBtcb AUM ( forkBtcb liquidity * forkBtcb max price)
     // = 4.985 * 20245.458
     // = 100923.60813
     assertEq(poolGetterFacet.getAumE18(true), 100923.60813 ether);
@@ -453,18 +453,18 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // strategy should hold no ibToken, as there are none rebalanced into the vault yet
     assertEq(alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy)), 0);
 
-    // 2. FarmKeeper trying to farm & rebalance the forkWbtc in the pool
+    // 2. FarmKeeper trying to farm & rebalance the forkBtcb in the pool
     // a profit/loss should be realized after this as there are part of liquidity in the farming vault
 
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), true);
+    poolFarmFacet.farm(address(forkBtcb), true);
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 4.985 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 4.985 ether, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -476,7 +476,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
 
     assertCloseWei(
       valueConvertFromShare,
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2
     );
 
@@ -501,17 +501,17 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     vm.warp(block.timestamp + 1 weeks);
 
     vm.startPrank(WBTC_PHILANTROPHIST);
-    forkWbtc.approve(address(alpacaWbtcVault), 100 ether);
+    forkBtcb.approve(address(alpacaWbtcVault), 100 ether);
     // call deposit to trigger accrue interest
     alpacaWbtcVault.deposit(100 ether);
     vm.stopPrank();
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 4.985 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 4.985 ether, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -538,7 +538,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
         / (alpacaWbtcVault.totalSupply());
 
       wbtcDelta = wbtcExpectedValue
-        - poolGetterFacet.strategyDataOf(address(forkWbtc)).principle;
+        - poolGetterFacet.strategyDataOf(address(forkBtcb)).principle;
 
       // TODO: find a way to accurately calculate the delta
       // assertEq(delta, 275816295065400);
@@ -563,14 +563,14 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
 
     // 4. Call farm to accrue interests
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), false);
+    poolFarmFacet.farm(address(forkBtcb), false);
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -591,16 +591,16 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     vm.warp(block.timestamp + 5 weeks);
 
     vm.startPrank(WBTC_PHILANTROPHIST);
-    forkWbtc.approve(address(alpacaWbtcVault), 100 ether);
+    forkBtcb.approve(address(alpacaWbtcVault), 100 ether);
     alpacaWbtcVault.deposit(100 ether);
     vm.stopPrank();
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -619,7 +619,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
         / (alpacaWbtcVault.totalSupply());
 
       wbtcDelta = wbtcExpectedValue
-        - poolGetterFacet.strategyDataOf(address(forkWbtc)).principle;
+        - poolGetterFacet.strategyDataOf(address(forkBtcb)).principle;
 
       wbtcLiquidity = wbtcLiquidity + wbtcDelta;
     }
@@ -636,17 +636,17 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     );
 
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), false);
+    poolFarmFacet.farm(address(forkBtcb), false);
 
     // only liquidity changes as the interest is accrued
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
 
     // other should still remains the same
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -672,13 +672,13 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
       address(forkBusd), 10000 ether, address(this), 0, zeroBytesArr()
     );
 
-    // forkWbtc should remain the same
+    // forkBtcb should remain the same
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -692,7 +692,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     assertEq(poolGetterFacet.feeReserveOf(address(forkBusd)), 30 ether);
     assertEq(poolGetterFacet.strategyDataOf(address(forkBusd)).principle, 0);
 
-    // AUMs = forkWbtc aum + forkBusd aum
+    // AUMs = forkBtcb aum + forkBusd aum
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
       9970 ether + (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
@@ -718,7 +718,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
       address(forkBusd),
       20 ether, // use 20e18 forkBusd as collateral
       0,
-      address(forkWbtc),
+      address(forkBtcb),
       20 * (PRICE_PRECISION), // position size of 20 usd
       false,
       prices.wbtcMinPrice,
@@ -735,11 +735,11 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // = 0.019999847801158233
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -756,12 +756,12 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     GetterFacetInterface.GetPositionReturnVars memory position;
     {
       position = poolGetterFacet.getPosition(
-        BOB, address(forkBusd), address(forkWbtc), false
+        BOB, address(forkBusd), address(forkBtcb), false
       );
       assertEq(position.size, 20 * PRICE_PRECISION);
     }
 
-    // AUMs = forkWbtc aum + forkBusd aum
+    // AUMs = forkBtcb aum + forkBusd aum
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
       9970 ether + 0.004434570082362653 ether
@@ -769,7 +769,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
 
-    // forkWbtc's AUM = 100952.373064013598578951 + short position loss
+    // forkBtcb's AUM = 100952.373064013598578951 + short position loss
     // = 100952.373064013598578951 + ((priceDelta * shortSize) / shortAvgPrice)
     // = 100952.373064013598578951 + ((4.488 * 20) / 20240.97)
     // = 100952.373064013598578951 + 0.004434570082362653
@@ -788,32 +788,32 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
   function testFarmableModuleCorrectness_WhenIncreaseAndDecreasePerpPosition()
     public
   {
-    poolFarmFacet.setStrategyTargetBps(address(forkWbtc), 5000);
+    poolFarmFacet.setStrategyTargetBps(address(forkBtcb), 5000);
     poolFarmFacet.setStrategyTargetBps(address(forkBusd), 5000);
 
-    forkWbtc.approve(address(poolRouter), 5 ether);
+    forkBtcb.approve(address(poolRouter), 5 ether);
     // 1. adding liquidity into an empty pool
     poolRouter.addLiquidity(
-      address(forkWbtc), 5 ether, address(this), 0, zeroBytesArr()
+      address(forkBtcb), 5 ether, address(this), 0, zeroBytesArr()
     );
 
     // there are 0.003% deposit fee
     // = 5 * (1-0.003)
     // = 4.985 liquidity
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 4.985 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 4.985 ether, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
-    assertEq(poolGetterFacet.strategyDataOf(address(forkWbtc)).principle, 0);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
+    assertEq(poolGetterFacet.strategyDataOf(address(forkBtcb)).principle, 0);
 
     // min AumE18
-    // forkWbtc AUM ( forkWbtc liquidity * forkWbtc min price)
+    // forkBtcb AUM ( forkBtcb liquidity * forkBtcb min price)
     // = 4.985 * 20240.97
     // = 100901.23545
     assertEq(poolGetterFacet.getAumE18(false), 100901.23545 ether);
 
     // max AumE18
-    // forkWbtc AUM ( forkWbtc liquidity * forkWbtc max price)
+    // forkBtcb AUM ( forkBtcb liquidity * forkBtcb max price)
     // = 4.985 * 20245.458
     // = 100923.60813
     assertEq(poolGetterFacet.getAumE18(true), 100923.60813 ether);
@@ -821,18 +821,18 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // strategy should hold no ibToken, as there are none rebalanced into the vault yet
     assertEq(alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy)), 0);
 
-    // 2. FarmKeeper trying to farm & rebalance the forkWbtc in the pool
+    // 2. FarmKeeper trying to farm & rebalance the forkBtcb in the pool
     // a profit/loss should be realized after this as there are part of liquidity in the farming vault
 
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), true);
+    poolFarmFacet.farm(address(forkBtcb), true);
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 4.985 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 4.985 ether, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -844,7 +844,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
 
     assertCloseWei(
       valueConvertFromShare,
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2
     );
 
@@ -869,17 +869,17 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     vm.warp(block.timestamp + 1 weeks);
 
     vm.startPrank(WBTC_PHILANTROPHIST);
-    forkWbtc.approve(address(alpacaWbtcVault), 100 ether);
+    forkBtcb.approve(address(alpacaWbtcVault), 100 ether);
     // call deposit to trigger accrue interest
     alpacaWbtcVault.deposit(100 ether);
     vm.stopPrank();
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 4.985 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 4.985 ether, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -897,7 +897,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
         / (alpacaWbtcVault.totalSupply());
 
       wbtcDelta = wbtcExpectedValue
-        - poolGetterFacet.strategyDataOf(address(forkWbtc)).principle;
+        - poolGetterFacet.strategyDataOf(address(forkBtcb)).principle;
 
       // TODO: find a way to accurately calculate the delta
       // assertEq(delta, 275816295065400);
@@ -931,14 +931,14 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
 
     // 4. Call farm to accrue interests
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), false);
+    poolFarmFacet.farm(address(forkBtcb), false);
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -959,16 +959,16 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     vm.warp(block.timestamp + 5 weeks);
 
     vm.startPrank(WBTC_PHILANTROPHIST);
-    forkWbtc.approve(address(alpacaWbtcVault), 100 ether);
+    forkBtcb.approve(address(alpacaWbtcVault), 100 ether);
     alpacaWbtcVault.deposit(100 ether);
     vm.stopPrank();
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -982,7 +982,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
         / (alpacaWbtcVault.totalSupply());
 
       wbtcDelta = wbtcExpectedValue
-        - poolGetterFacet.strategyDataOf(address(forkWbtc)).principle;
+        - poolGetterFacet.strategyDataOf(address(forkBtcb)).principle;
 
       // TODO: find a way to accurately calculate the delta
       // assertEq(delta, 275816295065400);
@@ -1008,17 +1008,17 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     );
 
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), false);
+    poolFarmFacet.farm(address(forkBtcb), false);
 
     // only liquidity changes as the interest is accrued
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
 
     // other should still remains the same
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -1044,13 +1044,13 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
       address(forkBusd), 10000 ether, address(this), 0, zeroBytesArr()
     );
 
-    // forkWbtc should remain the same
+    // forkBtcb should remain the same
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -1064,7 +1064,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     assertEq(poolGetterFacet.feeReserveOf(address(forkBusd)), 30 ether);
     assertEq(poolGetterFacet.strategyDataOf(address(forkBusd)).principle, 0);
 
-    // AUMs = forkWbtc aum + forkBusd aum
+    // AUMs = forkBtcb aum + forkBusd aum
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
       9970 ether + (((20240.97 * 10 ** 8) * wbtcLiquidity) / 10 ** 8),
@@ -1090,7 +1090,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
       address(forkBusd),
       20 ether, // use 20e18 forkBusd as collateral
       0,
-      address(forkWbtc),
+      address(forkBtcb),
       20 * (PRICE_PRECISION), // position size of 20 usd
       false,
       prices.wbtcMinPrice,
@@ -1107,11 +1107,11 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // = 0.019999847801158233
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -1128,12 +1128,12 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     GetterFacetInterface.GetPositionReturnVars memory position;
     {
       position = poolGetterFacet.getPosition(
-        BOB, address(forkBusd), address(forkWbtc), false
+        BOB, address(forkBusd), address(forkBtcb), false
       );
       assertEq(position.size, 20 * PRICE_PRECISION);
     }
 
-    // AUMs = forkWbtc aum + forkBusd aum
+    // AUMs = forkBtcb aum + forkBusd aum
     assertCloseWei(
       poolGetterFacet.getAumE18(false),
       9970 ether + 0.004434570082362653 ether
@@ -1141,7 +1141,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
 
-    // forkWbtc's AUM = 100952.373064013598578951 + short position loss
+    // forkBtcb's AUM = 100952.373064013598578951 + short position loss
     // = 100952.373064013598578951 + ((priceDelta * shortSize) / shortAvgPrice)
     // = 100952.373064013598578951 + ((4.488 * 20) / 20240.97)
     // = 100952.373064013598578951 + 0.004434570082362653
@@ -1164,7 +1164,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     poolRouter.decreasePosition(
       0,
       address(forkBusd),
-      address(forkWbtc),
+      address(forkBtcb),
       10 * (PRICE_PRECISION), // withdraw 10 collateral
       10 * (PRICE_PRECISION), // repay 10 debt
       false,
@@ -1176,13 +1176,13 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     );
     vm.stopPrank();
 
-    // forkWbtc is untouched
+    // forkBtcb is untouched
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), wbtcLiquidity, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), wbtcLiquidity, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.015 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.015 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2.4925 ether,
       2
     );
@@ -1230,12 +1230,12 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
 
     {
       position = poolGetterFacet.getPosition(
-        BOB, address(forkBusd), address(forkWbtc), false
+        BOB, address(forkBusd), address(forkBtcb), false
       );
       assertEq(position.size, 10 * PRICE_PRECISION);
     }
 
-    // forkWbtc's AUM = 100929.994007262622089557 + short position loss
+    // forkBtcb's AUM = 100929.994007262622089557 + short position loss
     // = 100929.994007262622089557 + ((priceDelta * shortSize) / shortAvgPrice)
     // = 100929.994007262622089557 + ((4.488 * 10) / 20240.97)
     // = 100929.994007262622089557 + 0.002217285041181326
@@ -1251,7 +1251,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
       math.roundUpE30(prices.wbtcMinPrice.mul(2)) + 2 // 20240.97 * 2 rounded up
     );
 
-    // forkWbtc's AUM = 100952.373064013598578951 + short position loss
+    // forkBtcb's AUM = 100952.373064013598578951 + short position loss
     // = 100952.373064013598578951 + ((priceDelta * shortSize) / shortAvgPrice)
     // = 100952.373064013598578951 + ((4.488 * 10) / 20240.97)
     // = 100952.373064013598578951 + 0.002217285041181326
@@ -1269,32 +1269,32 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
   }
 
   function testFarmableModuleCorrectness_WhenWithdrawnAllFromTheVault() public {
-    poolFarmFacet.setStrategyTargetBps(address(forkWbtc), 5000);
+    poolFarmFacet.setStrategyTargetBps(address(forkBtcb), 5000);
     poolFarmFacet.setStrategyTargetBps(address(forkBusd), 5000);
 
-    forkWbtc.approve(address(poolRouter), 100 ether);
+    forkBtcb.approve(address(poolRouter), 100 ether);
     // 1. adding liquidity into an empty pool
     poolRouter.addLiquidity(
-      address(forkWbtc), 100 ether, address(this), 0, zeroBytesArr()
+      address(forkBtcb), 100 ether, address(this), 0, zeroBytesArr()
     );
 
     // there are 0.003% deposit fee
     // = 100 * (1-0.003)
     // = 4.985 liquidity
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 99.7 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 99.7 ether, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.3 ether);
-    assertEq(poolGetterFacet.strategyDataOf(address(forkWbtc)).principle, 0);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.3 ether);
+    assertEq(poolGetterFacet.strategyDataOf(address(forkBtcb)).principle, 0);
 
     // min AumE18
-    // forkWbtc AUM ( forkWbtc liquidity * forkWbtc min price)
+    // forkBtcb AUM ( forkBtcb liquidity * forkBtcb min price)
     // = 99.7 * 20240.97
     // = 2018024.709
     assertEq(poolGetterFacet.getAumE18(false), 2018024.709 ether);
 
     // max AumE18
-    // forkWbtc AUM ( forkWbtc liquidity * forkWbtc max price)
+    // forkBtcb AUM ( forkBtcb liquidity * forkBtcb max price)
     // = 99.7 * 20245.458
     // = 2018472.1626
     assertEq(poolGetterFacet.getAumE18(true), 2018472.1626 ether);
@@ -1302,18 +1302,18 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
     // strategy should hold no ibToken, as there are none rebalanced into the vault yet
     assertEq(alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy)), 0);
 
-    // 2. FarmKeeper trying to farm & rebalance the forkWbtc in the pool
+    // 2. FarmKeeper trying to farm & rebalance the forkBtcb in the pool
     // a profit/loss should be realized after this as there are part of liquidity in the farming vault
 
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), true);
+    poolFarmFacet.farm(address(forkBtcb), true);
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 99.7 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 99.7 ether, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.3 ether);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.3 ether);
     assertCloseWei(
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       49.85 ether,
       2
     );
@@ -1326,7 +1326,7 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
 
     assertCloseWei(
       valueConvertFromShare,
-      poolGetterFacet.strategyDataOf(address(forkWbtc)).principle,
+      poolGetterFacet.strategyDataOf(address(forkBtcb)).principle,
       2
     );
 
@@ -1349,16 +1349,16 @@ contract PoolDiamond_ForkTestFarmAlpacaVaultStrategy is
       math.roundUpE30(prices.wbtcMaxPrice.mul(2)) // 20245.458 * 2 rounded up
     );
 
-    poolFarmFacet.setStrategyTargetBps(address(forkWbtc), 0);
+    poolFarmFacet.setStrategyTargetBps(address(forkBtcb), 0);
 
     vm.prank(EVE);
-    poolFarmFacet.farm(address(forkWbtc), true);
+    poolFarmFacet.farm(address(forkBtcb), true);
 
     assertCloseWei(
-      poolGetterFacet.liquidityOf(address(forkWbtc)), 99.7 ether, 2
+      poolGetterFacet.liquidityOf(address(forkBtcb)), 99.7 ether, 2
     );
-    assertEq(poolGetterFacet.feeReserveOf(address(forkWbtc)), 0.3 ether);
-    assertEq(poolGetterFacet.strategyDataOf(address(forkWbtc)).principle, 0);
+    assertEq(poolGetterFacet.feeReserveOf(address(forkBtcb)), 0.3 ether);
+    assertEq(poolGetterFacet.strategyDataOf(address(forkBtcb)).principle, 0);
 
     // share burned as all has been withdrawn
     assertEq(alpacaWbtcVault.balanceOf(address(wbtcFarmStrategy)), 0);

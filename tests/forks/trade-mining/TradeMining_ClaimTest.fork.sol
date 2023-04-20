@@ -9,23 +9,85 @@ import {
   FakePyth
 } from "@alperp-tests/forks/trade-mining/TradeMining_BaseTest.fork.sol";
 
+/// Forge
+import {StdStorage, stdStorage} from "@forge-std/StdStorage.sol";
+
 contract TradeMining_ClaimForkTest is TradeMining_BaseForkTest {
+  using stdStorage for StdStorage;
+
+  FakePyth internal fakePyth;
+
   function setUp() public override {
     super.setUp();
 
     // Deploy MockPyth to alter price easily
-    IPyth pyth = new FakePyth(86400, 1);
+    fakePyth = new FakePyth(86400, 1);
+    bytes[] memory pythUpdateData = new bytes[](5);
+    pythUpdateData[0] = fakePyth.createPriceFeedUpdateData(
+      BTCB_PYTH_PRICE_ID,
+      30_000 * 10 ** 8,
+      0,
+      -8,
+      30_000 * 10 ** 8,
+      1,
+      uint64(block.timestamp)
+    );
+    pythUpdateData[1] = fakePyth.createPriceFeedUpdateData(
+      BNB_PYTH_PRICE_ID,
+      330 * 10 ** 8,
+      0,
+      -8,
+      330 * 10 ** 8,
+      1,
+      uint64(block.timestamp)
+    );
+    pythUpdateData[2] = fakePyth.createPriceFeedUpdateData(
+      ETH_PYTH_PRICE_ID,
+      2_000 * 10 ** 8,
+      0,
+      -8,
+      2_000 * 10 ** 8,
+      1,
+      uint64(block.timestamp)
+    );
+    pythUpdateData[3] = fakePyth.createPriceFeedUpdateData(
+      USDT_PYTH_PRICE_ID,
+      1 * 10 ** 8,
+      0,
+      -8,
+      1 * 10 ** 8,
+      1,
+      uint64(block.timestamp)
+    );
+    pythUpdateData[4] = fakePyth.createPriceFeedUpdateData(
+      USDC_PYTH_PRICE_ID,
+      1 * 10 ** 8,
+      0,
+      -8,
+      1 * 10 ** 8,
+      1,
+      uint64(block.timestamp)
+    );
+    fakePyth.updatePriceFeeds{value: 5}(pythUpdateData);
     // Deploy a new PythPriceFeed
-    PythPriceFeed pythPriceFeed = deployPythPriceFeed(address(pyth));
+    PythPriceFeed pythPriceFeed = deployPythPriceFeed(address(fakePyth));
+    pythPriceFeed.setMaxPriceAge(120);
     // Set up new PythPriceFeed
     pythPriceFeed.setUpdater(POOL_ROUTER_04, true);
     pythPriceFeed.setUpdater(ORDER_BOOK, true);
+    // Set token price id
+    pythPriceFeed.setTokenPriceId(address(forkBtcb), BTCB_PYTH_PRICE_ID);
+    pythPriceFeed.setTokenPriceId(address(forkWbnb), BNB_PYTH_PRICE_ID);
+    pythPriceFeed.setTokenPriceId(address(forkEth), ETH_PYTH_PRICE_ID);
+    pythPriceFeed.setTokenPriceId(address(forkUsdt), USDT_PYTH_PRICE_ID);
+    pythPriceFeed.setTokenPriceId(address(forkUsdc), USDC_PYTH_PRICE_ID);
     // Set new PythPriceFeed to Alperp
-    vm.prank(
-      0xC44f82b07Ab3E691F826951a6E335E1bC1bB0B51,
-      0xC44f82b07Ab3E691F826951a6E335E1bC1bB0B51
-    );
+    vm.prank(DEPLOYER, DEPLOYER);
     forkPoolOracle.setSecondaryPriceFeed(address(pythPriceFeed));
+    // Upgrade PoolRouter04
+    upgrade(address(forkPoolRouter04), "PoolRouter04");
+    vm.prank(DEPLOYER, DEPLOYER);
+    forkPoolRouter04.setOraclePriceUpdater(pythPriceFeed);
   }
 
   function testCorrectness_Claim() public {
@@ -36,10 +98,57 @@ contract TradeMining_ClaimForkTest is TradeMining_BaseForkTest {
     vm.warp(1680739200);
 
     // Trade
+    // Build pyth update data
+    bytes[] memory pythUpdateData = new bytes[](5);
+    pythUpdateData[0] = fakePyth.createPriceFeedUpdateData(
+      BTCB_PYTH_PRICE_ID,
+      30_000 * 10 ** 8,
+      0,
+      -8,
+      30_000 * 10 ** 8,
+      1,
+      uint64(block.timestamp)
+    );
+    pythUpdateData[1] = fakePyth.createPriceFeedUpdateData(
+      BNB_PYTH_PRICE_ID,
+      330 * 10 ** 8,
+      0,
+      -8,
+      330 * 10 ** 8,
+      1,
+      uint64(block.timestamp)
+    );
+    pythUpdateData[2] = fakePyth.createPriceFeedUpdateData(
+      ETH_PYTH_PRICE_ID,
+      2_000 * 10 ** 8,
+      0,
+      -8,
+      2_000 * 10 ** 8,
+      1,
+      uint64(block.timestamp)
+    );
+    pythUpdateData[3] = fakePyth.createPriceFeedUpdateData(
+      USDT_PYTH_PRICE_ID,
+      1 * 10 ** 8,
+      0,
+      -8,
+      1 * 10 ** 8,
+      1,
+      uint64(block.timestamp)
+    );
+    pythUpdateData[4] = fakePyth.createPriceFeedUpdateData(
+      USDC_PYTH_PRICE_ID,
+      1 * 10 ** 8,
+      0,
+      -8,
+      1 * 10 ** 8,
+      1,
+      uint64(block.timestamp)
+    );
     // Market trade
     forkPoolAccessControlFacet.allowPlugin(address(forkPoolRouter04));
     forkWbnb.approve(address(forkPoolRouter04), type(uint256).max);
-    forkPoolRouter04.increasePosition(
+    forkPoolRouter04.increasePosition{value: 5}(
       0,
       WBNB_TOKEN,
       WBNB_TOKEN,
@@ -48,8 +157,8 @@ contract TradeMining_ClaimForkTest is TradeMining_BaseForkTest {
       WBNB_TOKEN,
       30_000 * 10 ** 30,
       true,
-      316 * 10 ** 30,
-      new bytes[](0)
+      330 * 10 ** 30,
+      pythUpdateData
     );
 
     // Assert AP balance.

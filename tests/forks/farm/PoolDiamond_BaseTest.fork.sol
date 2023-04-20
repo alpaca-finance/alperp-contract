@@ -118,7 +118,7 @@ contract PoolDiamond_BaseForkTest is ForkBaseTest {
   {
     address[] memory tokens = new address[](3);
     tokens[0] = address(forkBusd);
-    tokens[1] = address(forkWbtc);
+    tokens[1] = address(forkBtcb);
     tokens[2] = address(forkWbnb);
 
     LibPoolConfigV1.TokenConfig[] memory tokenConfigs =
@@ -165,8 +165,10 @@ contract PoolDiamond_BaseForkTest is ForkBaseTest {
 
   /// @dev Foundry's setUp method
   function setUp() public virtual {
+    vm.createSelectFork(vm.envString("BSC_MAINNET_RPC"), 27078173);
+
     forkBusd = IERC20(BUSD_TOKEN);
-    forkWbtc = IERC20(WBTC_TOKEN);
+    forkBtcb = IERC20(BTCB_TOKEN);
     forkWbnb = IERC20(WBNB_TOKEN);
 
     forkBusdPriceFeed = ChainlinkPriceFeedInterface(BUSD_CHAINLINK_ORACLE);
@@ -193,7 +195,7 @@ contract PoolDiamond_BaseForkTest is ForkBaseTest {
 
     alpacaWbtcVault = IVault(ALPACA_WBTC_VAULT);
     wbtcFarmStrategy =
-      deployAlpacaVaultFarmStrategy(WBTC_TOKEN, address(alpacaWbtcVault));
+      deployAlpacaVaultFarmStrategy(BTCB_TOKEN, address(alpacaWbtcVault));
 
     alpacaBnbVault = IVault(ALPACA_BNB_VAULT);
     bnbFarmStrategy =
