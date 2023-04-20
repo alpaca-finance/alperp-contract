@@ -1,6 +1,6 @@
 {
   "name": "@alpaca-finance/alperp-contract",
-  "version": "0.4.1-rc.1",
+  "version": "0.4.2-rc.1",
   "main": "index.js",
   "author": "Anonymous",
   "license": "MIT",
@@ -179,6 +179,8 @@
     "deploy:mainnet:trade-mining:set_miner_manager_period": "hardhat --network mainnet deploy --no-compile --reset --tags SetMiningManagerPeriod",
     "deploy:mainnet:trade-mining:set_ap_token_minter": "hardhat --network mainnet deploy --no-compile --reset --tags SetAPTokenMinter",
     "deploy:mainnet:orderbook:set-min-execution-fee": "npx hardhat --network mainnet deploy --no-compile --reset --tags SetMinExecutionFee",
+    "deploy:mainnet:periphery:liquidation-routers:deploy:liquidation-router01": "npx hardhat --network mainnet deploy --no-compile --reset --tags DeployLiquidationRouter01",
+    "deploy:mainnet:periphery:liquidation-routers:config:set-liquidator": "npx hardhat --network mainnet deploy --no-compile --reset --tags LiquidationRouter01SetLiquidator",
     "----------Script Tenderly Fork & Non Configuration Update-------------": "----------Simulate Tenderly Fork-------------",
     "script:tenderly:simulate_add_liquidity": "hardhat --network tenderly invoke:simulate_add_liquidity",
     "script:tenderly:simulate_open_position": "hardhat --network tenderly invoke:simulate_open_position",
