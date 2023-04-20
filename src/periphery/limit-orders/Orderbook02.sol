@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- *   ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -14,11 +14,16 @@
 pragma solidity 0.8.17;
 
 // OZ
-import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {ReentrancyGuardUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {AddressUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 // Alperp
 import {IWNative} from "@alperp/interfaces/IWNative.sol";
@@ -239,6 +244,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 executionFee,
     uint256 amountOut
   );
+  event SetPoolOracle(address prevPoolOracle, address newPoolOracle);
 
   event UpdateMinExecutionFee(uint256 _minExecutionFee);
   event UpdateMinPurchaseTokenAmountUsd(uint256 _minPurchaseTokenAmountUsd);
@@ -326,6 +332,11 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     minPurchaseTokenAmountUsd = _minPurchaseTokenAmountUsd;
 
     emit UpdateMinPurchaseTokenAmountUsd(_minPurchaseTokenAmountUsd);
+  }
+
+  function setPoolOracle(PoolOracle poolOracle_) external onlyOwner {
+    emit SetPoolOracle(address(poolOracle), address(poolOracle_));
+    poolOracle = poolOracle_;
   }
 
   /// @notice Set a new trade mining manager

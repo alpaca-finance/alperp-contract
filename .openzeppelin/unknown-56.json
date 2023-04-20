@@ -3115,7 +3115,7 @@
             "label": "increaseOrders",
             "offset": 0,
             "slot": "151",
-            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(IncreaseOrder)35455_storage))",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(IncreaseOrder)36135_storage))",
             "contract": "Orderbook02",
             "src": "src/periphery/limit-orders/Orderbook02.sol:78"
           },
@@ -3131,7 +3131,7 @@
             "label": "decreaseOrders",
             "offset": 0,
             "slot": "153",
-            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(DecreaseOrder)35476_storage))",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(DecreaseOrder)36156_storage))",
             "contract": "Orderbook02",
             "src": "src/periphery/limit-orders/Orderbook02.sol:80"
           },
@@ -3147,7 +3147,7 @@
             "label": "swapOrders",
             "offset": 0,
             "slot": "155",
-            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(SwapOrder)35494_storage))",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(SwapOrder)36174_storage))",
             "contract": "Orderbook02",
             "src": "src/periphery/limit-orders/Orderbook02.sol:83"
           },
@@ -3219,7 +3219,7 @@
             "label": "orderList",
             "offset": 0,
             "slot": "164",
-            "type": "t_struct(itmap)38896_storage",
+            "type": "t_struct(itmap)39576_storage",
             "contract": "Orderbook02",
             "src": "src/periphery/limit-orders/Orderbook02.sol:93"
           },
@@ -3227,7 +3227,7 @@
             "label": "oraclePriceUpdater",
             "offset": 0,
             "slot": "167",
-            "type": "t_contract(IOnchainPriceUpdater)31405",
+            "type": "t_contract(IOnchainPriceUpdater)32071",
             "contract": "Orderbook02",
             "src": "src/periphery/limit-orders/Orderbook02.sol:95"
           },
@@ -3243,7 +3243,7 @@
             "label": "tradeMiningManager",
             "offset": 0,
             "slot": "169",
-            "type": "t_contract(ITradeMiningManager)31626",
+            "type": "t_contract(ITradeMiningManager)32306",
             "contract": "Orderbook02",
             "src": "src/periphery/limit-orders/Orderbook02.sol:99"
           }
@@ -3257,7 +3257,7 @@
             "label": "address[]",
             "numberOfBytes": "32"
           },
-          "t_array(t_struct(KeyFlag)38884_storage)dyn_storage": {
+          "t_array(t_struct(KeyFlag)39564_storage)dyn_storage": {
             "label": "struct KeyFlag[]",
             "numberOfBytes": "32"
           },
@@ -3273,11 +3273,11 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(IOnchainPriceUpdater)31405": {
+          "t_contract(IOnchainPriceUpdater)32071": {
             "label": "contract IOnchainPriceUpdater",
             "numberOfBytes": "20"
           },
-          "t_contract(ITradeMiningManager)31626": {
+          "t_contract(ITradeMiningManager)32306": {
             "label": "contract ITradeMiningManager",
             "numberOfBytes": "20"
           },
@@ -3285,7 +3285,7 @@
             "label": "contract PoolOracle",
             "numberOfBytes": "20"
           },
-          "t_enum(OrderType)38863": {
+          "t_enum(OrderType)39543": {
             "label": "enum OrderType",
             "members": [
               "SWAP",
@@ -3298,15 +3298,15 @@
             "label": "mapping(address => bool)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_mapping(t_uint256,t_struct(DecreaseOrder)35476_storage))": {
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(DecreaseOrder)36156_storage))": {
             "label": "mapping(address => mapping(uint256 => struct Orderbook02.DecreaseOrder))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_mapping(t_uint256,t_struct(IncreaseOrder)35455_storage))": {
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(IncreaseOrder)36135_storage))": {
             "label": "mapping(address => mapping(uint256 => struct Orderbook02.IncreaseOrder))",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_mapping(t_uint256,t_struct(SwapOrder)35494_storage))": {
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(SwapOrder)36174_storage))": {
             "label": "mapping(address => mapping(uint256 => struct Orderbook02.SwapOrder))",
             "numberOfBytes": "32"
           },
@@ -3314,23 +3314,23 @@
             "label": "mapping(address => uint256)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(DecreaseOrder)35476_storage)": {
+          "t_mapping(t_uint256,t_struct(DecreaseOrder)36156_storage)": {
             "label": "mapping(uint256 => struct Orderbook02.DecreaseOrder)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(IncreaseOrder)35455_storage)": {
+          "t_mapping(t_uint256,t_struct(IncreaseOrder)36135_storage)": {
             "label": "mapping(uint256 => struct Orderbook02.IncreaseOrder)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(IndexValue)38879_storage)": {
+          "t_mapping(t_uint256,t_struct(IndexValue)39559_storage)": {
             "label": "mapping(uint256 => struct IndexValue)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(SwapOrder)35494_storage)": {
+          "t_mapping(t_uint256,t_struct(SwapOrder)36174_storage)": {
             "label": "mapping(uint256 => struct Orderbook02.SwapOrder)",
             "numberOfBytes": "32"
           },
-          "t_struct(DecreaseOrder)35476_storage": {
+          "t_struct(DecreaseOrder)36156_storage": {
             "label": "struct Orderbook02.DecreaseOrder",
             "members": [
               {
@@ -3396,7 +3396,7 @@
             ],
             "numberOfBytes": "320"
           },
-          "t_struct(IncreaseOrder)35455_storage": {
+          "t_struct(IncreaseOrder)36135_storage": {
             "label": "struct Orderbook02.IncreaseOrder",
             "members": [
               {
@@ -3468,7 +3468,7 @@
             ],
             "numberOfBytes": "352"
           },
-          "t_struct(IndexValue)38879_storage": {
+          "t_struct(IndexValue)39559_storage": {
             "label": "struct IndexValue",
             "members": [
               {
@@ -3479,14 +3479,14 @@
               },
               {
                 "label": "value",
-                "type": "t_struct(Orders)38873_storage",
+                "type": "t_struct(Orders)39553_storage",
                 "offset": 0,
                 "slot": "1"
               }
             ],
             "numberOfBytes": "160"
           },
-          "t_struct(KeyFlag)38884_storage": {
+          "t_struct(KeyFlag)39564_storage": {
             "label": "struct KeyFlag",
             "members": [
               {
@@ -3504,7 +3504,7 @@
             ],
             "numberOfBytes": "64"
           },
-          "t_struct(Orders)38873_storage": {
+          "t_struct(Orders)39553_storage": {
             "label": "struct Orders",
             "members": [
               {
@@ -3527,14 +3527,14 @@
               },
               {
                 "label": "orderType",
-                "type": "t_enum(OrderType)38863",
+                "type": "t_enum(OrderType)39543",
                 "offset": 0,
                 "slot": "3"
               }
             ],
             "numberOfBytes": "128"
           },
-          "t_struct(SwapOrder)35494_storage": {
+          "t_struct(SwapOrder)36174_storage": {
             "label": "struct Orderbook02.SwapOrder",
             "members": [
               {
@@ -3588,18 +3588,18 @@
             ],
             "numberOfBytes": "224"
           },
-          "t_struct(itmap)38896_storage": {
+          "t_struct(itmap)39576_storage": {
             "label": "struct itmap",
             "members": [
               {
                 "label": "data",
-                "type": "t_mapping(t_uint256,t_struct(IndexValue)38879_storage)",
+                "type": "t_mapping(t_uint256,t_struct(IndexValue)39559_storage)",
                 "offset": 0,
                 "slot": "0"
               },
               {
                 "label": "keys",
-                "type": "t_array(t_struct(KeyFlag)38884_storage)dyn_storage",
+                "type": "t_array(t_struct(KeyFlag)39564_storage)dyn_storage",
                 "offset": 0,
                 "slot": "1"
               },
@@ -4344,6 +4344,580 @@
           "t_uint64": {
             "label": "uint64",
             "numberOfBytes": "8"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "6bcfed1b8273834177e7d9bb661ecfd217a298055290c81fe3af9e541628599a": {
+      "address": "0xddfFBebD4cc8Da4A4DAeE38B49E10c9837B0862b",
+      "txHash": "0xaf8f7c48db09365a07d8692efb08ddd0c7bcefa64d00574cab310a80ca6d7f53",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "increaseOrders",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(IncreaseOrder)36135_storage))",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:83"
+          },
+          {
+            "label": "increaseOrdersIndex",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:85"
+          },
+          {
+            "label": "decreaseOrders",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(DecreaseOrder)36156_storage))",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:85"
+          },
+          {
+            "label": "decreaseOrdersIndex",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:87"
+          },
+          {
+            "label": "swapOrders",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(SwapOrder)36174_storage))",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:88"
+          },
+          {
+            "label": "swapOrdersIndex",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:90"
+          },
+          {
+            "label": "weth",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_address",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:92"
+          },
+          {
+            "label": "pool",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_address",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:93"
+          },
+          {
+            "label": "poolOracle",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_contract(PoolOracle)12155",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:94"
+          },
+          {
+            "label": "minExecutionFee",
+            "offset": 0,
+            "slot": "160",
+            "type": "t_uint256",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:94"
+          },
+          {
+            "label": "minPurchaseTokenAmountUsd",
+            "offset": 0,
+            "slot": "161",
+            "type": "t_uint256",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:95"
+          },
+          {
+            "label": "whitelist",
+            "offset": 0,
+            "slot": "162",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:96"
+          },
+          {
+            "label": "isAllowAllExecutor",
+            "offset": 0,
+            "slot": "163",
+            "type": "t_bool",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:98"
+          },
+          {
+            "label": "orderList",
+            "offset": 0,
+            "slot": "164",
+            "type": "t_struct(itmap)39606_storage",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:98"
+          },
+          {
+            "label": "oraclePriceUpdater",
+            "offset": 0,
+            "slot": "167",
+            "type": "t_contract(IOnchainPriceUpdater)32071",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:100"
+          },
+          {
+            "label": "wnativeRelayer",
+            "offset": 0,
+            "slot": "168",
+            "type": "t_address",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:102"
+          },
+          {
+            "label": "tradeMiningManager",
+            "offset": 0,
+            "slot": "169",
+            "type": "t_contract(ITradeMiningManager)32306",
+            "contract": "Orderbook02",
+            "src": "src/periphery/limit-orders/Orderbook02.sol:104"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_struct(KeyFlag)39594_storage)dyn_storage": {
+            "label": "struct KeyFlag[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IOnchainPriceUpdater)32071": {
+            "label": "contract IOnchainPriceUpdater",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ITradeMiningManager)32306": {
+            "label": "contract ITradeMiningManager",
+            "numberOfBytes": "20"
+          },
+          "t_contract(PoolOracle)12155": {
+            "label": "contract PoolOracle",
+            "numberOfBytes": "20"
+          },
+          "t_enum(OrderType)39573": {
+            "label": "enum OrderType",
+            "members": [
+              "SWAP",
+              "INCREASE",
+              "DECREASE"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(DecreaseOrder)36156_storage))": {
+            "label": "mapping(address => mapping(uint256 => struct Orderbook02.DecreaseOrder))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(IncreaseOrder)36135_storage))": {
+            "label": "mapping(address => mapping(uint256 => struct Orderbook02.IncreaseOrder))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(SwapOrder)36174_storage))": {
+            "label": "mapping(address => mapping(uint256 => struct Orderbook02.SwapOrder))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(DecreaseOrder)36156_storage)": {
+            "label": "mapping(uint256 => struct Orderbook02.DecreaseOrder)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(IncreaseOrder)36135_storage)": {
+            "label": "mapping(uint256 => struct Orderbook02.IncreaseOrder)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(IndexValue)39589_storage)": {
+            "label": "mapping(uint256 => struct IndexValue)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(SwapOrder)36174_storage)": {
+            "label": "mapping(uint256 => struct Orderbook02.SwapOrder)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(DecreaseOrder)36156_storage": {
+            "label": "struct Orderbook02.DecreaseOrder",
+            "members": [
+              {
+                "label": "account",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "subAccountId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "collateralToken",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "collateralDelta",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "indexToken",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "sizeDelta",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "isLong",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "triggerPrice",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "triggerAboveThreshold",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "8"
+              },
+              {
+                "label": "executionFee",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "9"
+              }
+            ],
+            "numberOfBytes": "320"
+          },
+          "t_struct(IncreaseOrder)36135_storage": {
+            "label": "struct Orderbook02.IncreaseOrder",
+            "members": [
+              {
+                "label": "account",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "subAccountId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "purchaseToken",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "purchaseTokenAmount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "collateralToken",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "indexToken",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "sizeDelta",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "isLong",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "triggerPrice",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "8"
+              },
+              {
+                "label": "triggerAboveThreshold",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "9"
+              },
+              {
+                "label": "executionFee",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "10"
+              }
+            ],
+            "numberOfBytes": "352"
+          },
+          "t_struct(IndexValue)39589_storage": {
+            "label": "struct IndexValue",
+            "members": [
+              {
+                "label": "keyIndex",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "value",
+                "type": "t_struct(Orders)39583_storage",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "160"
+          },
+          "t_struct(KeyFlag)39594_storage": {
+            "label": "struct KeyFlag",
+            "members": [
+              {
+                "label": "key",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "deleted",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Orders)39583_storage": {
+            "label": "struct Orders",
+            "members": [
+              {
+                "label": "account",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "subAccountId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "orderIndex",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "orderType",
+                "type": "t_enum(OrderType)39573",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          },
+          "t_struct(SwapOrder)36174_storage": {
+            "label": "struct Orderbook02.SwapOrder",
+            "members": [
+              {
+                "label": "account",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "path",
+                "type": "t_array(t_address)dyn_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "amountIn",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "minOut",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "triggerRatio",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "triggerAboveThreshold",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "shouldUnwrap",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "5"
+              },
+              {
+                "label": "executionFee",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              }
+            ],
+            "numberOfBytes": "224"
+          },
+          "t_struct(itmap)39606_storage": {
+            "label": "struct itmap",
+            "members": [
+              {
+                "label": "data",
+                "type": "t_mapping(t_uint256,t_struct(IndexValue)39589_storage)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "keys",
+                "type": "t_array(t_struct(KeyFlag)39594_storage)dyn_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "size",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
           },
           "t_uint8": {
             "label": "uint8",

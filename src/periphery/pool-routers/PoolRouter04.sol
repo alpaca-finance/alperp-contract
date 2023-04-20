@@ -24,12 +24,9 @@ import {ReentrancyGuardUpgradeable} from
 
 /// Alperp
 import {IWNative} from "@alperp/interfaces/IWNative.sol";
-import {LiquidityFacetInterface} from
-  "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
-import {GetterFacetInterface} from
-  "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
-import {PerpTradeFacetInterface} from
-  "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
+import {LiquidityFacetInterface} from "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
+import {GetterFacetInterface} from "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {PerpTradeFacetInterface} from "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
 import {IOnchainPriceUpdater} from "@alperp/interfaces/IOnChainPriceUpdater.sol";
 import {PoolOracle} from "@alperp/core/PoolOracle.sol";
 import {ITradeMiningManager} from "@alperp/interfaces/ITradeMiningManager.sol";

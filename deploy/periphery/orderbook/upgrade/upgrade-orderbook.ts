@@ -1,11 +1,11 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers, upgrades, tenderly } from "hardhat";
-import { getConfig } from "../utils/config";
+import { getConfig } from "../../../utils/config";
 import { getImplementationAddress } from "@openzeppelin/upgrades-core";
-import { MaybeMultisigTimelock } from "../utils/maybe-multisig";
-import { ProxyAdmin__factory } from "../../typechain";
-import { compareAddress } from "../utils/address";
+import { MaybeMultisigTimelock } from "../../../utils/maybe-multisig";
+import { ProxyAdmin__factory } from "../../../../typechain";
+import { compareAddress } from "../../../utils/address";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = getConfig();
@@ -13,7 +13,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const TARGET_ADDRESS = config.Pools.ALP.orderbook;
 
-  const EXACT_ETA = 1;
+  const EXACT_ETA = 0;
 
   const deployer = (await ethers.getSigners())[0];
 
