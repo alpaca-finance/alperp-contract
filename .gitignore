@@ -12,6 +12,8 @@ cache
 *.swp
 .tmp
 
+yarn-error.log
+
 .vscode/
 .idea/
 .openzeppelin/.hidden/
