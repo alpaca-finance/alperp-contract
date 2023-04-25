@@ -81,4 +81,8 @@ contract Config {
     0x2Fb74F8E1e9EFaEEc31e57946e0C1bC6853ca4f1;
   address internal constant POOL_ORACLE =
     0x9fD00Faef95cc028bc343BaC1fC11E870635B974;
+  address internal constant ALP_ADDRESS =
+    0x86a0384836Bd6fD6ad7Da9EBbA0F330300a6b2A8;
+  address internal constant ALP_STAKING =
+    0x7295ebf7e818d16EdF359EE2D18f1562BC2595B8;
 }

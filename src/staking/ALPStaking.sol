@@ -12,10 +12,14 @@
  */
 pragma solidity 0.8.17;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {ERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 import {IRewarder} from "./interfaces/IRewarder.sol";
 import {IStaking} from "./interfaces/IStaking.sol";
@@ -37,6 +41,7 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
   mapping(address => address[]) public stakingTokenRewarders;
 
   address public compounder;
+  mapping(address => bool) public isBlocked;
 
   event LogDeposit(
     address indexed caller, address indexed user, address token, uint256 amount
@@ -163,13 +168,15 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
   }
 
   function withdraw(address token, uint256 amount) external {
-    _withdraw(token, amount);
+    _withdraw(msg.sender, token, amount, msg.sender);
     emit LogWithdraw(msg.sender, token, amount);
   }
 
-  function _withdraw(address token, uint256 amount) internal {
+  function _withdraw(address user, address token, uint256 amount, address to)
+    internal
+  {
     if (stakingToken != token) revert ALPStaking_UnknownStakingToken();
-    if (userTokenAmount[token][msg.sender] < amount) {
+    if (userTokenAmount[token][user] < amount) {
       revert ALPStaking_InsufficientTokenAmount();
     }
 
@@ -177,15 +184,14 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
     for (uint256 i = 0; i < length;) {
       address rewarder = stakingTokenRewarders[token][i];
 
-      IRewarder(rewarder).onWithdraw(msg.sender, amount);
+      IRewarder(rewarder).onWithdraw(user, amount);
 
       unchecked {
         ++i;
       }
     }
-    userTokenAmount[token][msg.sender] -= amount;
-    IERC20Upgradeable(token).safeTransfer(msg.sender, amount);
-    emit LogWithdraw(msg.sender, token, amount);
+    userTokenAmount[token][user] -= amount;
+    IERC20Upgradeable(token).safeTransfer(to, amount);
   }
 
   function harvest(address[] memory rewarders) external {

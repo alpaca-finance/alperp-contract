@@ -7,8 +7,8 @@ import { upgrade } from "../../../utils/upgradeable";
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = getConfig();
   const deployer = (await ethers.getSigners())[0];
-  await upgrade("PythPriceFeed", config.Pools.ALP.pythPriceFeed, deployer);
+  await upgrade("AP", config.TradeMining.AP, deployer);
 };
 
 export default func;
-func.tags = ["UpgradePythPriceFeed"];
+func.tags = ["UpgradeAPToken"];
