@@ -9,13 +9,13 @@ const config = getConfig();
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const newPoolOracle = config.Pools.ALP.oracle02;
 
-  console.log(`> Setting Pool's oracle to ${newPoolOracle}`)
+  console.log(`> Setting Pool's oracle to ${newPoolOracle}`);
   const deployer = (await ethers.getSigners())[0];
   const pool = AdminFacetInterface__factory.connect(
     config.Pools.ALP.poolDiamond,
     deployer
   );
-  const tx = await pool.setPoolOracle(config.Pools.ALP.oracle);
+  const tx = await pool.setPoolOracle(newPoolOracle);
   console.log(`> ⛓ Tx submitted: ${tx.hash}`);
   console.log(`> Waiting for tx to be mined...`);
   await tx.wait(3);

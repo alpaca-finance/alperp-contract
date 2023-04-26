@@ -1,26 +1,33 @@
 // SPDX-License-Identifier: MIT
 /**
- *   ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
 pragma solidity 0.8.17;
 
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import {MerkleAirdrop} from "../airdrop/MerkleAirdrop.sol";
-import {AdminFacetInterface} from "../core/pool-diamond/interfaces/AdminFacetInterface.sol";
-import {GetterFacetInterface} from "../core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {AdminFacetInterface} from
+  "../core/pool-diamond/interfaces/AdminFacetInterface.sol";
+import {GetterFacetInterface} from
+  "../core/pool-diamond/interfaces/GetterFacetInterface.sol";
 import {IPoolRouter} from "../interfaces/IPoolRouter.sol";
 import {IFeedableRewarder} from "./interfaces/IFeedableRewarder.sol";
+import {IPancakeV3Router} from "@alperp/interfaces/IPancakeV3Router.sol";
+import {IOnchainPriceUpdater} from "@alperp/interfaces/IOnChainPriceUpdater.sol";
 
 contract RewardDistributor is OwnableUpgradeable {
   using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -52,6 +59,11 @@ contract RewardDistributor is OwnableUpgradeable {
   uint256 public referralRevenueMaxThreshold; // in BPS (10000)
 
   address public feeder;
+
+  /// Extension configs
+  IOnchainPriceUpdater public pythPriceFeed;
+  IPancakeV3Router public router;
+  mapping(address => mapping(address => uint24)) public poolFeeOf;
 
   /// @dev Error
   error RewardDistributor_BadParams();
@@ -90,6 +102,15 @@ contract RewardDistributor is OwnableUpgradeable {
     uint256 govAmount,
     uint256 burnerAmount
   );
+  event LogSetRouter(IPancakeV3Router oldRouter, IPancakeV3Router newRouter);
+  event LogSetPoolFee(
+    address token0, address token1, uint24 oldFee, uint24 newFee
+  );
+  event LogSetPythPriceFeed(
+    IOnchainPriceUpdater oldFeed, IOnchainPriceUpdater newFeed
+  );
+  event LogAlpSwapSuccess();
+  event LogAlpSwapFailed();
 
   modifier onlyFeeder() {
     if (msg.sender != feeder) revert RewardDistributor_NotFeeder();
@@ -196,6 +217,41 @@ contract RewardDistributor is OwnableUpgradeable {
     feeder = newFeeder;
   }
 
+  function setRouter(IPancakeV3Router newRouter) external onlyOwner {
+    emit LogSetRouter(router, newRouter);
+    router = newRouter;
+  }
+
+  function setPoolFees(
+    address[] calldata t0s,
+    address[] calldata t1s,
+    uint24[] calldata fees
+  ) external onlyOwner {
+    require(
+      t0s.length == t1s.length && t1s.length == fees.length,
+      "RewardDistributor: bad params"
+    );
+    for (uint256 i = 0; i < t0s.length;) {
+      emit LogSetPoolFee(t0s[i], t1s[i], poolFeeOf[t0s[i]][t1s[i]], fees[i]);
+      emit LogSetPoolFee(t1s[i], t0s[i], poolFeeOf[t1s[i]][t0s[i]], fees[i]);
+
+      poolFeeOf[t0s[i]][t1s[i]] = fees[i];
+      poolFeeOf[t1s[i]][t0s[i]] = fees[i];
+
+      unchecked {
+        ++i;
+      }
+    }
+  }
+
+  function setPythPriceFeed(IOnchainPriceUpdater newPythPriceFeed)
+    external
+    onlyOwner
+  {
+    emit LogSetPythPriceFeed(pythPriceFeed, newPythPriceFeed);
+    pythPriceFeed = newPythPriceFeed;
+  }
+
   function claimAndSwap(address[] memory tokens, bytes[] memory priceUpdateData)
     external
     payable
@@ -209,15 +265,17 @@ contract RewardDistributor is OwnableUpgradeable {
     bytes[] memory priceUpdateData
   ) internal {
     uint256 length = tokens.length;
+
+    // Update pyth price first
+    uint256 fee = pythPriceFeed.getUpdateFee(priceUpdateData);
+    pythPriceFeed.updatePrices{value: fee}(priceUpdateData);
+
     for (uint256 i = 0; i < length;) {
       // 1. Withdraw protocol revenue
       _withdrawProtocolRevenue(tokens[i]);
       // 2. Swap those revenue (along with surplus) to RewardToken Token
       _swapTokenToRewardToken(
-        tokens[i],
-        IERC20Upgradeable(tokens[i]).balanceOf(address(this)),
-        priceUpdateData,
-        msg.value / length
+        tokens[i], IERC20Upgradeable(tokens[i]).balanceOf(address(this))
       );
 
       unchecked {
@@ -254,10 +312,13 @@ contract RewardDistributor is OwnableUpgradeable {
       totalProtocolRevenue * referralRevenueMaxThreshold
         < referralRevenueAmount * MAX_BPS
     ) revert RewardDistributor_ReferralRevenueExceedMaxThreshold();
-    merkleAirdrop.init(weekTimestamp, merkleRoot);
-    IERC20Upgradeable(rewardToken).safeTransfer(
-      address(merkleAirdrop), referralRevenueAmount
-    );
+
+    if (referralRevenueAmount > 0) {
+      merkleAirdrop.init(weekTimestamp, merkleRoot);
+      IERC20Upgradeable(rewardToken).safeTransfer(
+        address(merkleAirdrop), referralRevenueAmount
+      );
+    }
 
     // Calculate reward sharing
     (
@@ -345,12 +406,7 @@ contract RewardDistributor is OwnableUpgradeable {
     IERC20Upgradeable(_token).safeTransfer(burner, _amount);
   }
 
-  function _swapTokenToRewardToken(
-    address token,
-    uint256 amount,
-    bytes[] memory priceUpdateData,
-    uint256 fee
-  ) internal {
+  function _swapTokenToRewardToken(address token, uint256 amount) internal {
     // If no token, no need to swap
     if (amount == 0) return;
 
@@ -358,12 +414,35 @@ contract RewardDistributor is OwnableUpgradeable {
     if (token == rewardToken) return;
 
     // Approve the token
-    IERC20Upgradeable(token).approve(poolRouter, amount);
+    IERC20Upgradeable token_ = IERC20Upgradeable(token);
+    token_.safeApprove(poolRouter, amount);
 
     // Swap
-    IPoolRouter(poolRouter).swap{value: fee}(
-      token, rewardToken, amount, 0, address(this), priceUpdateData
-    );
+    // Try ALP swap first, if fail then swap on PancakeV3
+    // No need to update pyth price here, because it's already updated in _claimAndSwap
+    bytes[] memory data = new bytes[](0);
+    try IPoolRouter(poolRouter).swap(
+      token, rewardToken, amount, 0, address(this), data
+    ) {
+      emit LogAlpSwapSuccess();
+    } catch {
+      emit LogAlpSwapFailed();
+      // Swap on PancakeV3
+      // SLOAD vars
+      uint24 poolFee = poolFeeOf[token][rewardToken];
+      require(poolFee != 0, "PF");
+      router.exactInputSingle(
+        IPancakeV3Router.ExactInputSingleParams({
+          tokenIn: token,
+          tokenOut: rewardToken,
+          fee: poolFeeOf[token][rewardToken],
+          recipient: address(this),
+          amountIn: amount,
+          amountOutMinimum: 0,
+          sqrtPriceLimitX96: 0
+        })
+      );
+    }
   }
 
   function _feedRewardToRewarders(

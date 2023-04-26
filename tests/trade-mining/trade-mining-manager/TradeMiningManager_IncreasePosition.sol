@@ -11,7 +11,7 @@
  * Alpaca Fin Corporation
  */
 
-pragma solidity >=0.8.4 <0.9.0;
+pragma solidity 0.8.17;
 
 /// OZ
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";

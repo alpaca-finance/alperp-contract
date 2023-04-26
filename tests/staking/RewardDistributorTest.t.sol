@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ * ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -24,6 +24,7 @@ import {MockPoolForRewardDistributor} from
   "../mocks/MockPoolForRewardDistributor.sol";
 import {MockPoolRouterForRewardDistributor} from
   "../mocks/MockPoolRouterForRewardDistributor.sol";
+import {MockPythPriceFeed} from "../mocks/MockPythPriceFeed.sol";
 import {console} from "../utils/console.sol";
 
 contract RewardDistributorTest is BaseTest {
@@ -68,6 +69,8 @@ contract RewardDistributorTest is BaseTest {
 
     merkleAirdrop = deployMerkleAirdrop(address(busd), address(this));
 
+    MockPythPriceFeed mockPyth = new MockPythPriceFeed();
+
     rewardDistributor = deployRewardDistributor(
       address(busd),
       address(pool),
@@ -85,6 +88,7 @@ contract RewardDistributorTest is BaseTest {
 
     rewardDistributor.setFeeder(address(this));
     merkleAirdrop.setFeeder(address(rewardDistributor));
+    rewardDistributor.setPythPriceFeed(mockPyth);
   }
 
   function testCorrectness_WhenClaimAndFeedProtocolRevenue() external {

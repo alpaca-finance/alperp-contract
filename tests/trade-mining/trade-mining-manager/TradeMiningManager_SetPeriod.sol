@@ -11,7 +11,7 @@
  * Alpaca Fin Corporation
  */
 
-pragma solidity >=0.8.4 <0.9.0;
+pragma solidity 0.8.17;
 
 /// Alperp tests
 import {TradeMiningManager_BaseTest} from

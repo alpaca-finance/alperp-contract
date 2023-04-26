@@ -8,7 +8,7 @@ const config = getConfig();
 
 const PYTH_PRICE_FEED = config.Pools.ALP.pythPriceFeed;
 
-const MAX_AGE = 10; // 10 seconds
+const MAX_AGE = 20; // 10 seconds
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];

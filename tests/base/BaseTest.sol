@@ -10,7 +10,7 @@
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
-pragma solidity >=0.8.4 <0.9.0;
+pragma solidity 0.8.17;
 
 /// Test
 import {console} from "../utils/console.sol";

@@ -11,7 +11,7 @@
  * Alpaca Fin Corporation
  */
 
-pragma solidity >=0.8.4 <0.9.0;
+pragma solidity 0.8.17;
 
 import {AP_BaseTest} from "@alperp-tests/trade-mining/ap/AP_BaseTest.t.sol";
 import {AP} from "@alperp/trade-mining/AP.sol";
