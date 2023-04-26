@@ -63,7 +63,7 @@ contract RewardDistributor is OwnableUpgradeable {
   /// Extension configs
   IOnchainPriceUpdater public pythPriceFeed;
   IPancakeV3Router public router;
-  mapping(address => mapping(address => uint24)) public poolFeeOf;
+  mapping(address => mapping(address => bytes)) public pathOf;
 
   /// @dev Error
   error RewardDistributor_BadParams();
@@ -103,8 +103,8 @@ contract RewardDistributor is OwnableUpgradeable {
     uint256 burnerAmount
   );
   event LogSetRouter(IPancakeV3Router oldRouter, IPancakeV3Router newRouter);
-  event LogSetPoolFee(
-    address token0, address token1, uint24 oldFee, uint24 newFee
+  event LogSetPathOf(
+    address token0, address token1, bytes oldPath, bytes newPath
   );
   event LogSetPythPriceFeed(
     IOnchainPriceUpdater oldFeed, IOnchainPriceUpdater newFeed
@@ -222,21 +222,19 @@ contract RewardDistributor is OwnableUpgradeable {
     router = newRouter;
   }
 
-  function setPoolFees(
+  function setPathOf(
     address[] calldata t0s,
     address[] calldata t1s,
-    uint24[] calldata fees
+    bytes[] calldata paths
   ) external onlyOwner {
     require(
-      t0s.length == t1s.length && t1s.length == fees.length,
+      t0s.length == t1s.length && t1s.length == paths.length,
       "RewardDistributor: bad params"
     );
     for (uint256 i = 0; i < t0s.length;) {
-      emit LogSetPoolFee(t0s[i], t1s[i], poolFeeOf[t0s[i]][t1s[i]], fees[i]);
-      emit LogSetPoolFee(t1s[i], t0s[i], poolFeeOf[t1s[i]][t0s[i]], fees[i]);
+      emit LogSetPathOf(t0s[i], t1s[i], pathOf[t0s[i]][t0s[i]], paths[i]);
 
-      poolFeeOf[t0s[i]][t1s[i]] = fees[i];
-      poolFeeOf[t1s[i]][t0s[i]] = fees[i];
+      pathOf[t0s[i]][t1s[i]] = paths[i];
 
       unchecked {
         ++i;
@@ -429,18 +427,20 @@ contract RewardDistributor is OwnableUpgradeable {
       emit LogAlpSwapFailed();
       // Swap on PancakeV3
       // SLOAD vars
-      uint24 poolFee = poolFeeOf[token][rewardToken];
-      require(poolFee != 0, "PF");
-      router.exactInputSingle(
-        IPancakeV3Router.ExactInputSingleParams({
-          tokenIn: token,
-          tokenOut: rewardToken,
-          fee: poolFeeOf[token][rewardToken],
-          recipient: address(this),
-          amountIn: amount,
-          amountOutMinimum: 0,
-          sqrtPriceLimitX96: 0
-        })
+      bytes memory path_ = pathOf[token][rewardToken];
+      require(path_.length != 0, "P");
+      if (token_.allowance(address(this), address(router)) == 0) {
+        token_.safeApprove(address(router), type(uint256).max);
+      }
+      router.exactInput(
+        (
+          IPancakeV3Router.ExactInputParams({
+            path: path_,
+            recipient: address(this),
+            amountIn: amount,
+            amountOutMinimum: 0
+          })
+        )
       );
     }
   }

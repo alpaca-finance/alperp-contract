@@ -1896,7 +1896,7 @@
             "label": "merkleAirdrop",
             "offset": 0,
             "slot": "112",
-            "type": "t_contract(MerkleAirdrop)4743",
+            "type": "t_contract(MerkleAirdrop)8982",
             "contract": "RewardDistributor",
             "src": "src/staking/RewardDistributor.sol:52"
           },
@@ -1934,7 +1934,7 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(MerkleAirdrop)4743": {
+          "t_contract(MerkleAirdrop)8982": {
             "label": "contract MerkleAirdrop",
             "numberOfBytes": "20"
           },
@@ -5600,6 +5600,241 @@
           },
           "t_mapping(t_address,t_uint256)": {
             "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "387fe59b9c0b3ee6b5121ea9561e99522621cafb3f83674b0fd57e29c33307ae": {
+      "address": "0x0C4e5b39328e80d548381a77E37B17aBBdD88ff8",
+      "txHash": "0xafe2721cb338f26818608fbe3ed54208c042e44d543936a94a92c04bfa225b20",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "rewardToken",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:41"
+          },
+          {
+            "label": "pool",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_address",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:44"
+          },
+          {
+            "label": "poolRouter",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_address",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:44"
+          },
+          {
+            "label": "alpStakingProtocolRevenueRewarder",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_address",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:46"
+          },
+          {
+            "label": "alpStakingBps",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_uint256",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:49"
+          },
+          {
+            "label": "devFundBps",
+            "offset": 0,
+            "slot": "106",
+            "type": "t_uint256",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:50"
+          },
+          {
+            "label": "govBps",
+            "offset": 0,
+            "slot": "107",
+            "type": "t_uint256",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:50"
+          },
+          {
+            "label": "burnBps",
+            "offset": 0,
+            "slot": "108",
+            "type": "t_uint256",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:50"
+          },
+          {
+            "label": "devFundAddress",
+            "offset": 0,
+            "slot": "109",
+            "type": "t_address",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:55"
+          },
+          {
+            "label": "govFeeder",
+            "offset": 0,
+            "slot": "110",
+            "type": "t_address",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:57"
+          },
+          {
+            "label": "burner",
+            "offset": 0,
+            "slot": "111",
+            "type": "t_address",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:59"
+          },
+          {
+            "label": "merkleAirdrop",
+            "offset": 0,
+            "slot": "112",
+            "type": "t_contract(MerkleAirdrop)8982",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:59"
+          },
+          {
+            "label": "referralRevenueMaxThreshold",
+            "offset": 0,
+            "slot": "113",
+            "type": "t_uint256",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:61"
+          },
+          {
+            "label": "feeder",
+            "offset": 0,
+            "slot": "114",
+            "type": "t_address",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:64"
+          },
+          {
+            "label": "pythPriceFeed",
+            "offset": 0,
+            "slot": "115",
+            "type": "t_contract(IOnchainPriceUpdater)32071",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:65"
+          },
+          {
+            "label": "router",
+            "offset": 0,
+            "slot": "116",
+            "type": "t_contract(IPancakeV3Router)32114",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:66"
+          },
+          {
+            "label": "pathOf",
+            "offset": 0,
+            "slot": "117",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bytes_storage))",
+            "contract": "RewardDistributor",
+            "src": "src/staking/RewardDistributor.sol:68"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes_storage": {
+            "label": "bytes",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IOnchainPriceUpdater)32071": {
+            "label": "contract IOnchainPriceUpdater",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IPancakeV3Router)32114": {
+            "label": "contract IPancakeV3Router",
+            "numberOfBytes": "20"
+          },
+          "t_contract(MerkleAirdrop)8982": {
+            "label": "contract MerkleAirdrop",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_bytes_storage)": {
+            "label": "mapping(address => bytes)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bytes_storage))": {
+            "label": "mapping(address => mapping(address => bytes))",
             "numberOfBytes": "32"
           },
           "t_uint256": {

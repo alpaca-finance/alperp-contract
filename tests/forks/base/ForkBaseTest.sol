@@ -30,7 +30,9 @@ import {
   ALPStaking,
   TransparentUpgradeableProxy,
   ALP,
-  console2
+  RewardDistributor,
+  console2,
+  IPancakeV3Router
 } from "@alperp-tests/base/BaseTest.sol";
 
 /// Pyth
@@ -67,6 +69,9 @@ abstract contract ForkBaseTest is BaseTest, Config {
   Paradeen forkParadeen;
   AP forkAp;
   PoolOracle forkPoolOracle;
+  RewardDistributor forkRewardDistributor;
+  PythPriceFeed forkPythPriceFeed;
+  IPancakeV3Router forkPancakeV3Router;
 
   constructor() {
     forkProxyAdmin = ProxyAdmin(PROXY_ADMIN);
@@ -91,6 +96,9 @@ abstract contract ForkBaseTest is BaseTest, Config {
     forkAp = AP(AP_ADDRESS);
     forkParadeen = Paradeen(PARADEEN);
     forkPoolOracle = PoolOracle(POOL_ORACLE);
+    forkRewardDistributor = RewardDistributor(payable(REWARD_DISTRIBUTOR));
+    forkPythPriceFeed = PythPriceFeed(payable(PYTH_PRICE_FEED));
+    forkPancakeV3Router = IPancakeV3Router(payable(PANCAKE_V3_ROUTER));
   }
 
   function upgrade(address target, string memory contractName) internal {

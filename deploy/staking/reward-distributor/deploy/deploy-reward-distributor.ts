@@ -2,7 +2,7 @@ import { getImplementationAddress } from "@openzeppelin/upgrades-core";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers, tenderly, upgrades } from "hardhat";
-import { getConfig, writeConfigFile } from "../utils/config";
+import { getConfig, writeConfigFile } from "../../../utils/config";
 
 const config = getConfig();
 

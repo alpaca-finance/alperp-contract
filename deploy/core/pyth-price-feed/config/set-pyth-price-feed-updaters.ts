@@ -8,7 +8,7 @@ const config = getConfig();
 
 const PYTH_PRICE_FEED = config.Pools.ALP.pythPriceFeed;
 
-const UPDATERS: Array<string> = [config.LiquidationRouter];
+const UPDATERS: Array<string> = [config.Staking.RewardDistributor.address];
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];

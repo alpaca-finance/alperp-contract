@@ -67,6 +67,8 @@ contract Config {
   /// Alperp
   address internal constant DEPLOYER =
     0xC44f82b07Ab3E691F826951a6E335E1bC1bB0B51;
+  address internal constant REWARD_KEEPER =
+    0xF62Bf3b5608FC5ED119735aDfc3DC3A4814AC884;
   address internal constant PROXY_ADMIN =
     0x3dBcbbE5a361BF97D79538bCcED4dd03d04B9726;
   address internal constant POOL_DIAMOND_ADDRESS =
@@ -85,4 +87,10 @@ contract Config {
     0x86a0384836Bd6fD6ad7Da9EBbA0F330300a6b2A8;
   address internal constant ALP_STAKING =
     0x7295ebf7e818d16EdF359EE2D18f1562BC2595B8;
+  address internal constant PYTH_PRICE_FEED =
+    0x28f5fC5a49355575FB7a6B249A11167cf4e7Bcb1;
+  address internal constant REWARD_DISTRIBUTOR =
+    0x884339220Ce0a63e9CcEA0bd1a4DB8cb5677F08E;
+  address internal constant PANCAKE_V3_ROUTER =
+    0x13f4EA83D0bd40E75C8222255bc855a974568Dd4;
 }
