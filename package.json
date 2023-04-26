@@ -146,6 +146,7 @@
     "deploy:mainnet:pool:config:set-min-profit-duration": "npx hardhat --network mainnet deploy --no-compile --reset --tags SetMinProfitDuration",
     "deploy:mainnet:alp-staking:script:check-staking-balances": "npx hardhat --network mainnet deploy --no-compile --reset --tags ALPStakingCheckBalances",
     "deploy:mainnet:oracle:set_pyth_price_feed_token_price_ids": "npx hardhat --network mainnet deploy --no-compile --reset --tags SetPythPriceFeedTokenPriceIds",
+    "deploy:mainnet:core:pool:config:set-mint-burn-fee-bps": "npx hardhat --network mainnet deploy --no-compile --reset --tags AdminFacet_SetMintBurnFeeBps",
     "deploy:mainnet:pool:admin_set_plugin": "hardhat --network mainnet deploy --no-compile --reset --tags SetPlugin",
     "deploy:mainnet:pool:set_whitelist_orderbook": "hardhat --network mainnet deploy --no-compile --reset --tags SetWhitelistOrderbook",
     "deploy:mainnet:pool:pool_router_03": "hardhat --network mainnet deploy --no-compile --reset --tags PoolRouter03",
