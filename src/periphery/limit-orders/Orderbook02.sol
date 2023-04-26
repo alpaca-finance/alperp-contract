@@ -29,19 +29,11 @@ import {OwnableUpgradeable} from
 import {IWNative} from "@alperp/interfaces/IWNative.sol";
 import {IOnchainPriceUpdater} from "@alperp/interfaces/IOnChainPriceUpdater.sol";
 import {IWNativeRelayer} from "@alperp/interfaces/IWNativeRelayer.sol";
-import {GetterFacetInterface} from
-  "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
-import {LiquidityFacetInterface} from
-  "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
-import {PerpTradeFacetInterface} from
-  "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
+import {GetterFacetInterface} from "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {LiquidityFacetInterface} from "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
+import {PerpTradeFacetInterface} from "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
 import {PoolOracle} from "@alperp/core/PoolOracle.sol";
-import {
-  IterableMapping,
-  Orders,
-  OrderType,
-  itmap
-} from "@alperp/periphery/limit-orders/libraries/IterableMapping.sol";
+import {IterableMapping,Orders,OrderType,itmap} from "@alperp/periphery/limit-orders/libraries/IterableMapping.sol";
 import {ITradeMiningManager} from "@alperp/interfaces/ITradeMiningManager.sol";
 
 contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
@@ -252,10 +244,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 executionFee,
     uint256 amountOut
   );
-  event SetPoolOracle(address prevPoolOracle, address newPoolOracle);
-
   event UpdateMinExecutionFee(uint256 _minExecutionFee);
-  event UpdateMinPurchaseTokenAmountUsd(uint256 _minPurchaseTokenAmountUsd);
   event SetWhitelist(address _whitelistAddress, bool _oldAllow, bool _newAllow);
   event SetIsAllowAllExecutor(bool _isAllow);
   event SetTradeMiningManager(
@@ -337,22 +326,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
   function setMinExecutionFee(uint256 _minExecutionFee) external onlyOwner {
     minExecutionFee = _minExecutionFee;
-
     emit UpdateMinExecutionFee(_minExecutionFee);
-  }
-
-  function setMinPurchaseTokenAmountUsd(uint256 _minPurchaseTokenAmountUsd)
-    external
-    onlyOwner
-  {
-    minPurchaseTokenAmountUsd = _minPurchaseTokenAmountUsd;
-
-    emit UpdateMinPurchaseTokenAmountUsd(_minPurchaseTokenAmountUsd);
-  }
-
-  function setPoolOracle(PoolOracle poolOracle_) external onlyOwner {
-    emit SetPoolOracle(address(poolOracle), address(poolOracle_));
-    poolOracle = poolOracle_;
   }
 
   /// @notice Set a new trade mining manager

@@ -13,7 +13,8 @@
 
 pragma solidity 0.8.17;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import {ISecondaryPriceFeed} from "../interfaces/ISecondaryPriceFeed.sol";
 import {IOnchainPriceUpdater} from "../interfaces/IOnChainPriceUpdater.sol";
@@ -55,6 +56,7 @@ contract PythPriceFeed is
   event SetCachedPrices(
     bytes[] _priceUpdateData, address[] _tokens, uint256[] _prices
   );
+  event SetPyth(address prevPyth, address newPyth);
 
   error PythPriceFeed_OnlyUpdater();
   error PythPriceFeed_InvalidMaxPriceAge();
@@ -99,6 +101,13 @@ contract PythPriceFeed is
     for (uint256 i = 0; i < _tokens.length; i++) {
       setTokenPriceId(_tokens[i], _priceId[i]);
     }
+  }
+
+  /// @notice Set a new pyth contract address
+  /// @param _pyth - a new pyth contract address
+  function setPyth(address _pyth) external onlyOwner {
+    emit SetPyth(address(pyth), _pyth);
+    pyth = IPyth(_pyth);
   }
 
   /// @notice A function for set max price age (to prevent price stale)
@@ -196,7 +205,7 @@ contract PythPriceFeed is
   /// @return price in PRICE_PRECISION decimals
   function getPrice(
     address _token,
-    uint256 /* _referencePrice */,
+    uint256, /* _referencePrice */
     bool /*_maximise*/
   ) external view returns (uint256) {
     // Use cached price if it has been updated at the same block
@@ -212,11 +221,13 @@ contract PythPriceFeed is
     bytes32 priceID = tokenPriceId[_token];
 
     // Get price from pyth, revert if price is stale
-    PythStructs.Price memory _price = pyth.getPriceNoOlderThan(priceID, maxPriceAge);
+    PythStructs.Price memory _price =
+      pyth.getPriceNoOlderThan(priceID, maxPriceAge);
     uint256 tokenDecimals = _price.expo < 0
       ? (10 ** int256(-_price.expo).toUint256())
       : 10 ** int256(_price.expo).toUint256();
-    return ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
+    return
+      ((int256(_price.price)).toUint256() * PRICE_PRECISION) / tokenDecimals;
   }
 
   /// @custom:oz-upgrades-unsafe-allow constructor
