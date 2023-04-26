@@ -6,7 +6,8 @@ import {
   TradeMining_BaseForkTest,
   PythPriceFeed,
   IPyth,
-  FakePyth
+  FakePyth,
+  Orderbook02
 } from "@alperp-tests/forks/trade-mining/TradeMining_BaseTest.fork.sol";
 
 /// Forge
@@ -86,6 +87,7 @@ contract TradeMining_ClaimForkTest is TradeMining_BaseForkTest {
     forkPoolOracle.setSecondaryPriceFeed(address(pythPriceFeed));
     // Upgrade PoolRouter04
     upgrade(address(forkPoolRouter04), "PoolRouter04");
+    upgrade(address(forkOrderBook02), "Orderbook02");
     vm.prank(DEPLOYER, DEPLOYER);
     forkPoolRouter04.setOraclePriceUpdater(pythPriceFeed);
   }
@@ -172,18 +174,21 @@ contract TradeMining_ClaimForkTest is TradeMining_BaseForkTest {
     forkOrderBook02.createIncreaseOrder{
       value: forkOrderBook02.minExecutionFee()
     }(
-      0,
-      path,
-      10 ether,
-      address(forkWbnb),
-      0,
-      30_000 * 10 ** 30,
-      address(forkWbnb),
-      true,
-      314 * 10 ** 30,
-      true,
-      forkOrderBook02.minExecutionFee(),
-      false
+      Orderbook02.CreateIncreaseOrderParams({
+        subAccountId: 0,
+        path: path,
+        amountIn: 10 ether,
+        indexToken: address(forkWbnb),
+        minOut: 0,
+        sizeDelta: 30_000 * 10 ** 30,
+        collateralToken: address(forkWbnb),
+        isLong: true,
+        triggerPrice: 314 * 10 ** 30,
+        triggerAboveThreshold: true,
+        executionFee: forkOrderBook02.minExecutionFee(),
+        shouldWrap: false,
+        pythUpdateData: zeroBytesArr()
+      })
     );
 
     // Assert AP balance.

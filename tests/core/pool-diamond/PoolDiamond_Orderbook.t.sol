@@ -8,7 +8,8 @@ import {
   LiquidityFacetInterface,
   GetterFacetInterface,
   PerpTradeFacetInterface,
-  FakePyth
+  FakePyth,
+  Orderbook02
 } from "./PoolDiamond_BaseTest.t.sol";
 
 contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
@@ -77,60 +78,69 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     address[] memory path = new address[](1);
     path[0] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("InsufficientExecutionFee()"));
-    orderbook.createIncreaseOrder{value: 0.01 ether}({
-      _subAccountId: 0,
-      _path: path,
-      _amountIn: 22500,
-      _indexToken: address(wbtc),
-      _minOut: 0,
-      _sizeDelta: 47 * 10 ** 30,
-      _collateralToken: address(wbtc),
-      _isLong: true,
-      _triggerPrice: 41_001 * 10 ** 30,
-      _triggerAboveThreshold: false,
-      _executionFee: 0 ether,
-      _shouldWrap: false
-    });
+    orderbook.createIncreaseOrder{value: 0.01 ether}(
+      Orderbook02.CreateIncreaseOrderParams({
+        subAccountId: 0,
+        path: path,
+        amountIn: 22500,
+        indexToken: address(wbtc),
+        minOut: 0,
+        sizeDelta: 47 * 10 ** 30,
+        collateralToken: address(wbtc),
+        isLong: true,
+        triggerPrice: 41_001 * 10 ** 30,
+        triggerAboveThreshold: false,
+        executionFee: 0 ether,
+        shouldWrap: false,
+        pythUpdateData: zeroBytesArr()
+      })
+    );
   }
 
   function testRevert_IncreaseOrder_OnlyNativeShouldWrap() external {
     address[] memory path = new address[](1);
     path[0] = address(wbtc);
     vm.expectRevert(abi.encodeWithSignature("OnlyNativeShouldWrap()"));
-    orderbook.createIncreaseOrder{value: 0.01 ether}({
-      _subAccountId: 0,
-      _path: path,
-      _amountIn: 22500,
-      _indexToken: address(wbtc),
-      _minOut: 0,
-      _sizeDelta: 47 * 10 ** 30,
-      _collateralToken: address(wbtc),
-      _isLong: true,
-      _triggerPrice: 41_001 * 10 ** 30,
-      _triggerAboveThreshold: false,
-      _executionFee: 0.01 ether,
-      _shouldWrap: true
-    });
+    orderbook.createIncreaseOrder{value: 0.01 ether}(
+      Orderbook02.CreateIncreaseOrderParams({
+        subAccountId: 0,
+        path: path,
+        amountIn: 22500,
+        indexToken: address(wbtc),
+        minOut: 0,
+        sizeDelta: 47 * 10 ** 30,
+        collateralToken: address(wbtc),
+        isLong: true,
+        triggerPrice: 41_001 * 10 ** 30,
+        triggerAboveThreshold: false,
+        executionFee: 0.01 ether,
+        shouldWrap: true,
+        pythUpdateData: zeroBytesArr()
+      })
+    );
   }
 
   function testRevert_IncreaseOrder_IncorrectValueTransfer() external {
     address[] memory path = new address[](1);
     path[0] = address(bnb);
     vm.expectRevert(abi.encodeWithSignature("IncorrectValueTransfer()"));
-    orderbook.createIncreaseOrder{value: 0.01 ether}({
-      _subAccountId: 0,
-      _path: path,
-      _amountIn: 22500,
-      _indexToken: address(wbtc),
-      _minOut: 0,
-      _sizeDelta: 47 * 10 ** 30,
-      _collateralToken: address(wbtc),
-      _isLong: true,
-      _triggerPrice: 41_001 * 10 ** 30,
-      _triggerAboveThreshold: false,
-      _executionFee: 0.01 ether,
-      _shouldWrap: true
-    });
+    orderbook.createIncreaseOrder{value: 0.01 ether}(
+      Orderbook02.CreateIncreaseOrderParams({
+        subAccountId: 0,
+        path: path,
+        amountIn: 22500,
+        indexToken: address(wbtc),
+        minOut: 0,
+        sizeDelta: 47 * 10 ** 30,
+        collateralToken: address(wbtc),
+        isLong: true,
+        triggerPrice: 41_001 * 10 ** 30,
+        triggerAboveThreshold: false,
+        executionFee: 0.01 ether,
+        shouldWrap: true,
+        pythUpdateData: zeroBytesArr()
+      })
+    );
   }
 
   function testRevert_IncreaseOrder_InvalidPath() external {
@@ -140,20 +150,23 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     wbtc.approve(address(orderbook), 22500);
     wbtc.mint(address(this), 22500);
     vm.expectRevert(abi.encodeWithSignature("InvalidPath()"));
-    orderbook.createIncreaseOrder{value: 0.01 ether}({
-      _subAccountId: 0,
-      _path: path,
-      _amountIn: 22500,
-      _indexToken: address(wbtc),
-      _minOut: 0,
-      _sizeDelta: 47 * 10 ** 30,
-      _collateralToken: address(wbtc),
-      _isLong: true,
-      _triggerPrice: 41_001 * 10 ** 30,
-      _triggerAboveThreshold: false,
-      _executionFee: 0.01 ether,
-      _shouldWrap: false
-    });
+    orderbook.createIncreaseOrder{value: 0.01 ether}(
+      Orderbook02.CreateIncreaseOrderParams({
+        subAccountId: 0,
+        path: path,
+        amountIn: 22500,
+        indexToken: address(wbtc),
+        minOut: 0,
+        sizeDelta: 47 * 10 ** 30,
+        collateralToken: address(wbtc),
+        isLong: true,
+        triggerPrice: 41_001 * 10 ** 30,
+        triggerAboveThreshold: false,
+        executionFee: 0.01 ether,
+        shouldWrap: false,
+        pythUpdateData: zeroBytesArr()
+      })
+    );
   }
 
   function testRevert_DecreaseOrder_InsufficientExecutionFee() external {
@@ -231,20 +244,23 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     poolAccessControlFacet.allowPlugin(address(orderbook));
     address[] memory path = new address[](1);
     path[0] = address(dai);
-    orderbook.createIncreaseOrder{value: 0.01 ether}({
-      _subAccountId: 1,
-      _path: path,
-      _amountIn: 20 * 10 ** 18,
-      _indexToken: address(wbtc),
-      _minOut: 0,
-      _sizeDelta: 90 * 10 ** 30,
-      _collateralToken: address(dai),
-      _isLong: false,
-      _triggerPrice: 49_999 * 10 ** 30,
-      _triggerAboveThreshold: true,
-      _executionFee: 0.01 ether,
-      _shouldWrap: false
-    });
+    orderbook.createIncreaseOrder{value: 0.01 ether}(
+      Orderbook02.CreateIncreaseOrderParams({
+        subAccountId: 1,
+        path: path,
+        amountIn: 20 * 10 ** 18,
+        indexToken: address(wbtc),
+        minOut: 0,
+        sizeDelta: 90 * 10 ** 30,
+        collateralToken: address(dai),
+        isLong: false,
+        triggerPrice: 49_999 * 10 ** 30,
+        triggerAboveThreshold: true,
+        executionFee: 0.01 ether,
+        shouldWrap: false,
+        pythUpdateData: zeroBytesArr()
+      })
+    );
 
     // Edit the trigger price of the submitted order
     orderbook.updateIncreaseOrder({

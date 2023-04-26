@@ -29,11 +29,19 @@ import {OwnableUpgradeable} from
 import {IWNative} from "@alperp/interfaces/IWNative.sol";
 import {IOnchainPriceUpdater} from "@alperp/interfaces/IOnChainPriceUpdater.sol";
 import {IWNativeRelayer} from "@alperp/interfaces/IWNativeRelayer.sol";
-import {GetterFacetInterface} from "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
-import {LiquidityFacetInterface} from "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
-import {PerpTradeFacetInterface} from "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
+import {GetterFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {LiquidityFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
+import {PerpTradeFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
 import {PoolOracle} from "@alperp/core/PoolOracle.sol";
-import {IterableMapping,Orders,OrderType,itmap} from "@alperp/periphery/limit-orders/libraries/IterableMapping.sol";
+import {
+  IterableMapping,
+  Orders,
+  OrderType,
+  itmap
+} from "@alperp/periphery/limit-orders/libraries/IterableMapping.sol";
 import {ITradeMiningManager} from "@alperp/interfaces/ITradeMiningManager.sol";
 
 contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
@@ -306,6 +314,14 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     oraclePriceUpdater.setCachedPrices(_priceUpdateData, _tokens, _prices);
   }
 
+  function _updatePyth(bytes[] calldata _pythPriceUpdateData)
+    internal
+    returns (uint256 _fee)
+  {
+    _fee = oraclePriceUpdater.getUpdateFee(_pythPriceUpdateData);
+    oraclePriceUpdater.updatePrices{value: _fee}(_pythPriceUpdateData);
+  }
+
   function setWhitelist(address whitelistAddress, bool isAllow)
     external
     onlyOwner
@@ -392,7 +408,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     if (_executionFee < minExecutionFee) revert InsufficientExecutionFee();
 
     // always need this call because of mandatory executionFee user has to transfer in BNB
-    _transferInETH();
+    _transferInETH(0);
 
     if (_shouldWrap) {
       if (_path[0] != weth) revert OnlyNativeShouldWrap();
@@ -683,57 +699,71 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   }
 
   struct CreateIncreaseOrderLocalVars {
-    address _purchaseToken;
-    uint256 _purchaseTokenAmount;
-    uint256 _purchaseTokenAmountUsd;
+    address purchaseToken;
+    uint256 purchaseTokenAmount;
+    uint256 purchaseTokenAmountUsd;
+    uint256 netMsgValue;
   }
 
-  function createIncreaseOrder(
-    uint256 _subAccountId,
-    address[] memory _path,
-    uint256 _amountIn,
-    address _indexToken,
-    uint256 _minOut,
-    uint256 _sizeDelta,
-    address _collateralToken,
-    bool _isLong,
-    uint256 _triggerPrice,
-    bool _triggerAboveThreshold,
-    uint256 _executionFee,
-    bool _shouldWrap
-  ) external payable nonReentrant {
-    CreateIncreaseOrderLocalVars memory vars;
-    // always need this call because of mandatory executionFee user has to transfer in BNB
-    _transferInETH();
+  struct CreateIncreaseOrderParams {
+    uint256 subAccountId;
+    address[] path;
+    uint256 amountIn;
+    address indexToken;
+    uint256 minOut;
+    uint256 sizeDelta;
+    address collateralToken;
+    bool isLong;
+    uint256 triggerPrice;
+    bool triggerAboveThreshold;
+    uint256 executionFee;
+    bool shouldWrap;
+    bytes[] pythUpdateData;
+  }
 
-    if (_executionFee < minExecutionFee) revert InsufficientExecutionFee();
-    if (_shouldWrap) {
-      if (_path[0] != weth) revert OnlyNativeShouldWrap();
-      if (msg.value != _executionFee + _amountIn) {
+  function createIncreaseOrder(CreateIncreaseOrderParams calldata _params)
+    external
+    payable
+    nonReentrant
+  {
+    CreateIncreaseOrderLocalVars memory _vars;
+    // always need this call because of mandatory executionFee user has to transfer in BNB
+    _vars.netMsgValue = _transferInETH(_updatePyth(_params.pythUpdateData));
+
+    if (_params.executionFee < minExecutionFee) {
+      revert InsufficientExecutionFee();
+    }
+    if (_params.shouldWrap) {
+      if (_params.path[0] != weth) revert OnlyNativeShouldWrap();
+      if (_vars.netMsgValue != _params.executionFee + _params.amountIn) {
         revert IncorrectValueTransfer();
       }
     } else {
-      if (msg.value != _executionFee) revert IncorrectValueTransfer();
-      IERC20Upgradeable(_path[0]).safeTransferFrom(
-        msg.sender, address(this), _amountIn
+      if (_vars.netMsgValue != _params.executionFee) {
+        revert IncorrectValueTransfer();
+      }
+      IERC20Upgradeable(_params.path[0]).safeTransferFrom(
+        msg.sender, address(this), _params.amountIn
       );
     }
 
-    vars._purchaseToken = _path[_path.length - 1];
+    _vars.purchaseToken = _params.path[_params.path.length - 1];
 
-    if (_path.length > 1) {
-      if (_path[0] == _path[_path.length - 1]) revert InvalidPath();
-      IERC20Upgradeable(_path[0]).safeTransfer(pool, _amountIn);
-      vars._purchaseTokenAmount =
-        _swap(msg.sender, _path, _minOut, address(this));
+    if (_params.path.length > 1) {
+      if (_params.path[0] == _params.path[_params.path.length - 1]) {
+        revert InvalidPath();
+      }
+      IERC20Upgradeable(_params.path[0]).safeTransfer(pool, _params.amountIn);
+      _vars.purchaseTokenAmount =
+        _swap(msg.sender, _params.path, _params.minOut, address(this));
     } else {
-      vars._purchaseTokenAmount = _amountIn;
+      _vars.purchaseTokenAmount = _params.amountIn;
     }
 
     {
       uint256 _purchaseTokenAmountUsd = GetterFacetInterface(pool)
         .convertTokensToUsde30(
-        vars._purchaseToken, vars._purchaseTokenAmount, false
+        _vars.purchaseToken, _vars.purchaseTokenAmount, false
       );
       if (_purchaseTokenAmountUsd < minPurchaseTokenAmountUsd) {
         revert InsufficientCollateral();
@@ -742,16 +772,16 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     _createIncreaseOrder(
       msg.sender,
-      _subAccountId,
-      vars._purchaseToken,
-      vars._purchaseTokenAmount,
-      _collateralToken,
-      _indexToken,
-      _sizeDelta,
-      _isLong,
-      _triggerPrice,
-      _triggerAboveThreshold,
-      _executionFee
+      _params.subAccountId,
+      _vars.purchaseToken,
+      _vars.purchaseTokenAmount,
+      _params.collateralToken,
+      _params.indexToken,
+      _params.sizeDelta,
+      _params.isLong,
+      _params.triggerPrice,
+      _params.triggerAboveThreshold,
+      _params.executionFee
     );
   }
 
@@ -959,7 +989,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _triggerPrice,
     bool _triggerAboveThreshold
   ) external payable nonReentrant {
-    _transferInETH();
+    _transferInETH(0);
 
     if (msg.value < minExecutionFee) revert InsufficientExecutionFee();
 
@@ -1146,9 +1176,13 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     );
   }
 
-  function _transferInETH() private {
+  function _transferInETH(uint256 _offset)
+    private
+    returns (uint256 netMsgValue)
+  {
     if (msg.value != 0) {
-      IWNative(weth).deposit{value: msg.value}();
+      IWNative(weth).deposit{value: msg.value - _offset}();
+      netMsgValue = msg.value - _offset;
     }
   }
 

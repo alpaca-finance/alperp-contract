@@ -216,7 +216,7 @@ contract BaseTest is TestBase, ATest {
   }
 
   function zeroBytesArr() internal pure returns (bytes[] memory) {
-    bytes[] memory data = new bytes[](1);
+    bytes[] memory data = new bytes[](0);
     return data;
   }
 
