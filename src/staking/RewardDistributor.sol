@@ -413,7 +413,7 @@ contract RewardDistributor is OwnableUpgradeable {
 
     // Approve the token
     IERC20Upgradeable token_ = IERC20Upgradeable(token);
-    token_.safeApprove(poolRouter, amount);
+    token_.approve(poolRouter, amount);
 
     // Swap
     // Try ALP swap first, if fail then swap on PancakeV3
@@ -430,7 +430,7 @@ contract RewardDistributor is OwnableUpgradeable {
       bytes memory path_ = pathOf[token][rewardToken];
       require(path_.length != 0, "P");
       if (token_.allowance(address(this), address(router)) == 0) {
-        token_.safeApprove(address(router), type(uint256).max);
+        token_.approve(address(router), type(uint256).max);
       }
       router.exactInput(
         (

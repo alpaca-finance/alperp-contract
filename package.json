@@ -133,6 +133,7 @@
     "deploy:mainnet:diamond_cut": "hardhat --network mainnet deploy --no-compile --reset --tags ExecuteDiamondCut",
     "deploy:mainnet:diamond_cut:diamond_initiailzer": "hardhat --network mainnet deploy --no-compile --reset --tags ExecuteDiamondCut-InitializeDiamond",
     "deploy:mainnet:pool:config:set-token-configs": "hardhat --network mainnet deploy --no-compile --reset --tags SetTokenConfigs",
+    "deploy:mainnet:pool:config:set-funding-rate": "hardhat --network mainnet deploy --no-compile --reset --tags Pool_SetFundingRate",
     "deploy:mainnet:pool:set_price_feed": "hardhat --network mainnet deploy --no-compile --reset --tags SetPriceFeed",
     "deploy:mainnet:token:set_minter": "hardhat --network mainnet deploy --no-compile --reset --tags SetMinter",
     "deploy:mainnet:pool:set_allow_liquidators": "hardhat --network mainnet deploy --no-compile --reset --tags SetAllowLiquidators",
