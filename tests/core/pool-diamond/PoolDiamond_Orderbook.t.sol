@@ -356,8 +356,6 @@ contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
     assertFalse(isProfit);
     assertEq(delta, 2.25 * 10 ** 30);
 
-    vm.stopPrank();
-
     // Make WBTC price pump to 42,000 USD
     wbtcPriceFeed.setLatestAnswer(42_000 * 10 ** 8);
     wbtcPriceFeed.setLatestAnswer(42_000 * 10 ** 8);

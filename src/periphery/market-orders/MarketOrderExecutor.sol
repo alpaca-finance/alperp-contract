@@ -9,8 +9,7 @@ import {OwnableUpgradeable} from
 
 // Alperp
 import {PythPriceFeed} from "@alperp/core/PythPriceFeed.sol";
-import {MarketOrderRouter} from
-  "@alperp/periphery/market-orders/MarketOrderRouter.sol";
+import {MarketOrderRouter} from "@alperp/periphery/market-orders/MarketOrderRouter.sol";
 
 contract MarketOrderExecutor is OwnableUpgradeable, ReentrancyGuardUpgradeable {
   PythPriceFeed public pythPriceFeed;

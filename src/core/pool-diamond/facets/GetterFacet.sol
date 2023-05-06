@@ -23,9 +23,6 @@ import {GetterFacetInterface} from "../interfaces/GetterFacetInterface.sol";
 import {StrategyInterface} from "../../../interfaces/StrategyInterface.sol";
 import {ALP} from "../../../tokens/ALP.sol";
 
-// Forge
-import {console2} from "@forge-std/console2.sol";
-
 contract GetterFacet is GetterFacetInterface {
   using SafeCast for int256;
   using SafeCast for uint256;

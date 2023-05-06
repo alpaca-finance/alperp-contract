@@ -60,7 +60,7 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
     pythPriceFeed.setUpdater(ALICE, true);
 
     // ALICE call setCachedPrice
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](2);
     address[] memory tokenAddrs = new address[](2);
     uint256[] memory cachedPrices = new uint256[](2);
@@ -90,7 +90,7 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
 
   function testRevert_WhenBeCalledBySomeone() external {
     // ALICE call setCachedPrice
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
     uint256[] memory cachedPrices = new uint256[](1);
@@ -108,7 +108,7 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
     pythPriceFeed.setUpdater(ALICE, true);
 
     // ALICE call setCachedPrice
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](2);
     uint256[] memory cachedPrices = new uint256[](2);

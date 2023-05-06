@@ -152,7 +152,7 @@
     "deploy:mainnet:pool:set_whitelist_orderbook": "hardhat --network mainnet deploy --no-compile --reset --tags SetWhitelistOrderbook",
     "deploy:mainnet:pool:pool_router_03": "hardhat --network mainnet deploy --no-compile --reset --tags PoolRouter03",
     "deploy:mainnet:pool:set_pool_router": "hardhat --network mainnet deploy --no-compile --reset --tags SetRouter",
-    "deploy:mainnet:pool-router:upgrade_pool_router": "hardhat --network mainnet deploy --no-compile --reset --tags UpgradePoolRouter04",
+    "deploy:mainnet:periphery:pool-router:upgrade:pool-router": "hardhat --network mainnet deploy --no-compile --reset --tags PoolRouter_Upgrade",
     "deploy:mainnet:pool-router:set_wnative_relayer": "hardhat --network mainnet deploy --no-compile --reset --tags SetWNativeRelayer",
     "deploy:mainnet:oracle:set_secondary_price_feed": "npx hardhat --network mainnet deploy --no-compile --reset --tags SetSecondaryPriceFeed",
     "deploy:mainnet:staking:deploy_alp_staking": "npx hardhat --network mainnet deploy --no-compile --reset --tags ALPStaking",

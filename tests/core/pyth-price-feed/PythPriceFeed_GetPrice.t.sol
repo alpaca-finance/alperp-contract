@@ -169,7 +169,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
 
     // alice set cached price
     uint256 fastWBNBPrice = 280 * 10 ** 30;
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
     uint256[] memory cachedPrices = new uint256[](1);
@@ -220,7 +220,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
 
     // alice set cached price
     uint256 fastWBNBPrice = 280 * 10 ** 30;
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
     uint256[] memory cachedPrices = new uint256[](1);
@@ -254,7 +254,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
 
     // alice set cached price
     uint256 fastWBNBPrice = 280 * 10 ** 30;
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
     uint256[] memory cachedPrices = new uint256[](1);

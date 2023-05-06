@@ -234,7 +234,7 @@ contract BaseTest is TestBase, ATest {
 
   function createPriceFeedUpdateData(bytes32 id, uint256 price)
     internal
-    pure
+    view
     returns (bytes memory priceFeedData)
   {
     PythStructs.PriceFeed memory priceFeed;
