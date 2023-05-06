@@ -1,6 +1,6 @@
 {
   "name": "@alpaca-finance/alperp-contract",
-  "version": "0.4.3-rc.1",
+  "version": "0.4.4-rc.1",
   "main": "index.js",
   "author": "Anonymous",
   "license": "MIT",
