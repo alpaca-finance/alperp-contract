@@ -13,21 +13,31 @@
 
 pragma solidity 0.8.17;
 
-import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import {SafeERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {IWNative} from "../../../interfaces/IWNative.sol";
+import {ReentrancyGuardUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {OwnableUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {AddressUpgradeable} from
+  "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import {SafeERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {IERC20Upgradeable} from
+  "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {IWNative} from "@alperp/interfaces/IWNative.sol";
 
-import {IWNativeRelayer} from "../../../interfaces/IWNativeRelayer.sol";
-import {IPoolOracle} from "../../../interfaces/IPoolOracle.sol";
-import {GetterFacetInterface} from "../interfaces/GetterFacetInterface.sol";
-import {LiquidityFacetInterface} from "../interfaces/LiquidityFacetInterface.sol";
-import {PerpTradeFacetInterface} from "../interfaces/PerpTradeFacetInterface.sol";
-import {LibPoolConfigV1} from "../libraries/LibPoolConfigV1.sol";
+import {IWNativeRelayer} from "@alperp/interfaces/IWNativeRelayer.sol";
+import {IPoolOracle} from "@alperp/interfaces/IPoolOracle.sol";
+import {GetterFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/GetterFacetInterface.sol";
+import {LiquidityFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/LiquidityFacetInterface.sol";
+import {PerpTradeFacetInterface} from
+  "@alperp/core/pool-diamond/interfaces/PerpTradeFacetInterface.sol";
+import {LibPoolConfigV1} from
+  "@alperp/core/pool-diamond/libraries/LibPoolConfigV1.sol";
+import {TradeMiningManager} from "@alperp/trade-mining/TradeMiningManager.sol";
 
-/// @notice This contract will be deprecated after 0.3.1
+/// @title MarketOrderRouter - 2-phases commit for market orders
 contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   using SafeERC20Upgradeable for IERC20Upgradeable;
   using AddressUpgradeable for address payable;
@@ -67,21 +77,12 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     bool withdrawETH;
   }
 
-  struct SwapOrderRequest {
-    address account;
-    address[] path;
-    uint256 amountIn;
-    uint256 minOut;
-    bool shouldUnwrap;
-    uint256 executionFee;
-    uint256 blockNumber;
-    uint256 blockTime;
-  }
-
   address public admin;
   address public pool;
-  address public poolOracle;
+  IPoolOracle public poolOracle;
   address public weth;
+
+  TradeMiningManager public tradeMiningManager;
 
   // to prevent using the deposit and withdrawal of collateral as a zero fee swap,
   // there is a small depositFeeBps charged if a collateral deposit results in the decrease
@@ -102,11 +103,9 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
   bytes32[] public increasePositionRequestKeys;
   bytes32[] public decreasePositionRequestKeys;
-  bytes32[] public swapOrderRequestKeys;
 
   uint256 public increasePositionRequestKeysStart;
   uint256 public decreasePositionRequestKeysStart;
-  uint256 public swapOrderRequestKeysStart;
 
   address public wnativeRelayer;
 
@@ -116,8 +115,6 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   mapping(bytes32 => IncreasePositionRequest) public increasePositionRequests;
   mapping(address => uint256) public decreasePositionsIndex;
   mapping(bytes32 => DecreasePositionRequest) public decreasePositionRequests;
-  mapping(address => uint256) public swapOrdersIndex;
-  mapping(bytes32 => SwapOrderRequest) public swapOrderRequests;
 
   event SetDepositFee(uint256 depositFeeBps);
   event SetIncreasePositionBufferBps(uint256 increasePositionBufferBps);
@@ -217,39 +214,6 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 timeGap,
     uint256 index
   );
-  event CreateSwapOrder(
-    address account,
-    address[] path,
-    uint256 amountIn,
-    uint256 minOut,
-    bool shouldUnwrap,
-    uint256 executionFee,
-    uint256 index,
-    uint256 queueIndex
-  );
-  event ExecuteSwapOrder(
-    address account,
-    address[] path,
-    uint256 amountIn,
-    uint256 minOut,
-    bool shouldUnwrap,
-    uint256 executionFee,
-    uint256 amountOut,
-    uint256 blockGap,
-    uint256 timeGap,
-    uint256 queueIndex
-  );
-  event CancelSwapOrder(
-    address account,
-    address[] path,
-    uint256 amountIn,
-    uint256 minOut,
-    bool shouldUnwrap,
-    uint256 executionFee,
-    uint256 blockGap,
-    uint256 timeGap,
-    uint256 queueIndex
-  );
   event SetPositionKeeper(address indexed account, bool isActive);
   event SetMinExecutionFee(uint256 minExecutionFee);
   event SetIsLeverageEnabled(bool isLeverageEnabled);
@@ -260,8 +224,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   );
   event SetRequestKeysStartValues(
     uint256 increasePositionRequestKeysStart,
-    uint256 decreasePositionRequestKeysStart,
-    uint256 swapOrderRequestKeysStart
+    uint256 decreasePositionRequestKeysStart
   );
   event CollectFee(
     address indexed token, uint256 feeAmount, uint256 feeReserve
@@ -304,6 +267,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     address _pool,
     address _poolOracle,
     address _wnativeRelayer,
+    address _tradeMiningManager,
     address _weth,
     uint256 _depositFeeBps,
     uint256 _minExecutionFee
@@ -312,8 +276,11 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
     pool = _pool;
-    poolOracle = _poolOracle;
+    poolOracle = IPoolOracle(_poolOracle);
     wnativeRelayer = _wnativeRelayer;
+
+    tradeMiningManager = TradeMiningManager(_tradeMiningManager);
+
     weth = _weth;
     depositFeeBps = _depositFeeBps;
     minExecutionFee = _minExecutionFee;
@@ -333,7 +300,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
   }
 
   function setPoolOracle(address _poolOracle) external onlyAdmin {
-    poolOracle = _poolOracle;
+    poolOracle = IPoolOracle(_poolOracle);
     emit SetPoolOracle(_poolOracle);
   }
 
@@ -399,40 +366,43 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     maxTimeDelay = _maxTimeDelay;
     emit SetDelayValues(
       _minBlockDelayKeeper, _minTimeDelayPublic, _maxTimeDelay
-      );
+    );
   }
 
   function setRequestKeysStartValues(
     uint256 _increasePositionRequestKeysStart,
-    uint256 _decreasePositionRequestKeysStart,
-    uint256 _swapOrderRequestKeysStart
+    uint256 _decreasePositionRequestKeysStart
   ) external onlyAdmin {
     increasePositionRequestKeysStart = _increasePositionRequestKeysStart;
     decreasePositionRequestKeysStart = _decreasePositionRequestKeysStart;
-    swapOrderRequestKeysStart = _swapOrderRequestKeysStart;
 
     emit SetRequestKeysStartValues(
-      _increasePositionRequestKeysStart,
-      _decreasePositionRequestKeysStart,
-      _swapOrderRequestKeysStart
-      );
+      _increasePositionRequestKeysStart, _decreasePositionRequestKeysStart
+    );
   }
 
+  /// @notice Execute increase position requests
+  /// @param _endIndex The end index of the array to execute
+  /// @param _feeReceiver The address to send the fees to
   function executeIncreasePositions(
     uint256 _endIndex,
-    address payable _executionFeeReceiver
+    address payable _feeReceiver
   ) external onlyPositionKeeper {
     uint256 index = increasePositionRequestKeysStart;
     uint256 length = increasePositionRequestKeys.length;
 
+    // if the array is empty or the start index is greater than the array length
+    // then skip the execution.
     if (index >= length) {
       return;
     }
 
+    // Execute up until end of the array.
     if (_endIndex > length) {
       _endIndex = length;
     }
 
+    // Execute each request
     while (index < _endIndex) {
       bytes32 key = increasePositionRequestKeys[index];
 
@@ -442,15 +412,17 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       // an error could be thrown if the request is too old or if the slippage is
       // higher than what the user specified, or if there is insufficient liquidity for the position
       // in case an error was thrown, cancel the request
-      try this.executeIncreasePosition(key, _executionFeeReceiver, index)
-      returns (bool _wasExecuted) {
+      try this.executeIncreasePosition(key, _feeReceiver, index) returns (
+        bool _wasExecuted
+      ) {
         if (!_wasExecuted) {
           break;
         }
       } catch {
         // wrap this call in a try catch to prevent invalid cancels from blocking the loop
-        try this.cancelIncreasePosition(key, _executionFeeReceiver, index)
-        returns (bool _wasCancelled) {
+        try this.cancelIncreasePosition(key, _feeReceiver, index) returns (
+          bool _wasCancelled
+        ) {
           if (!_wasCancelled) {
             break;
           }
@@ -464,17 +436,31 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     increasePositionRequestKeysStart = index;
   }
 
+  struct ExecuteDecreasePositionsParams {
+    uint256 endIndex;
+    address payable executionFeeReceiver;
+    bytes[] priceUpdateData;
+    address[] tokens;
+    uint256[] prices;
+  }
+
+  /// @notice Execute decrease position requests
+  /// @param _endIndex The end index of the array to execute
+  /// @param _feeReceiver The address to send the fees to
   function executeDecreasePositions(
     uint256 _endIndex,
-    address payable _executionFeeReceiver
+    address payable _feeReceiver
   ) external onlyPositionKeeper {
     uint256 index = decreasePositionRequestKeysStart;
     uint256 length = decreasePositionRequestKeys.length;
 
+    // if the array is empty or the start index is greater than the array length
+    // then skip the execution.
     if (index >= length) {
       return;
     }
 
+    // Execute up until end of the array.
     if (_endIndex > length) {
       _endIndex = length;
     }
@@ -487,15 +473,17 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       // minimum number of blocks has not yet passed
       // an error could be thrown if the request is too old
       // in case an error was thrown, cancel the request
-      try this.executeDecreasePosition(key, _executionFeeReceiver, index)
-      returns (bool _wasExecuted) {
+      try this.executeDecreasePosition(key, _feeReceiver, index) returns (
+        bool _wasExecuted
+      ) {
         if (!_wasExecuted) {
           break;
         }
       } catch {
         // wrap this call in a try catch to prevent invalid cancels from blocking the loop
-        try this.cancelDecreasePosition(key, _executionFeeReceiver, index)
-        returns (bool _wasCancelled) {
+        try this.cancelDecreasePosition(key, _feeReceiver, index) returns (
+          bool _wasCancelled
+        ) {
           if (!_wasCancelled) {
             break;
           }
@@ -507,53 +495,6 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     }
 
     decreasePositionRequestKeysStart = index;
-  }
-
-  function executeSwapOrders(
-    uint256 _endIndex,
-    address payable _executionFeeReceiver
-  ) external onlyPositionKeeper {
-    uint256 index = swapOrderRequestKeysStart;
-    uint256 length = swapOrderRequestKeys.length;
-
-    if (index >= length) {
-      return;
-    }
-
-    if (_endIndex > length) {
-      _endIndex = length;
-    }
-
-    while (index < _endIndex) {
-      bytes32 key = swapOrderRequestKeys[index];
-
-      // if the request was executed then delete the key from the array
-      // if the request was not executed then break from the loop, this can happen if the
-      // minimum number of blocks has not yet passed
-      // an error could be thrown if the request is too old
-      // in case an error was thrown, cancel the request
-      try this.executeSwapOrder(key, _executionFeeReceiver, index) returns (
-        bool _wasExecuted
-      ) {
-        if (!_wasExecuted) {
-          break;
-        }
-      } catch {
-        // wrap this call in a try catch to prevent invalid cancels from blocking the loop
-        try this.cancelSwapOrder(key, _executionFeeReceiver, index) returns (
-          bool _wasCancelled
-        ) {
-          if (!_wasCancelled) {
-            break;
-          }
-        } catch {}
-      }
-
-      delete swapOrderRequestKeys[index];
-      index++;
-    }
-
-    swapOrderRequestKeysStart = index;
   }
 
   function createIncreasePosition(
@@ -669,51 +610,16 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     );
   }
 
-  function createSwapOrder(
-    address[] memory _path,
-    uint256 _amountIn,
-    uint256 _minOut,
-    uint256 _executionFee,
-    bool _shouldWrap,
-    bool _shouldUnwrap
-  ) external payable nonReentrant returns (bytes32) {
-    if (_path.length != 1 && _path.length != 2) revert InvalidPathLength();
-    if (_path[0] == _path[_path.length - 1]) revert InvalidPath();
-    if (_amountIn == 0) revert InvalidAmountIn();
-    if (_executionFee < minExecutionFee) revert InsufficientExecutionFee();
-
-    // always need this call because of mandatory executionFee user has to transfer in BNB
-    _transferInETH();
-
-    if (_shouldWrap) {
-      if (_path[0] != weth) revert OnlyNativeShouldWrap();
-      if (msg.value != _executionFee + _amountIn) {
-        revert IncorrectValueTransferred();
-      }
-    } else {
-      if (msg.value != _executionFee) revert IncorrectValueTransferred();
-      IERC20Upgradeable(_path[0]).safeTransferFrom(
-        msg.sender, address(this), _amountIn
-      );
-    }
-
-    return _createSwapOrder(
-      msg.sender, _path, _amountIn, _minOut, _shouldUnwrap, _executionFee
-    );
-  }
-
   function getRequestQueueLengths()
     external
     view
-    returns (uint256, uint256, uint256, uint256, uint256, uint256)
+    returns (uint256, uint256, uint256, uint256)
   {
     return (
       increasePositionRequestKeysStart,
       increasePositionRequestKeys.length,
       decreasePositionRequestKeysStart,
-      decreasePositionRequestKeys.length,
-      swapOrderRequestKeysStart,
-      swapOrderRequestKeys.length
+      decreasePositionRequestKeys.length
     );
   }
 
@@ -723,7 +629,8 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 index
   ) public nonReentrant returns (bool) {
     IncreasePositionRequest memory request = increasePositionRequests[_key];
-    // if the request was already executed or cancelled, return true so that the executeIncreasePositions loop will continue executing the next request
+    // if the request was already executed or cancelled,
+    // return true so that the executeIncreasePositions loop will continue executing the next request
     if (request.account == address(0)) {
       return true;
     }
@@ -786,9 +693,9 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       block.timestamp - request.blockTime,
       index,
       request.isLong
-        ? IPoolOracle(poolOracle).getMaxPrice(request.indexToken)
-        : IPoolOracle(poolOracle).getMinPrice(request.indexToken)
-      );
+        ? poolOracle.getMaxPrice(request.indexToken)
+        : poolOracle.getMinPrice(request.indexToken)
+    );
 
     return true;
   }
@@ -839,7 +746,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       block.number - request.blockNumber,
       block.timestamp - request.blockTime,
       index
-      );
+    );
 
     return true;
   }
@@ -910,9 +817,9 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       block.timestamp - request.blockTime,
       index,
       request.isLong
-        ? IPoolOracle(poolOracle).getMinPrice(request.indexToken)
-        : IPoolOracle(poolOracle).getMaxPrice(request.indexToken)
-      );
+        ? poolOracle.getMinPrice(request.indexToken)
+        : poolOracle.getMaxPrice(request.indexToken)
+    );
 
     return true;
   }
@@ -952,113 +859,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       block.number - request.blockNumber,
       block.timestamp - request.blockTime,
       index
-      );
-
-    return true;
-  }
-
-  function executeSwapOrder(
-    bytes32 _key,
-    address payable _executionFeeReceiver,
-    uint256 index
-  ) public nonReentrant returns (bool) {
-    SwapOrderRequest memory request = swapOrderRequests[_key];
-    // if the request was already executed or cancelled, return true so that the executeDecreasePositions loop will continue executing the next request
-    if (request.account == address(0)) {
-      return true;
-    }
-
-    bool shouldExecute = _validateExecution(
-      request.blockNumber, request.blockTime, request.account
     );
-    if (!shouldExecute) {
-      return false;
-    }
-
-    delete swapOrderRequests[_key];
-
-    IERC20Upgradeable(request.path[0]).safeTransfer(pool, request.amountIn);
-
-    uint256 _amountOut;
-    if (request.path[request.path.length - 1] == weth && request.shouldUnwrap) {
-      _amountOut =
-        _swap(request.account, request.path, request.minOut, address(this));
-      _transferOutETHWithGasLimitIgnoreFail(
-        _amountOut, payable(request.account)
-      );
-    } else {
-      _amountOut =
-        _swap(request.account, request.path, request.minOut, request.account);
-    }
-
-    // pay executor
-    _transferOutETHWithGasLimitIgnoreFail(
-      request.executionFee, _executionFeeReceiver
-    );
-
-    emit ExecuteSwapOrder(
-      request.account,
-      request.path,
-      request.amountIn,
-      request.minOut,
-      request.shouldUnwrap,
-      request.executionFee,
-      _amountOut,
-      block.number - request.blockNumber,
-      block.timestamp - request.blockTime,
-      index
-      );
-
-    return true;
-  }
-
-  function cancelSwapOrder(
-    bytes32 _key,
-    address payable _executionFeeReceiver,
-    uint256 index
-  ) public nonReentrant returns (bool) {
-    SwapOrderRequest memory request = swapOrderRequests[_key];
-    // if the request was already executed or cancelled, return true so that the executeIncreasePositions loop will continue executing the next request
-    if (request.account == address(0)) {
-      return true;
-    }
-
-    bool shouldCancel = _validateCancellation(
-      request.blockNumber, request.blockTime, request.account
-    );
-
-    if (!shouldCancel) {
-      return false;
-    }
-
-    delete swapOrderRequests[_key];
-
-    if (request.path[0] == weth) {
-      _transferOutETHWithGasLimitIgnoreFail(
-        request.amountIn, payable(request.account)
-      );
-    } else {
-      IERC20Upgradeable(request.path[0]).safeTransfer(
-        request.account, request.amountIn
-      );
-    }
-
-    // pay executor
-    _transferOutETHWithGasLimitIgnoreFail(
-      request.executionFee, _executionFeeReceiver
-    );
-
-    emit CancelSwapOrder(
-      request.account,
-      request.path,
-      request.amountIn,
-      request.minOut,
-      request.shouldUnwrap,
-      request.executionFee,
-      block.number - request.blockNumber,
-      block.timestamp - request.blockTime,
-      index
-      );
 
     return true;
   }
@@ -1086,15 +887,6 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     returns (address[] memory)
   {
     DecreasePositionRequest memory request = decreasePositionRequests[_key];
-    return request.path;
-  }
-
-  function getSwapOrderRequestPath(bytes32 _key)
-    public
-    view
-    returns (address[] memory)
-  {
-    SwapOrderRequest memory request = swapOrderRequests[_key];
     return request.path;
   }
 
@@ -1143,8 +935,8 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _price
   ) internal {
     uint256 markPrice = _isLong
-      ? IPoolOracle(poolOracle).getMaxPrice(_indexToken)
-      : IPoolOracle(poolOracle).getMinPrice(_indexToken);
+      ? poolOracle.getMaxPrice(_indexToken)
+      : poolOracle.getMinPrice(_indexToken);
     bool isPriceValid = _isLong ? markPrice <= _price : markPrice >= _price;
     if (!isPriceValid) {
       revert InvalidPriceForExecution();
@@ -1161,12 +953,24 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       _isLong
     );
 
+    if (address(tradeMiningManager) != address(0)) {
+      // If trade mining is enabled, call the trade mining manager to its state
+      tradeMiningManager.onIncreasePosition(
+        _account,
+        _subAccountId,
+        _collateralToken,
+        _indexToken,
+        _sizeDelta,
+        _isLong
+      );
+    }
+
     emit IncreasePosition(
       _account,
       _subAccountId,
       _sizeDelta,
       GetterFacetInterface(pool).positionFeeBps()
-      );
+    );
   }
 
   function _decreasePosition(
@@ -1181,8 +985,8 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     uint256 _price
   ) internal returns (uint256) {
     uint256 markPrice = _isLong
-      ? IPoolOracle(poolOracle).getMinPrice(_indexToken)
-      : IPoolOracle(poolOracle).getMaxPrice(_indexToken);
+      ? poolOracle.getMinPrice(_indexToken)
+      : poolOracle.getMaxPrice(_indexToken);
 
     bool isPriceValid = _isLong ? markPrice >= _price : markPrice <= _price;
     if (!isPriceValid) {
@@ -1205,7 +1009,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       _subAccountId,
       _sizeDelta,
       GetterFacetInterface(pool).positionFeeBps()
-      );
+    );
 
     return amountOut;
   }
@@ -1435,7 +1239,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       index,
       increasePositionRequestKeys.length - 1,
       tx.gasprice
-      );
+    );
 
     return requestKey;
   }
@@ -1500,7 +1304,7 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       request.executionFee,
       index,
       decreasePositionRequestKeys.length - 1
-      );
+    );
     return requestKey;
   }
 
@@ -1514,56 +1318,6 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
 
     decreasePositionRequests[key] = _request;
     decreasePositionRequestKeys.push(key);
-
-    return (index, key);
-  }
-
-  function _createSwapOrder(
-    address _account,
-    address[] memory _path,
-    uint256 _amountIn,
-    uint256 _minOut,
-    bool _shouldUnwrap,
-    uint256 _executionFee
-  ) internal returns (bytes32) {
-    SwapOrderRequest memory request = SwapOrderRequest(
-      _account,
-      _path,
-      _amountIn,
-      _minOut,
-      _shouldUnwrap,
-      _executionFee,
-      block.number,
-      block.timestamp
-    );
-
-    (uint256 index, bytes32 requestKey) = _storeSwapOrderRequest(request);
-
-    emit CreateSwapOrder(
-      request.account,
-      request.path,
-      request.amountIn,
-      request.minOut,
-      request.shouldUnwrap,
-      request.executionFee,
-      index,
-      swapOrderRequestKeys.length - 1
-      );
-
-    return requestKey;
-  }
-
-  function _storeSwapOrderRequest(SwapOrderRequest memory _request)
-    internal
-    returns (uint256, bytes32)
-  {
-    address account = _request.account;
-    uint256 index = swapOrdersIndex[account] + 1;
-    swapOrdersIndex[account] = index;
-    bytes32 key = getRequestKey(account, index);
-
-    swapOrderRequests[key] = _request;
-    swapOrderRequestKeys.push(key);
 
     return (index, key);
   }

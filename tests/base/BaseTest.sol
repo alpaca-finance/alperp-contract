@@ -92,8 +92,10 @@ import {AlpacaVaultFarmStrategy} from "@alperp/core/AlpacaVaultFarmStrategy.sol"
 /// Alperp - Order Mgmt
 import {PoolRouter04} from "@alperp/periphery/pool-routers/PoolRouter04.sol";
 import {Orderbook02} from "@alperp/periphery/limit-orders/Orderbook02.sol";
+import {MarketOrderExecutor} from
+  "@alperp/periphery/market-orders/MarketOrderExecutor.sol";
 import {MarketOrderRouter} from
-  "@alperp/core/pool-diamond/market-orders/MarketOrderRouter.sol";
+  "@alperp/periphery/market-orders/MarketOrderRouter.sol";
 
 /// Alperp - Oracles
 import {PoolOracle} from "@alperp/core/PoolOracle.sol";
@@ -126,6 +128,7 @@ import {MockStrategy} from "@alperp-tests/mocks/MockStrategy.sol";
 
 /// Pyth
 import {MockPyth as FakePyth} from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
+import {PythStructs} from "@pythnetwork/pyth-sdk-solidity/PythStructs.sol";
 import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
 /// Chainlink
@@ -193,6 +196,15 @@ contract BaseTest is TestBase, ATest {
 
   ProxyAdmin internal proxyAdmin;
 
+  bytes32 internal constant WBTC_PRICE_ID =
+    0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43;
+  bytes32 internal constant WBNB_PRICE_ID =
+    0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f;
+  bytes32 internal constant ETH_PRICE_ID =
+    0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace;
+  bytes32 internal constant DAI_PRICE_ID =
+    0xb0948a5e5313200c632b51bb5ca32f6de0d36e9950a942d19751e833f70dabfd;
+
   constructor() {
     bnb = new MockWNative();
     weth = deployMockErc20("Wrapped Ethereum", "WETH", 18);
@@ -217,6 +229,42 @@ contract BaseTest is TestBase, ATest {
 
   function zeroBytesArr() internal pure returns (bytes[] memory) {
     bytes[] memory data = new bytes[](0);
+    return data;
+  }
+
+  function createPriceFeedUpdateData(bytes32 id, uint256 price)
+    internal
+    pure
+    returns (bytes memory priceFeedData)
+  {
+    PythStructs.PriceFeed memory priceFeed;
+
+    priceFeed.id = id;
+
+    priceFeed.price.price = int64(int256(price));
+    priceFeed.price.conf = 0;
+    priceFeed.price.expo = -8;
+    priceFeed.price.publishTime = uint64(block.timestamp);
+
+    priceFeed.emaPrice.price = int64(int256(price));
+    priceFeed.emaPrice.conf = 0;
+    priceFeed.emaPrice.expo = -8;
+    priceFeed.emaPrice.publishTime = uint64(block.timestamp);
+
+    priceFeedData = abi.encode(priceFeed);
+  }
+
+  function buildPythUpdateData(
+    uint256 wbtcPrice,
+    uint256 bnbPrice,
+    uint256 ethPrice,
+    uint256 daiPrice
+  ) internal view returns (bytes[] memory) {
+    bytes[] memory data = new bytes[](4);
+    data[0] = createPriceFeedUpdateData(WBTC_PRICE_ID, wbtcPrice);
+    data[1] = createPriceFeedUpdateData(WBNB_PRICE_ID, bnbPrice);
+    data[2] = createPriceFeedUpdateData(ETH_PRICE_ID, ethPrice);
+    data[3] = createPriceFeedUpdateData(DAI_PRICE_ID, daiPrice);
     return data;
   }
 
@@ -973,9 +1021,27 @@ contract BaseTest is TestBase, ATest {
     return Orderbook02(payable(_proxy));
   }
 
+  function deployMarketOrderExecutor(
+    address _pythPriceFeed,
+    address _marketOrderRouter
+  ) internal returns (MarketOrderExecutor) {
+    bytes memory _logicBytecode = abi.encodePacked(
+      vm.getCode("./out/MarketOrderExecutor.sol/MarketOrderExecutor.json")
+    );
+    bytes memory _initializer = abi.encodeWithSelector(
+      bytes4(keccak256("initialize(address,address)")),
+      _pythPriceFeed,
+      _marketOrderRouter
+    );
+    address _proxy = _setupUpgradeable(_logicBytecode, _initializer);
+
+    return MarketOrderExecutor(_proxy);
+  }
+
   function deployMarketOrderRouter(
     address _pool,
     address _poolOracle,
+    address _tradeMiningManager,
     address _weth,
     uint256 _depositFee,
     uint256 _minExecutionFee
@@ -986,11 +1052,14 @@ contract BaseTest is TestBase, ATest {
     MockWNativeRelayer _mockWNativeRelayer = deployWNativeRelayer(_weth);
     bytes memory _initializer = abi.encodeWithSelector(
       bytes4(
-        keccak256("initialize(address,address,address,address,uint256,uint256)")
+        keccak256(
+          "initialize(address,address,address,address,address,uint256,uint256)"
+        )
       ),
       _pool,
       _poolOracle,
       address(_mockWNativeRelayer),
+      _tradeMiningManager,
       _weth,
       _depositFee,
       _minExecutionFee
@@ -1036,8 +1105,8 @@ contract BaseTest is TestBase, ATest {
   function deployFakePyth(
     uint256 _validTimePeriod,
     uint256 _singleUpdateFeeInWei
-  ) internal returns (IPyth) {
-    return IPyth(address(new FakePyth(_validTimePeriod, _singleUpdateFeeInWei)));
+  ) internal returns (FakePyth) {
+    return new FakePyth(_validTimePeriod, _singleUpdateFeeInWei);
   }
 
   function deployPythPriceFeed(address _pyth) internal returns (PythPriceFeed) {

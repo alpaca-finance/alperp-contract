@@ -27,9 +27,6 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
   using SafeCast for uint256;
   using SafeCast for int32;
 
-  bytes32 internal constant WBNB_PRICE_ID =
-    0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f;
-
   struct PriceFeedData {
     bytes32 id;
     int64 price;

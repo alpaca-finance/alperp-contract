@@ -14,8 +14,6 @@ import {
 
 contract PoolDiamond_Orderbook is PoolDiamond_BaseTest {
   uint256 internal constant FEE = 0.01 ether;
-  bytes32 internal constant WBTC_PRICE_ID =
-    0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43;
 
   struct PriceFeedData {
     bytes32 id;

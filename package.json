@@ -144,7 +144,7 @@
     "mainnet:scripts:pyth:update-pyth-token-prices": "npx hardhat --network mainnet deploy --no-compile --reset --tags UpdatePythTokenPrices",
     "deploy:mainnet:pool:config:set-pool-oracle": "npx hardhat --network mainnet deploy --no-compile --reset --tags SetPoolOracle",
     "deploy:mainnet:core:pyth-price-feed:config:set-pyth-price-feed-max-age": "npx hardhat --network mainnet deploy --no-compile --reset --tags PythPriceFeed_SetPythPriceFeedMaxAge",
-    "deploy:mainnet:pool:config:set-min-profit-duration": "npx hardhat --network mainnet deploy --no-compile --reset --tags SetMinProfitDuration",
+    "deploy:mainnet:core:pool:config:set-min-profit-duration": "npx hardhat --network mainnet deploy --no-compile --reset --tags SetMinProfitDuration",
     "deploy:mainnet:alp-staking:script:check-staking-balances": "npx hardhat --network mainnet deploy --no-compile --reset --tags ALPStakingCheckBalances",
     "deploy:mainnet:oracle:set_pyth_price_feed_token_price_ids": "npx hardhat --network mainnet deploy --no-compile --reset --tags SetPythPriceFeedTokenPriceIds",
     "deploy:mainnet:core:pool:config:set-mint-burn-fee-bps": "npx hardhat --network mainnet deploy --no-compile --reset --tags AdminFacet_SetMintBurnFeeBps",

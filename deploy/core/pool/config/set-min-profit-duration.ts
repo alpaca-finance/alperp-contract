@@ -6,7 +6,7 @@ import { getConfig } from "../../../utils/config";
 
 const config = getConfig();
 
-const MIN_DURATION = 180; // 3 min
+const MIN_DURATION = 1800; // 3 min
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];
