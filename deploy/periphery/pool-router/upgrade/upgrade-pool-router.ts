@@ -7,23 +7,21 @@ import { getImplementationAddress } from "@openzeppelin/upgrades-core";
 const config = getConfig();
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  const version = "PoolRouter05";
   const deployer = (await ethers.getSigners())[0];
-  const PoolRouter04 = await ethers.getContractFactory(
-    "PoolRouter04",
-    deployer
-  );
+  const PoolRouterFactory = await ethers.getContractFactory(version, deployer);
 
-  console.log(`> Preparing to upgrade PoolRouter04`);
-  const newPoolRouter04 = await upgrades.prepareUpgrade(
+  console.log(`> Preparing to upgrade PoolRouter to ${version}`);
+  const newPoolRouter = await upgrades.prepareUpgrade(
     config.PoolRouter,
-    PoolRouter04
+    PoolRouterFactory
   );
   console.log(`> Done`);
 
-  console.log(`> New PoolRouter04 Implementation address: ${newPoolRouter04}`);
+  console.log(`> New PoolRouter Implementation address: ${newPoolRouter}`);
   const upgradeTx = await upgrades.upgradeProxy(
     config.PoolRouter,
-    PoolRouter04
+    PoolRouterFactory
   );
   console.log(`> ⛓ Tx is submitted: ${upgradeTx.deployTransaction.hash}`);
   console.log(`> Waiting for tx to be mined...`);
@@ -38,10 +36,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(`> Verify contract on Tenderly`);
   await tenderly.verify({
     address: implAddress,
-    name: "PoolRouter04",
+    name: version,
   });
   console.log(`> ✅ Done`);
 };
 
 export default func;
-func.tags = ["UpgradePoolRouter04"];
+func.tags = ["PoolRouter_Upgrade"];

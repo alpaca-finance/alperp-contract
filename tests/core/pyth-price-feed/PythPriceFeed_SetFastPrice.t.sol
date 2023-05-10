@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 /**
- * ∩~~~~∩ 
- *   ξ ･×･ ξ 
- *   ξ　~　ξ 
- *   ξ　　 ξ 
- *   ξ　　 “~～~～〇 
- *   ξ　　　　　　 ξ 
- *   ξ ξ ξ~～~ξ ξ ξ 
+ *   ∩~~~~∩
+ *   ξ ･×･ ξ
+ *   ξ　~　ξ
+ *   ξ　　 ξ
+ *   ξ　　 “~～~～〇
+ *   ξ　　　　　　 ξ
+ *   ξ ξ ξ~～~ξ ξ ξ
  * 　 ξ_ξξ_ξ　ξ_ξξ_ξ
  * Alpaca Fin Corporation
  */
@@ -18,11 +18,6 @@ import {
 } from "./PythPriceFeed_BaseTest.t.sol";
 
 contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
-  bytes32 internal constant WBNB_PRICE_ID =
-    0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f;
-  bytes32 internal constant BTC_PRICE_ID =
-    0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43;
-
   function setUp() public override {
     super.setUp();
 
@@ -39,7 +34,7 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
     });
     bytes memory btcPriceFeedData = FakePyth(address(pyth))
       .createPriceFeedUpdateData({
-      id: BTC_PRICE_ID,
+      id: WBTC_PRICE_ID,
       price: int64(30_000_000_0000),
       conf: uint64(150_000_0000),
       expo: int32(-8),
@@ -59,13 +54,13 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
   function testCorrectness_WhenSetMultiPrice() external {
     // set token to the correct price id
     pythPriceFeed.setTokenPriceId(address(bnb), WBNB_PRICE_ID);
-    pythPriceFeed.setTokenPriceId(address(wbtc), BTC_PRICE_ID);
+    pythPriceFeed.setTokenPriceId(address(wbtc), WBTC_PRICE_ID);
 
     // set ALICE as a updater
     pythPriceFeed.setUpdater(ALICE, true);
 
     // ALICE call setCachedPrice
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](2);
     address[] memory tokenAddrs = new address[](2);
     uint256[] memory cachedPrices = new uint256[](2);
@@ -95,7 +90,7 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
 
   function testRevert_WhenBeCalledBySomeone() external {
     // ALICE call setCachedPrice
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
     uint256[] memory cachedPrices = new uint256[](1);
@@ -113,7 +108,7 @@ contract PythPriceFeed_SetCachedPrice is PythPriceFeed_BaseTest {
     pythPriceFeed.setUpdater(ALICE, true);
 
     // ALICE call setCachedPrice
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](2);
     uint256[] memory cachedPrices = new uint256[](2);

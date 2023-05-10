@@ -42,6 +42,7 @@ import {
   LibAccessControl,
   FundingRateFacetInterface,
   Orderbook02,
+  MarketOrderExecutor,
   MarketOrderRouter,
   FastPriceFeed,
   PythPriceFeed,
@@ -68,10 +69,11 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
   FundingRateFacetInterface internal poolFundingRateFacet;
 
   Orderbook02 internal orderbook;
+  MarketOrderExecutor internal marketOrderExecutor;
   MarketOrderRouter internal marketOrderRouter;
 
   PythPriceFeed internal pythPriceFeed;
-  IPyth internal pyth;
+  FakePyth internal pyth;
 
   function setUp() public virtual {
     revenueToken = deployMockWNative();
@@ -126,7 +128,9 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
       LibAccessControl.FARM_KEEPER, address(this)
     );
 
-    // Grant Plugin for Orderbook (Limit Order) and MarketOrderRouter for (Market Order)
+    // Deploy & config periphery contracts.
+    // Orderbook for limit order
+    // Deploy Orderbook
     orderbook = deployOrderbook(
       poolDiamond,
       address(poolOracle),
@@ -135,21 +139,54 @@ abstract contract PoolDiamond_BaseTest is BaseTest {
       1 ether,
       address(pythPriceFeed)
     );
+    // Allow orderbook as a plugin on poolDiamond
     poolAdminFacet.setPlugin(address(orderbook), true);
+    // MarketOrderRouter for market order
+    // Deploy MarketOrderRouter
     marketOrderRouter = deployMarketOrderRouter(
-      poolDiamond, address(poolOracle), address(bnb), 1 ether, 0.01 ether
+      poolDiamond,
+      address(poolOracle),
+      address(tradeMiningManager),
+      address(bnb),
+      1 ether,
+      0.01 ether
     );
+    // Deploy MarketOrderExecutor
+    marketOrderExecutor = deployMarketOrderExecutor(
+      address(pythPriceFeed), address(marketOrderRouter)
+    );
+    // Set address(this) to be the executor
+    marketOrderExecutor.setExecutor(address(this), true);
+    // Set address(this) as a admin of MarketOrderRouter
+    marketOrderRouter.setAdmin(address(this));
+    // Allow marketOrderExecutor as a position keeper on MarketOrderRouter
+    marketOrderRouter.setPositionKeeper(address(marketOrderExecutor), true);
+    // Allow marketOrderRouter as a plugin on poolDiamond
     poolAdminFacet.setPlugin(address(marketOrderRouter), true);
 
-    // for majority of orderbook test cases, can omit pyth price first
+    // For majority of orderbook test cases, can omit pyth price first
     pythPriceFeed.setFavorRefPrice(true);
     pythPriceFeed.setUpdater(address(orderbook), true);
     pythPriceFeed.setUpdater(address(poolRouter), true);
+    pythPriceFeed.setUpdater(address(marketOrderExecutor), true);
+    pyth.updatePriceFeeds{value: 0.04 ether}(buildPythUpdateData(40_000 * 1e8, 400 * 1e8, 1800 * 1e8, 1 * 1e8));
+    tokens = new address[](4);
+    tokens[0] = address(wbtc);
+    tokens[1] = address(bnb);
+    tokens[2] = address(weth);
+    tokens[3] = address(dai);
+    bytes32[] memory tokenIds = new bytes32[](4);
+    tokenIds[0] = WBTC_PRICE_ID;
+    tokenIds[1] = WBNB_PRICE_ID;
+    tokenIds[2] = ETH_PRICE_ID;
+    tokenIds[3] = DAI_PRICE_ID;
+    pythPriceFeed.setTokenPriceIds(tokens, tokenIds);
     pythPriceFeed.setMaxPriceAge(15);
 
     // Config trade mining.
     ap.setMinter(address(tradeMiningManager), true);
     tradeMiningManager.setAuth(address(poolRouter), true);
+    tradeMiningManager.setAuth(address(marketOrderRouter), true);
     tradeMiningManager.setAuth(address(orderbook), true);
     tradeMiningManager.setPeriod(1, 1735689600);
     tradeMiningManager.setAp(ap);

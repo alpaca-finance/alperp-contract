@@ -27,9 +27,6 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
   using SafeCast for uint256;
   using SafeCast for int32;
 
-  bytes32 internal constant WBNB_PRICE_ID =
-    0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f;
-
   struct PriceFeedData {
     bytes32 id;
     int64 price;
@@ -172,7 +169,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
 
     // alice set cached price
     uint256 fastWBNBPrice = 280 * 10 ** 30;
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
     uint256[] memory cachedPrices = new uint256[](1);
@@ -223,7 +220,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
 
     // alice set cached price
     uint256 fastWBNBPrice = 280 * 10 ** 30;
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
     uint256[] memory cachedPrices = new uint256[](1);
@@ -257,7 +254,7 @@ contract PythPriceFeed_GetPrice is PythPriceFeed_BaseTest {
 
     // alice set cached price
     uint256 fastWBNBPrice = 280 * 10 ** 30;
-    vm.prank(ALICE);
+    vm.startPrank(ALICE);
     bytes[] memory cachedPriceUpdateDatas = new bytes[](1);
     address[] memory tokenAddrs = new address[](1);
     uint256[] memory cachedPrices = new uint256[](1);
