@@ -432,14 +432,6 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     increasePositionRequestKeysStart = index;
   }
 
-  struct ExecuteDecreasePositionsParams {
-    uint256 endIndex;
-    address payable executionFeeReceiver;
-    bytes[] priceUpdateData;
-    address[] tokens;
-    uint256[] prices;
-  }
-
   /// @notice Execute decrease position requests
   /// @param _endIndex The end index of the array to execute
   /// @param _feeReceiver The address to send the fees to

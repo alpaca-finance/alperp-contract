@@ -27,6 +27,8 @@
   },
   "PoolRouter": "0x43074C43BdbEc9e09602d23C69f04543f70251B8",
   "LiquidationRouter": "",
+  "MarketOrderRouter": "",
+  "MarketOrderExecutor": "",
   "WNativeRelayer": "0xa815338cab1c7b7AB805144F9c267e372782e2D9",
   "Pools": {
     "ALP": {

@@ -6,7 +6,7 @@ import { getConfig } from "../../../utils/config";
 
 const config = getConfig();
 
-const plugin = config.PoolRouter;
+const plugin = config.MarketOrderRouter;
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];
@@ -24,4 +24,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["SetPlugin"];
+func.tags = ["Pool_SetPlugin"];

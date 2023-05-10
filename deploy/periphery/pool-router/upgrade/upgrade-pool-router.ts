@@ -9,10 +9,7 @@ const config = getConfig();
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const version = "PoolRouter05";
   const deployer = (await ethers.getSigners())[0];
-  const PoolRouterFactory = await ethers.getContractFactory(
-    version,
-    deployer
-  );
+  const PoolRouterFactory = await ethers.getContractFactory(version, deployer);
 
   console.log(`> Preparing to upgrade PoolRouter to ${version}`);
   const newPoolRouter = await upgrades.prepareUpgrade(
