@@ -46,7 +46,7 @@
         "fundingRate": "0x1f2a297A8495bd69569b5b4CFf487Bfb71987746",
         "getter": "0x85116CAF6279E92aF32a43D6a861e0847e59F97a",
         "ownership": "0xBd363c9E24E3cF780BEdf7ae0c7F24a4477C9C01",
-        "perpTrade": "0xD2De80625dC085b221AFeACD5b78839d18F1d1c3",
+        "perpTrade": "0xC47Afb0c3008ee64D0671524c46AeF08E07b7B2f",
         "diamondInitializer": "0xEB786a76B3C00fBA21344361f1E1F71A8c7C7A0C",
         "poolConfigInitializer": "0xcbd09eFee86750253C3377c296111378F206cB3C",
         "accessControlInitializer": "0x52DEfffff49E30b55bA908d94AA48c5262dF8337"

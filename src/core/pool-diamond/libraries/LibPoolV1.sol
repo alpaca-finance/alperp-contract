@@ -151,7 +151,7 @@ library LibPoolV1 {
     LibPoolConfigV1.PoolConfigV1DiamondStorage storage poolConfigds =
       LibPoolConfigV1.poolConfigV1DiamondStorage();
 
-    if (account != msg.sender && poolConfigds.router != msg.sender) {
+    if (poolConfigds.router != msg.sender) {
       if (!poolV1ds.plugins[msg.sender]) {
         revert LibPoolV1_ForbiddenPlugin();
       }
