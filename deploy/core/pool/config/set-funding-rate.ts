@@ -6,7 +6,7 @@ import { getConfig } from "../../../utils/config";
 import {
   FundingRateFacet__factory,
   GetterFacetInterface__factory,
-} from "../../../../compiled-typechain";
+} from "../../../../typechain";
 import * as readlineSync from "readline-sync";
 import { BigNumberish } from "ethers";
 

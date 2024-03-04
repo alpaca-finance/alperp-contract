@@ -17,7 +17,6 @@ enum FacetCutAction {
 
 const methods = [
   "addLiquidity(address,address,address)",
-  "flashLoan(address,address[],address[],uint256[],bytes)",
   "removeLiquidity(address,address,address)",
   "swap(address,address,address,uint256,address)",
 ];

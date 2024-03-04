@@ -635,11 +635,10 @@ contract BaseTest is TestBase, ATest {
   {
     LiquidityFacet liquidityFacet = new LiquidityFacet();
 
-    bytes4[] memory selectors = new bytes4[](4);
+    bytes4[] memory selectors = new bytes4[](3);
     selectors[0] = LiquidityFacet.addLiquidity.selector;
     selectors[1] = LiquidityFacet.removeLiquidity.selector;
     selectors[2] = LiquidityFacet.swap.selector;
-    selectors[3] = LiquidityFacet.flashLoan.selector;
 
     DiamondCutInterface.FacetCut[] memory facetCuts = buildFacetCut(
       address(liquidityFacet), DiamondCutInterface.FacetCutAction.Add, selectors

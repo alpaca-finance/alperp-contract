@@ -24,7 +24,7 @@ enum FacetCutAction {
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const FACET = "LiquidityFacet";
   const INITIALIZER_ADDRESS = ethers.constants.AddressZero;
-  const OLD_FACET_ADDRESS = "0xD052ada2402b7bB200d16F738C857C8454b1661a";
+  const OLD_FACET_ADDRESS = "0x12045fd463Cb51BCbfA6539fb0F5F1352c63CCa9";
 
   const deployer = (await ethers.getSigners())[0];
 
