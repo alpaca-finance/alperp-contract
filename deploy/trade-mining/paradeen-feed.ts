@@ -12,12 +12,23 @@ interface FeedParadeenParams {
 }
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const PARADEEN_ADDRESS = "";
   const PARAMS_INPUT: Array<FeedParadeenParams> = [
     {
-      weekTimstamp: BigNumber.from(1710349200),
-      amount: ethers.utils.parseUnits("20000", 6),
-    }
+      weekTimstamp: BigNumber.from(1680739200),
+      amount: ethers.utils.parseEther("32000"),
+    },
+    {
+      weekTimstamp: BigNumber.from(1681344000),
+      amount: ethers.utils.parseEther("32000"),
+    },
+    {
+      weekTimstamp: BigNumber.from(1681948800),
+      amount: ethers.utils.parseEther("32000"),
+    },
+    {
+      weekTimstamp: BigNumber.from(1682553600),
+      amount: ethers.utils.parseEther("32000"),
+    },
   ];
 
   // Ask for confirmation
@@ -39,19 +50,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     p.weekTimstamp.div(WEEK).mul(WEEK)
   );
   const amounts = PARAMS_INPUT.map((p) => p.amount);
+  const config = getConfig();
   const signer = (await ethers.getSigners())[0];
 
   const paradeen = Paradeen__factory.connect(
-    PARADEEN_ADDRESS,
+    config.TradeMining.paradeen,
     signer
   );
 
   console.log("> Feeding rewards to Paradeen");
-  console.log(`Feeding ${timestamps} , ${amounts}`);
-  // const tx = await paradeen.feed(timestamps, amounts);
-  // console.log(`> ⛓ Tx submitted: ${tx.hash}`);
+  const tx = await paradeen.feed(timestamps, amounts);
+  console.log(`> ⛓ Tx submitted: ${tx.hash}`);
   console.log(`> Waiting tx to be mined...`);
-  // await tx.wait();
+  await tx.wait();
   console.log(`> Tx mined!`);
 };
 
