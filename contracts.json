@@ -85,7 +85,8 @@
   "TradeMining": {
     "tradeMiningManager": "0xD78C4b5dfcb1EdD23654A59EBc733c3Fe133DD36",
     "paradeen": "0xBA61db6b2CFEbC1580BF692389e831B24bb0a5eF",
+    "pythParadeen": "0x7D8697d7E2304F738a2004251d734883EC07F1E5",
     "AP": "0x2Fb74F8E1e9EFaEEc31e57946e0C1bC6853ca4f1",
-    "rewardToken": "0x8F0528cE5eF7B51152A59745bEfDD91D97091d2F"
+    "rewardToken": "0xb0188B0bb2cD4a6D2744637fC83C94a284B247Da"
   }
 }

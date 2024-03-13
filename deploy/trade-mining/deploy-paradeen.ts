@@ -10,8 +10,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deployer = (await ethers.getSigners())[0];
 
   const AP = config.TradeMining.AP;
-  const START_WEEK_CURSOR = 1680739200;
-  const REWARD_TOKEN = config.Tokens.ALPACA;
+  const START_WEEK_CURSOR = 1710374400; // 14 March 2024
+  const REWARD_TOKEN = "0xb0188B0bb2cD4a6D2744637fC83C94a284B247Da";
   const EMERGENCY_RETURN = deployer.address;
 
   console.log(`> Deploying Paradeen Contract`);

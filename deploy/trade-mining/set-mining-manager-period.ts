@@ -7,8 +7,8 @@ import { getConfig } from "../utils/config";
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = getConfig();
 
-  const START_TIMESTAMP = 1680739200;
-  const END_TIMESTAMP = 1684972800;
+  const START_TIMESTAMP = 1710374400; // 14 March 2024
+  const END_TIMESTAMP = 1716422400; // 23 May 2024
 
   const deployer = (await ethers.getSigners())[0];
   const tradeMiningManager = TradeMiningManager__factory.connect(
