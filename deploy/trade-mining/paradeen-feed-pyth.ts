@@ -21,7 +21,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // contracts
   const ap = AP__factory.connect(config.TradeMining.AP, ethers.provider);
   const paradeen = Paradeen__factory.connect(
-    config.TradeMining.paradeen,
+    config.TradeMining.pythParadeen,
     signer
   );
 
@@ -50,7 +50,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(`> Trading fee collected: ${formatEther(tradingFeeCollected)}`);
   console.log(`> Pyth price: ${formatEther(pythPrice)}\n`);
 
-  let amountToFeed = BigNumber.from(0);
+  let amountToFeed: BigNumber;
 
   if (tradingFeeCollected.lt(weeklyFeeThreshold)) {
     console.log(
