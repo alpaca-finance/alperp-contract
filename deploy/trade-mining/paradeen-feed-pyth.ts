@@ -3,7 +3,11 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { ethers } from "hardhat";
 import { getConfig } from "../utils/config";
 import { BigNumber } from "ethers";
-import { AP__factory, Paradeen__factory } from "../../typechain";
+import {
+  AP__factory,
+  ERC20__factory,
+  Paradeen__factory,
+} from "../../typechain";
 import * as readlineSync from "readline-sync";
 import { getCoinGeckoPriceUSD } from "../utils/price";
 import { formatEther } from "ethers/lib/utils";
@@ -20,6 +24,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   // contracts
   const ap = AP__factory.connect(config.TradeMining.AP, ethers.provider);
+  const pyth = ERC20__factory.connect(config.TradeMining.rewardToken, signer);
   const paradeen = Paradeen__factory.connect(
     config.TradeMining.pythParadeen,
     signer
@@ -77,11 +82,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // Check feed timestamp
   const weeklyReward = await paradeen.tokensPerWeek(weekCursor);
   if (weeklyReward.gt(0)) {
+    console.log("====================================");
     console.log(
-      `> Weekly reward for ${weekCursor}: ${formatEther(weeklyReward)}`
+      `> Weekly reward for ${weekCursor}: ${formatEther(
+        weeklyReward.mul(E18).div(pythExponent)
+      )} Pyth`
     );
     console.log(`> Already fed for this week`);
-    const goNext = readlineSync.question("Confirm to re-feed? (y/n): ");
+    const goNext = readlineSync.question(
+      "Confirm to re-feed (increase)? (y/n): "
+    );
     switch (goNext.toLowerCase()) {
       case "y":
         break;
@@ -117,6 +127,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     p.weekTimestamp.div(WEEK).mul(WEEK)
   );
   const amounts = PARAMS_INPUT.map((p) => p.amount);
+
+  console.log("> Approving Pyth to Paradeen...");
+  const approvedTx = await pyth.approve(paradeen.address, amountToFeed);
+  console.log(`> ⛓ Tx submitted: ${approvedTx.hash}`);
 
   console.log("> Feeding rewards to Paradeen");
   const tx = await paradeen.feed(timestamps, amounts);
