@@ -33,6 +33,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // configs
   const tradingFeeBps = 9;
   const weeklyFeeThreshold = BigNumber.from(20000).mul(E18);
+  const endTimestamp = 1716422400; // May 23, 2024
 
   console.log(`> Prepare data...`);
 
@@ -91,6 +92,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         console.log("Invalid input");
         return;
     }
+  }
+
+  if (weekCursor.gt(endTimestamp)) {
+    console.log("> The campaign has ended, no need to feed");
+    return;
   }
 
   // Ask for confirmation
