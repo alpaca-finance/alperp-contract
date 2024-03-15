@@ -28,6 +28,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // constants
   const E18 = BigNumber.from(10).pow(18);
   const WEEK = BigNumber.from(604800);
+  const MAX_BPS = BigNumber.from(10000);
 
   // configs
   const tradingFeeBps = 9;
@@ -42,7 +43,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const tradingFeeCollected = weeklyTradingVolume
     .mul(tradingFeeBps)
     .mul(2) // account closing volume assure
-    .div(10000);
+    .div(MAX_BPS);
   const pythPrice = await getCoinGeckoPriceUSD("pyth-network");
 
   console.log(`> Weekly trading volume: ${formatEther(weeklyTradingVolume)}`);
@@ -112,9 +113,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const amounts = PARAMS_INPUT.map((p) => p.amount);
 
   console.log("> Feeding rewards to Paradeen");
-  const tx = await paradeen.feed(timestamps, amounts, {
-    gasLimit: 10000000000,
-  });
+  const tx = await paradeen.feed(timestamps, amounts);
   console.log(`> ⛓ Tx submitted: ${tx.hash}`);
   console.log(`> Waiting tx to be mined...`);
   await tx.wait();
