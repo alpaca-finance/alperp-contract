@@ -184,6 +184,7 @@
     "deploy:mainnet:trade-mining:ap-token:upgrade:ap-token": "hardhat --network mainnet deploy --no-compile --reset --tags UpgradeAPToken",
     "deploy:mainnet:trade-mining:paradeen": "hardhat --network mainnet deploy --no-compile --reset --tags Paradeen",
     "deploy:mainnet:trade-mining:feed-paradeen": "hardhat --network mainnet deploy --no-compile --reset --tags FeedParadeen",
+    "deploy:mainnet:trade-mining:feed-paradeen-pyth": "hardhat --network mainnet deploy --no-compile --reset --tags FeedParadeenPyth",
     "deploy:mainnet:trade-mining:set_mineable": "hardhat --network mainnet deploy --no-compile --reset --tags SetMiningManagerMinable",
     "deploy:mainnet:trade-mining:set_miner_manager_auth": "hardhat --network mainnet deploy --no-compile --reset --tags SetMiningManagerAuth",
     "deploy:mainnet:trade-mining:set_miner_manager_point": "hardhat --network mainnet deploy --no-compile --reset --tags SetMiningManagerPoint",
