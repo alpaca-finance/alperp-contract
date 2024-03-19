@@ -10,25 +10,33 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const config = getConfig();
   const networkInfo = await ethers.provider.getNetwork();
 
-  const TARGET_ADDRESS = config.Pools.ALP.orderbook;
+  const TARGET_ADDRESS = config.MarketOrderRouter;
 
   const EXACT_ETA = 0;
 
   const deployer = (await ethers.getSigners())[0];
 
-  const Orderbook02 = await ethers.getContractFactory("Orderbook02", deployer);
-
-  console.log(`> Preparing to upgrade Orderbook02`);
-  const newOrderbook02 = await upgrades.prepareUpgrade(
-    TARGET_ADDRESS,
-    Orderbook02
+  const marketOrderRouter = await ethers.getContractFactory(
+    "MarketOrderRouter",
+    deployer
   );
 
-  console.log(`> New Orderbook02 Implementation address: ${newOrderbook02}`);
+  console.log(`> Preparing to upgrade MarketOrderRouter`);
+  const newMarketOrderRouter = await upgrades.prepareUpgrade(
+    TARGET_ADDRESS,
+    marketOrderRouter
+  );
+
+  console.log(
+    `> New MarketOrderRouter Implementation address: ${newMarketOrderRouter}`
+  );
   const proxyAdmin = ProxyAdmin__factory.connect(config.ProxyAdmin, deployer);
 
   if (!compareAddress(await proxyAdmin.owner(), config.Timelock)) {
-    const upgradeTx = await upgrades.upgradeProxy(TARGET_ADDRESS, Orderbook02);
+    const upgradeTx = await upgrades.upgradeProxy(
+      TARGET_ADDRESS,
+      marketOrderRouter
+    );
     console.log(`> ⛓ Tx is submitted: ${upgradeTx.deployTransaction.hash}`);
     console.log(`> Waiting for tx to be mined...`);
     await upgradeTx.deployTransaction.wait();
@@ -39,12 +47,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     console.log(`> Queue tx on Timelock to upgrade the implementation`);
     await timelock.queueTransaction(
-      `Upgrade Orderbook02`,
+      `Upgrade MarketOrderRouter`,
       config.ProxyAdmin,
       "0",
       "upgrade(address,address)",
       ["address", "address"],
-      [TARGET_ADDRESS, newOrderbook02],
+      [TARGET_ADDRESS, newMarketOrderRouter],
       EXACT_ETA
     );
   }
@@ -53,4 +61,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["UpgradeOrderBook"];
+func.tags = ["UpgradeMarketOrderRouter"];
