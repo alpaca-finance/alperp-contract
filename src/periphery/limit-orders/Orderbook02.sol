@@ -1077,6 +1077,18 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     // pay executor
     _transferOutETH(order.executionFee, _feeReceiver);
 
+    if (address(tradeMiningManager) != address(0)) {
+      // If tradeMiningManager is set, then call it to update trade mining state
+      tradeMiningManager.onDecreasePosition(
+        order.account,
+        order.subAccountId,
+        order.collateralToken,
+        order.indexToken,
+        order.sizeDelta,
+        order.isLong
+      );
+    }
+
     emit ExecuteDecreaseOrder(
       order.account,
       order.subAccountId,

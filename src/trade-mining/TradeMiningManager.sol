@@ -120,12 +120,23 @@ contract TradeMiningManager is ITradeMiningManager, OwnableUpgradeable {
   }
 
   /// @notice On decrease position. NOT IMPLEMENTED. Reserved for future use.
-  function onDecreasePosition(address, uint256, address, address, uint256, bool)
-    external
-    view
-    onlyAuth
-  {
-    return;
+  function onDecreasePosition(
+    address _primaryAccount,
+    uint256,
+    address,
+    address,
+    uint256 _sizeDelta,
+    bool
+  ) external onlyAuth {
+    // Check if it's in the period
+    if (block.timestamp < startTimestamp || block.timestamp > endTimestamp) {
+      // Not in the period, then do nothing
+      return;
+    }
+
+    // Mint AP to the trader
+    // Convert 1e30 -> 1e18 => / 1e12
+    alpacaPoint.mint(_primaryAccount, _sizeDelta / 1e12);
   }
 
   /// @notice On liquidate position. NOT IMPLEMENTED. Reserved for future use.
