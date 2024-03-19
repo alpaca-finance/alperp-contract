@@ -377,13 +377,6 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
         receiver
       );
     }
-
-    if (address(tradeMiningManager) != address(0)) {
-      // If trade mining is enabled, call the trade mining manager to its state
-      tradeMiningManager.onDecreasePosition(
-        msg.sender, subAccountId, collateralToken, indexToken, sizeDelta, isLong
-      );
-    }
   }
 
   function decreasePositionNative(
@@ -430,13 +423,6 @@ contract PoolRouter04 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
         address(this)
       );
       _transferOutETH(amountOutFromSwap, receiver);
-    }
-
-    if (address(tradeMiningManager) != address(0)) {
-      // If trade mining is enabled, call the trade mining manager to its state
-      tradeMiningManager.onDecreasePosition(
-        msg.sender, subAccountId, collateralToken, indexToken, sizeDelta, isLong
-      );
     }
   }
 
