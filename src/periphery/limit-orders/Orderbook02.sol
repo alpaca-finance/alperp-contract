@@ -1196,7 +1196,7 @@ contract Orderbook02 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       return _vaultSwap(_account, _path[1], _path[2], _minOut, _receiver);
     }
 
-    revert("OrderBook: invalid _path.length");
+    revert("o");
   }
 
   function _vaultSwap(
