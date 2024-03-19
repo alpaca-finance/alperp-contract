@@ -992,6 +992,18 @@ contract MarketOrderRouter is ReentrancyGuardUpgradeable, OwnableUpgradeable {
       _receiver
     );
 
+    if (address(tradeMiningManager) != address(0)) {
+      // If trade mining is enabled, call the trade mining manager to its state
+      tradeMiningManager.onDecreasePosition(
+        _account,
+        _subAccountId,
+        _collateralToken,
+        _indexToken,
+        _sizeDelta,
+        _isLong
+      );
+    }
+
     emit DecreasePosition(
       _account,
       _subAccountId,

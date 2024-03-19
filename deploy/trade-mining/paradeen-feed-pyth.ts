@@ -48,7 +48,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const weeklyTradingVolume = await ap.weeklyTotalSupply(weekCursor);
   const tradingFeeCollected = weeklyTradingVolume
     .mul(tradingFeeBps)
-    .mul(2) // account closing volume assure
     .div(MAX_BPS);
   const pythPrice = await getCoinGeckoPriceUSD("pyth-network");
 
