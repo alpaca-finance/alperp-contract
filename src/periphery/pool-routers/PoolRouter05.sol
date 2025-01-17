@@ -325,7 +325,17 @@ contract PoolRouter05 is ReentrancyGuardUpgradeable, OwnableUpgradeable {
     );
     wNativeRelayer.withdraw(_amountOut);
 
-    payable(_receiver).transfer(_amountOut);
+    // slither-disable-next-line arbitrary-send-eth
+    // To mitigate potential attacks, the call method is utilized,
+    // allowing the contract to bypass any revert calls from the destination address.
+    // By setting the gas limit to 2300, equivalent to the gas limit of the transfer method,
+    // the transaction maintains a secure execution."
+    (bool success, ) = _receiver.call{ value: _amountOut, gas: 2300 }("");
+    // send WNative instead when native token transfer fail
+    if (!success) {
+      WNATIVE.deposit{ value: _amountOut }();
+      WNATIVE.transfer(_receiver, _amountOut);
+    }
   }
 
   receive() external payable {

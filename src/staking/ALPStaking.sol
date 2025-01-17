@@ -27,6 +27,7 @@ import {IStaking} from "./interfaces/IStaking.sol";
 contract ALPStaking is IStaking, OwnableUpgradeable {
   using SafeERC20Upgradeable for IERC20Upgradeable;
 
+  error ALPStaking_NotMsgSender();
   error ALPStaking_UnknownStakingToken();
   error ALPStaking_InsufficientTokenAmount();
   error ALPStaking_NotRewarder();
@@ -132,6 +133,7 @@ contract ALPStaking is IStaking, OwnableUpgradeable {
   }
 
   function deposit(address to, address token, uint256 amount) external {
+    if (to != msg.sender) revert ALPStaking_NotMsgSender();
     if (stakingToken != token) revert ALPStaking_UnknownStakingToken();
 
     uint256 length = stakingTokenRewarders[token].length;
